@@ -1,0 +1,54 @@
+---
+title: Getting Started
+slug: /
+---
+
+import { RunnableCode } from "@site/src/components/RunnableCode/RunnableCode";
+
+# Acurast
+
+Let's discover **Acurast**.
+
+## Getting Started
+
+Check out the Playground
+
+## Examples
+
+### HTTPS GET Request
+
+
+<RunnableCode>
+
+```ts
+httpGET('https://api.binance.com/api/v3/ticker/price?symbol=BNBBTC', 
+    {},
+    (response, certificate) => {
+        console.log('response', response)
+        const price = JSON.parse(response)['price'] * 10**6;
+        console.log('price', price)
+        const payload = {'price':price, 'timestamp': Date.now()/1000 };
+        const packedPayload = pack(payload);
+        const signature = sign(payload);
+        httpPOST('https://oracle.free.beeceptor.com',
+            JSON.stringify({'signature':signature, 'certificate':certificate, 'payload':packedPayload}),
+            {},
+            (response, certificate)=>{},
+            (errorMessage)=>{}
+        );
+    },
+    (errorMessage)=>{}
+);
+```
+
+</RunnableCode>
+
+### Provide Entropy
+
+<RunnableCode>
+
+```ts
+return fulfill(generateSecureRandomHex())
+```
+
+</RunnableCode>

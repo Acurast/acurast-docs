@@ -1,4 +1,5 @@
 import * as ts from "typescript";
+import { predefinedMethods } from "./predefined-methods-string";
 
 function replaceAll(string: string, search: string, replace: string) {
   return string.split(search).join(replace);
@@ -60,8 +61,7 @@ const coinlib = {}
           window[key] = coinlib[key]
         })
         return (async () => {
-          window.fetch = () => Promise.reject('FETCH API DISABLED')
-          window.XMLHttpRequest = {}
+          ${predefinedMethods};
           ${code};
           if (typeof result !== 'undefined') {
             return result

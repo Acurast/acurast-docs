@@ -8,7 +8,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Acurast Docs',
-  tagline: '',
+  tagline: 'On Demand Oracle Machine',
   url: 'https://docs.acurast.com',
   baseUrl: '/',
   onBrokenLinks: 'throw',

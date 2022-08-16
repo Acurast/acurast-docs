@@ -12,6 +12,10 @@ const defaultCode = `// This is an example
 const test = 'Acurast'
 
 console.log(test)
+
+console.log('fulfill', fulfill())
+console.log('ownAddress', ownAddress())
+console.log('generateSecureRandomHex', generateSecureRandomHex())
 `;
 
 function Playground() {
