@@ -10,7 +10,7 @@ const config = {
   title: 'Acurast Docs',
   tagline: 'On Demand Oracle Machine',
   url: 'https://docs.acurast.com',
-  baseUrl: '/',
+  baseUrl: '/acurast-docs/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'throw',
   favicon: 'img/favicon.ico',
