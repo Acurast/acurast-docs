@@ -151,9 +151,6 @@ const internalFetch = (config, symbols) => {
 }
 
 const median = (values) => {
-    if (!values) {
-        return []
-    }
     values.sort((a,b) => a-b)
 
     if (values.length%2 == 0){

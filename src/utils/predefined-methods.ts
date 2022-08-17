@@ -1,53 +1,83 @@
-export const fulfill = (payload: any) => { console.log('fulfill', payload); return payload }
+export const fulfill = (payload: any) => {
+  console.log("fulfill", payload);
+  return payload;
+};
 
-export const pack = (payload: any) => { console.log('pack'); return payload }
+export const pack = (payload: any) => {
+  console.log("pack");
+  return payload;
+};
 
-export const sign = (payload: any) => { console.log('sign'); return payload }
+export const sign = (payload: any) => {
+  console.log("sign");
+  return payload;
+};
 
-export const httpGET = async (url: string, headers: any, successCallback: (response: any, certificate?: any, payload?: any) => string, errorCallback: (error: Error)=> void) => {
-    console.log('httpGET')
-    const response = await fetch('https://cors-proxy.airgap.prod.gke.papers.tech/proxy?url=' + url, {
-        method: 'GET',
-        mode: 'cors',
-        headers: headers,
-      });
-      // TODO: Handle non-json responses
-      const json = response.json()
-      json.then(res => {console.log(res)
-        successCallback(JSON.stringify(res))
-    })
-      console.log('httpGET', json)
-      return json;
-}
+export const httpGET = async (
+  url: string,
+  headers: any,
+  successCallback: (response: any, certificate?: any, payload?: any) => string,
+  errorCallback: (error: Error) => void
+) => {
+  console.log("httpGET");
+  const response = await fetch(
+    "https://cors-proxy.airgap.prod.gke.papers.tech/proxy?url=" + url,
+    {
+      method: "GET",
+      mode: "cors",
+      headers: headers,
+    }
+  );
+  // TODO: Handle non-json responses
+  const jsonPromise = response.json();
+  jsonPromise.then((res) => {
+    console.log('response', res);
+    successCallback(JSON.stringify(res));
+  });
 
-export const httpPOST = async (url: string, body: any, headers: any, successCallback: (payload: any, certificate?: any, response?: any) => string, errorCallback: (error: Error)=> void) => {
-    console.log('httpPOST')
-    const response = await fetch(url, {
-        method: 'POST',
-        mode: 'cors',
-        headers: headers,
-        body: body
-      });
+  return jsonPromise;
+};
 
-      const text = response.text()
+export const httpPOST = async (
+  url: string,
+  body: any,
+  headers: any,
+  successCallback: (payload: any, certificate?: any, response?: any) => string,
+  errorCallback: (error: Error) => void
+) => {
+  console.log("httpPOST");
+  const response = await fetch(url, {
+    method: "POST",
+    mode: "cors",
+    headers: headers,
+    body: body,
+  });
 
-      text.then(res => {
-        successCallback(res)
-      })
+  const text = response.text();
 
-      return text;
-}
+  text.then((res) => {
+    successCallback(res);
+  });
 
-export const attest = (nonce: string, successCallback: (payload: any, certificate: any, response: any) => string, errorCallback: (error: Error)=> void) => {
-    console.log('attest');
-}
+  return text;
+};
+
+export const attest = (
+  nonce: string,
+  successCallback: (payload: any, certificate: any, response: any) => string,
+  errorCallback: (error: Error) => void
+) => {
+  console.log("attest");
+};
 
 export const ownAddress = () => {
-    return 'tz1xxxxxxx'
-}
+  return "tz1xxxxxxx";
+};
 
 export const generateSecureRandomHex = (): string => {
-    var buf = new Uint8Array(4);
-    window.crypto.getRandomValues(buf);
-    return Array.from(buf).map(x => x.toString(16)).join('')
-}
+  var buf = new Uint8Array(4);
+  window.crypto.getRandomValues(buf);
+  return Array.from(buf)
+    .map((x) => x.toString(16))
+    .join("");
+};
