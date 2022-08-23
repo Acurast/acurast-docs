@@ -21,18 +21,23 @@ export const httpGET = async (
 ) => {
   console.log("httpGET");
   const response = await fetch(
-    "https://cors-proxy.airgap.prod.gke.papers.tech/proxy?url=" + url,
+    "https://cors-proxy.airgap.prod.gke.papers.tech/proxy-with-fingerprint?url=" +
+      url,
     {
       method: "GET",
       mode: "cors",
       headers: headers,
     }
   );
+
   // TODO: Handle non-json responses
   const jsonPromise = response.json();
   jsonPromise.then((res) => {
-    console.log('response', res);
-    successCallback(JSON.stringify(res));
+    console.log("response", res);
+    successCallback(
+      JSON.stringify(res),
+      response.headers.get("X-Fingerprint256")
+    );
   });
 
   return jsonPromise;

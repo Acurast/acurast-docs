@@ -92,13 +92,13 @@ const BINANCE_US_TEMPLATE = `https://api.binance.us/api/v3/klines?symbol=<<SYMBO
 const COINBASE_TEMPLATE = `https://api.pro.coinbase.com/products/<<SYMBOL>>/candles?granularity=900&start=${PREVIOUS_EPOCH_START_ISO}&end=${PREVIOUS_EPOCH_END_ISO}`
 const BITFINEX_TEMPLATE = `https://api-pub.bitfinex.com/v2/candles/trade:15m:t<<SYMBOL>>/hist?start=${PREVIOUS_EPOCH_START_MILLIS}&end=${PREVIOUS_EPOCH_END_MILLIS}`
 
-const BINANCE_CONFIG = { 'url': BINANCE_TEMPLATE, 'exchange_id': 'BNN', 'timestamp_factor': 1, 'timestamp_index': 0, 'close_index': 4, 'certificate': '7fb8a999a18ad88559cbceb886f5e029324ac3848a0b6b44dbd1747f4fd58feb' }
-const KUCOIN_CONFIG = { 'url': KUCOIN_TEMPLATE, 'exchange_id': 'KUC', 'timestamp_factor': 1000, 'timestamp_index': 0, 'close_index': 2, 'certificate': 'd0e255e2dd1b6888a3d2eb2f844fb5f7a6cc70dbfbed25c0b8be5576985336a9' }
-const GATE_IO_CONFIG = { 'url': GATE_IO_TEMPLATE, 'exchange_id': 'GAT', 'timestamp_factor': 1000, 'timestamp_index': 0, 'close_index': 2, 'certificate': 'a519944feacca0bfecac4f6edbc04ea1f161dc8cb4658a2768a9dc56d5cdddf9' }
+const BINANCE_CONFIG = { 'url': BINANCE_TEMPLATE, 'exchange_id': 'BNN', 'timestamp_factor': 1, 'timestamp_index': 0, 'close_index': 4, 'certificate': '0D:ED:57:7F:B9:1B:4C:8E:B2:36:50:10:4A:BA:08:FF:6C:86:77:75:4E:32:8D:02:09:E1:BE:F3:42:7B:BD:D4' }
+const KUCOIN_CONFIG = { 'url': KUCOIN_TEMPLATE, 'exchange_id': 'KUC', 'timestamp_factor': 1000, 'timestamp_index': 0, 'close_index': 2, 'certificate': 'A7:3F:12:F8:0A:A1:87:C0:97:86:B1:E1:0E:03:73:9C:3C:71:73:44:DA:32:C7:77:21:57:0F:48:5C:FC:18:6F' }
+const GATE_IO_CONFIG = { 'url': GATE_IO_TEMPLATE, 'exchange_id': 'GAT', 'timestamp_factor': 1000, 'timestamp_index': 0, 'close_index': 2, 'certificate': '45:8B:33:B8:2F:54:69:32:7B:FB:0B:02:51:29:08:E6:6F:62:BA:2E:93:0A:F7:9E:CB:03:07:C2:E8:E9:DC:74' }
 
-const BINANCE_US_CONFIG = {'url':BINANCE_US_TEMPLATE,'exchange_id':'BNU', 'timestamp_factor':1, 'timestamp_index':0, 'close_index':4, 'certificate': 'b68fb71edd6b691a42a5d79b1bc4df225782229112ed52f1ba3c1ded258c8e31' }
-const COINBASE_CONFIG = {'url':COINBASE_TEMPLATE, 'exchange_id':'CBP', 'timestamp_factor':1000, 'timestamp_index':0, 'close_index':4, 'certificate': 'd6487de59f4bbf86bc432f81904fecff028350e8f5bf08eb1fe617b7a161c5ca'}
-const BITFINEX_CONFIG = {'url':BITFINEX_TEMPLATE, 'exchange_id':'BFX', 'timestamp_factor':1,'timestamp_index':0, 'close_index':2, 'certificate': 'ab7283ac13db585fe1e4ea00fdc132bbbfa0138ada9dfe17867d8dc6cf5e70ef' }
+const BINANCE_US_CONFIG = {'url':BINANCE_US_TEMPLATE,'exchange_id':'BNU', 'timestamp_factor':1, 'timestamp_index':0, 'close_index':4, 'certificate': '9E:94:90:DB:57:6D:B8:17:A4:68:C4:30:9D:83:76:C1:49:04:26:C1:2E:55:93:9D:E0:92:A6:13:16:14:E0:FA' }
+const COINBASE_CONFIG = {'url':COINBASE_TEMPLATE, 'exchange_id':'CBP', 'timestamp_factor':1000, 'timestamp_index':0, 'close_index':4, 'certificate': '8B:70:72:2E:AE:DC:63:68:D9:EA:59:6F:B3:30:C1:E7:F8:5F:30:81:8D:7C:90:05:73:BC:64:04:61:D1:03:03'}
+const BITFINEX_CONFIG = {'url':BITFINEX_TEMPLATE, 'exchange_id':'BFX', 'timestamp_factor':1,'timestamp_index':0, 'close_index':2, 'certificate': '57:E3:2B:C3:C5:AC:D8:86:E4:E4:25:9C:CB:A2:40:29:1F:07:7D:E1:61:21:2B:0F:B0:EC:8E:71:4A:82:C8:D1' }
 
 const INITIAL_PRICES = {
     'AAVEUSD': 150.80,
@@ -129,7 +129,7 @@ const internalFetch = (config, symbols) => {
                         response = response['data']
                     }
 
-                    /* if(certificate === config.certificate){ */
+                    if(certificate === config.certificate){
                         const payload = {
                             'symbol': symbol.replace("-", "").replace("_", "").replace("UST", "USDT"),
                             'exchange_id': config.exchange_id,
@@ -138,9 +138,9 @@ const internalFetch = (config, symbols) => {
                             'certificate': certificate
                         }
                         resolve(payload)
-                    /* } else {
+                    } else {
                         reject("certificate does not match")
-                    }                     */
+                    }
                 },
                 (errorMessage) => {
                     reject(errorMessage)
