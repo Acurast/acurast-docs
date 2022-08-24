@@ -2,45 +2,44 @@
 // Note: type annotations allow type checking and IDEs autocompletion
 const path = require("path");
 
-const lightCodeTheme = require('prism-react-renderer/themes/github');
-const darkCodeTheme = require('prism-react-renderer/themes/dracula');
+const lightCodeTheme = require("prism-react-renderer/themes/github");
+const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'Acurast Docs',
-  tagline: 'On Demand Oracle Machine',
-  url: 'https://docs.acurast.com',
-  baseUrl: '/acurast-docs/',
-  onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'throw',
-  favicon: 'img/favicon.ico',
+  title: "Acurast Docs",
+  tagline: "On Demand Oracle Machine",
+  url: "https://docs.acurast.com",
+  baseUrl: "/",
+  onBrokenLinks: "throw",
+  onBrokenMarkdownLinks: "throw",
+  favicon: "img/favicon.ico",
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'acurast', // Usually your GitHub org/user name.
-  projectName: 'acurast-docs', // Usually your repo name.
+  organizationName: "acurast", // Usually your GitHub org/user name.
+  projectName: "acurast-docs", // Usually your repo name.
 
   // Even if you don't use internalization, you can use this field to set useful
   // metadata like html lang. For example, if your site is Chinese, you may want
   // to replace "en" with "zh-Hans".
   i18n: {
-    defaultLocale: 'en',
-    locales: ['en'],
+    defaultLocale: "en",
+    locales: ["en"],
   },
 
   presets: [
     [
-      'classic',
+      "classic",
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
           routeBasePath: "/",
-          sidebarPath: require.resolve('./sidebars.js'),
-          editUrl:
-            'https://github.com/acurast/acurast-docs/',
+          sidebarPath: require.resolve("./sidebars.js"),
+          editUrl: "https://github.com/acurast/acurast-docs/",
         },
         theme: {
-          customCss: require.resolve('./src/css/custom.css'),
+          customCss: require.resolve("./src/css/custom.css"),
         },
       }),
     ],
@@ -50,10 +49,10 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       navbar: {
-        title: 'Acurast',
+        title: "Acurast",
         logo: {
-          alt: 'My Site Logo',
-          src: 'img/logo.svg',
+          alt: "My Site Logo",
+          src: "img/logo.svg",
         },
         items: [
           // {
@@ -64,26 +63,26 @@ const config = {
           // },
           { to: "/playground/", label: "Playground", position: "right" },
           {
-            href: 'https://github.com/acurast/acurast-docs',
-            label: 'GitHub',
-            position: 'right',
+            href: "https://github.com/acurast/acurast-docs",
+            label: "GitHub",
+            position: "right",
           },
         ],
       },
       footer: {
-        style: 'dark',
+        style: "dark",
         links: [
           {
-            title: 'Docs',
+            title: "Docs",
             items: [
               {
-                label: 'Getting started',
-                to: '/',
+                label: "Getting started",
+                to: "/",
               },
             ],
           },
           {
-            title: 'Community',
+            title: "Community",
             items: [
               // {
               //   label: 'Discord',
@@ -96,11 +95,11 @@ const config = {
             ],
           },
           {
-            title: 'More',
+            title: "More",
             items: [
               {
-                label: 'GitHub',
-                href: 'https://github.com/acurast/acurast-docs',
+                label: "GitHub",
+                href: "https://github.com/acurast/acurast-docs",
               },
             ],
           },
@@ -112,9 +111,7 @@ const config = {
         darkTheme: darkCodeTheme,
       },
     }),
-  plugins: [
-    path.join(__dirname, "/plugins/monaco-editor"),
-  ],
+  plugins: [path.join(__dirname, "/plugins/monaco-editor")],
 };
 
 module.exports = config;
