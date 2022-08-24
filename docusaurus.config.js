@@ -13,7 +13,7 @@ const config = {
   baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "throw",
-  favicon: "img/favicon.ico",
+  favicon: "img/favicon.svg",
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
@@ -49,10 +49,11 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       navbar: {
-        title: "Acurast",
+        title: "Docs",
         logo: {
-          alt: "My Site Logo",
-          src: "img/logo.svg",
+          alt: "Acurast",
+          src: "img/acurast_logo_dark.svg",
+          srcDark: "img/acurast_logo_light.svg",
         },
         items: [
           // {
@@ -88,10 +89,10 @@ const config = {
               //   label: 'Discord',
               //   href: 'https://discordapp.com/invite/docusaurus',
               // },
-              // {
-              //   label: 'Twitter',
-              //   href: 'https://twitter.com/docusaurus',
-              // },
+              {
+                label: "Twitter",
+                href: "https://twitter.com/acurastnetwork",
+              },
             ],
           },
           {
@@ -104,7 +105,7 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} Acurast`,
+        copyright: `Copyright © ${new Date().getFullYear()} Acurast Association`,
       },
       prism: {
         theme: lightCodeTheme,
