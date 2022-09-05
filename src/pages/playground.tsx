@@ -85,7 +85,7 @@ function Playground() {
   }
 
   return (
-    <Layout title="AirGap" description="AirGap Playground" noFooter={true}>
+    <Layout title="Acurast" description="Acurast Playground" noFooter={true}>
       <div className={classnames(styles.runbox)}>
         <button
           onClick={execute}

@@ -110,6 +110,7 @@ const config = {
       prism: {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
+        additionalLanguages: ["rust", "solidity"],
       },
     }),
   plugins: [path.join(__dirname, "/plugins/monaco-editor")],
