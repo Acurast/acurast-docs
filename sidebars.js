@@ -20,7 +20,7 @@ const sidebars = {
   docs: [
     "introduction",
     "developers",
-    "data-transmitters",
+    "acurast-transmitters",
     {
       type: "category",
       label: "Integrations",
