@@ -28,6 +28,7 @@ const sidebars = {
         "integrations/introduction",
         "integrations/substrate",
         "integrations/substrate-evm",
+        "integrations/substrate-wasm",
       ],
       collapsed: false,
     },
