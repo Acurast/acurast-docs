@@ -19,7 +19,12 @@ const sidebars = {
   // But you can create a sidebar manually
   docs: [
     "introduction",
-    "developers",
+    {
+      type: "category",
+      label: "Developers",
+      items: ["developers/introduction", "developers/get-started"],
+      collapsed: false,
+    },
     "acurast-transmitters",
     {
       type: "category",
