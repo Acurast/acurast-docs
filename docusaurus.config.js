@@ -64,7 +64,7 @@ const config = {
           // },
           { to: "/playground/", label: "Playground", position: "right" },
           {
-            href: "https://github.com/acurast/acurast-docs",
+            href: "https://github.com/acurast/",
             label: "GitHub",
             position: "right",
           },
