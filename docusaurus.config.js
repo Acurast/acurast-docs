@@ -112,6 +112,7 @@ const config = {
         darkTheme: darkCodeTheme,
         additionalLanguages: ["rust", "solidity"],
       },
+      image: "img/social-preview.png",
     }),
   plugins: [path.join(__dirname, "/plugins/monaco-editor")],
 };
