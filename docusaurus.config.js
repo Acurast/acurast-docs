@@ -82,15 +82,15 @@ const config = {
               },
               {
                 label: "Developers",
-                to: "/developers/introduction",
+                to: "developers/introduction",
               },
               {
                 label: "Data Transmitters",
-                to: "/acurast-transmitters",
+                to: "acurast-transmitters",
               },
               {
                 label: "Integrations",
-                to: "/integrations/introductions",
+                to: "integrations/introduction",
               },
             ],
           },
