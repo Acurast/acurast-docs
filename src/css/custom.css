@@ -34,3 +34,6 @@
   --ifm-color-primary-lighter: #8085fe;
   --ifm-color-primary-lightest: #b1b4ff;
 }
+.footer--dark {
+  --ifm-footer-background-color: #0f0f0f;
+}

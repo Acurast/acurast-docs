@@ -77,21 +77,41 @@ const config = {
             title: "Docs",
             items: [
               {
-                label: "Getting started",
+                label: "Introduction",
                 to: "/",
+              },
+              {
+                label: "Developers",
+                to: "/developers/introduction",
+              },
+              {
+                label: "Data Transmitters",
+                to: "/acurast-transmitters",
+              },
+              {
+                label: "Integrations",
+                to: "/integrations/introductions",
               },
             ],
           },
           {
             title: "Community",
             items: [
-              // {
-              //   label: 'Discord',
-              //   href: 'https://discordapp.com/invite/docusaurus',
-              // },
+              {
+                label: "Discord",
+                href: "https://discord.gg/wqgC6b6aKe",
+              },
+              {
+                label: "Telegram",
+                href: "https://t.me/acurastnetwork",
+              },
               {
                 label: "Twitter",
                 href: "https://twitter.com/acurastnetwork",
+              },
+              {
+                label: "Medium",
+                href: "https://acurast.medium.com/",
               },
             ],
           },
@@ -100,7 +120,7 @@ const config = {
             items: [
               {
                 label: "GitHub",
-                href: "https://github.com/acurast/acurast-docs",
+                href: "https://github.com/acurast/",
               },
             ],
           },
