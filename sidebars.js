@@ -34,6 +34,7 @@ const sidebars = {
         "integrations/substrate",
         "integrations/substrate-evm",
         "integrations/substrate-wasm",
+        "integrations/tezos",
       ],
       collapsed: false,
     },
