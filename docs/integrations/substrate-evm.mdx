@@ -9,7 +9,7 @@ Acurast can be used on Substrate with an EVM integration. The output of the Acur
 
 ### Example integration with EVM parachain
 
-The following example shows a possible integration approach for an EVM parachain, using [frontier](https://github.com/paritytech/frontier).
+The following example shows a possible integration approach for an EVM parachain using [frontier](https://github.com/paritytech/frontier).
 
 The example shows how to route the fulfillment's pyload to a smart contract by calling the `fulfill` mehod on it and passing the payload bytes are argument.
 
@@ -41,7 +41,7 @@ impl pallet_acurast::FulfillmentRouter<Runtime> for AcurastRouter {
 		origin: frame_system::pallet_prelude::OriginFor<Runtime>,
 		from: <Runtime as frame_system::Config>::AccountId,
 		fulfillment: pallet_acurast::Fulfillment,
-		registration: pallet_acurast::Registration<AcurastRegistrationExtra>,
+		registration: pallet_acurast::JobRegistrationFor<Runtime>,
 		requester: <<Runtime as frame_system::Config>::Lookup as StaticLookup>::Target,
 	) -> DispatchResultWithPostInfo {
 		let from_bytes: [u8; 32] = from.try_into().unwrap();
@@ -91,6 +91,7 @@ impl pallet_acurast::Config for Runtime {
 	type Event = Event;
 	type RegistrationExtra = AcurastRegistrationExtra;
 	type FulfillmentRouter = AcurastRouter;
+	...
 }
 
 // Create the runtime by composing the FRAME pallets that were previously configured.

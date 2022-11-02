@@ -18,6 +18,7 @@ pub enum ContractMethodSelector {
 	Default,
 	Custom([u8; 4]),
 }
+
 impl ContractMethodSelector {
 	fn into_fixed_bytes(self) -> [u8; 4] {
 		match self {
@@ -26,29 +27,32 @@ impl ContractMethodSelector {
 		}
 	}
 }
+
 #[derive(RuntimeDebug, Encode, Decode, MaxEncodedLen, TypeInfo, Clone, PartialEq, Eq)]
 pub struct RegistrationExtra {
 	pub contract_address: AccountId,
 	pub selector: ContractMethodSelector,
 }
+
 parameter_types! {
 	pub const MaxAllowedSources: u16 = 100;
 	pub AllowedRevocationListUpdate: Vec<AccountId> = vec![];
 }
+
 impl pallet_acurast::Config for Runtime {
 	type Event = Event;
 	type RegistrationExtra = RegistrationExtra;
 	type FulfillmentRouter = AcurastRouter;
-	type MaxAllowedSources = MaxAllowedSources;
-	type AllowedRevocationListUpdate = AllowedRevocationListUpdate;
+	...
 }
+
 pub struct AcurastRouter;
 impl pallet_acurast::FulfillmentRouter<Runtime> for AcurastRouter {
 	fn received_fulfillment(
 		origin: frame_system::pallet_prelude::OriginFor<Runtime>,
 		from: <Runtime as frame_system::Config>::AccountId,
 		fulfillment: pallet_acurast::Fulfillment,
-		registration: pallet_acurast::JobRegistration<AccountId, RegistrationExtra>,
+		registration: pallet_acurast::JobRegistrationFor<Runtime>,
 		requester: <<Runtime as frame_system::Config>::Lookup as StaticLookup>::Target,
 	) -> DispatchResultWithPostInfo {
 		Contracts::call(
@@ -67,6 +71,7 @@ impl pallet_acurast::FulfillmentRouter<Runtime> for AcurastRouter {
 		)
 	}
 }
+
 construct_runtime!(
 	pub enum Runtime where
 		Block = Block,
@@ -77,8 +82,10 @@ construct_runtime!(
 		...
 		// Contracts
 		Contracts: pallet_contracts,
+
 		// Acurast
 		Acurast: pallet_acurast,
+
 	}
 );
 ```
@@ -89,10 +96,14 @@ The following snippet of code shows a very basic WASM smart contract implemented
 
 ```rust
 #![cfg_attr(not(feature = "std"), no_std)]
+
 use ink_lang as ink;
+
 #[ink::contract]
 mod receiver {
+
     use ink_prelude::vec::Vec;
+
     /// Defines the storage of your contract.
     /// Add new fields to the below struct in order
     /// to add new static storage fields to your contract.
@@ -102,6 +113,7 @@ mod receiver {
         target: Option<AccountId>,
         payload: Option<Vec<u8>>,
     }
+
     impl Receiver {
         /// Constructor that initializes `source`, `target` and `payload` to `None`.
         ///
@@ -114,6 +126,7 @@ mod receiver {
                 payload: None,
             }
         }
+
         /// Simply stores the `source`, `target` and `payload` values.
         #[ink(message)]
         pub fn fulfill(&mut self, source: AccountId, target: AccountId, payload: Vec<u8>) {
@@ -121,6 +134,7 @@ mod receiver {
             self.target = Some(target);
             self.payload = Some(payload);
         }
+
         /// Simply returns the current value of our `source`, `target` and `payload`.
         #[ink(message)]
         pub fn get(&self) -> (Option<AccountId>, Option<AccountId>, Option<Vec<u8>>) {
