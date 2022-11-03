@@ -55,6 +55,7 @@ function Monaco(props) {
       <MonacoEditor
         {...props}
         editorWillMount={onEditorWillMount}
+        editorWillUnmount={() => undefined}
         editorDidMount={onEditorDidMount}
         theme={colorMode === 'dark' ? "vs-dark" : "vs-light"}
       />
