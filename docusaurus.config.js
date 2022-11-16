@@ -107,7 +107,7 @@ const config = {
               },
               {
                 label: "Twitter",
-                href: "https://twitter.com/acurastnetwork",
+                href: "https://twitter.com/Acurast",
               },
               {
                 label: "Medium",
