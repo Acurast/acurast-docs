@@ -26,6 +26,8 @@ const sidebars = {
       collapsed: false,
     },
     "acurast-transmitters",
+    "acurast-protocol",
+    "acurast-marketplace",
     {
       type: "category",
       label: "Integrations",
