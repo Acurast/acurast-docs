@@ -48,6 +48,12 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      algolia: {
+        appId: "UO421L1YVM",
+        apiKey: "13fccdc821ae6dd593e9cad8bb442ab7",
+        indexName: "acurast",
+        searchParameters: {},
+      },
       navbar: {
         title: "Docs",
         logo: {
