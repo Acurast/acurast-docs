@@ -1,7 +1,7 @@
 import * as ts from "typescript";
 import { predefinedMethods } from "./predefined-methods-string";
 
-function replaceAll(string: string, search: string, replace: string) {
+function replaceAll(string: string, search: string | RegExp, replace: string) {
   return string.split(search).join(replace);
 }
 
@@ -54,6 +54,7 @@ const coinlib = {}
   };
 
   code = replaceAll(code, "console.log(", "progress(");
+  code = code.replace(/(^|\s+)(print[(])/g, "progress(");
   code = removeImports(code);
   code = ts.transpile(`({
       run: async (coinlib: any, progress: any): string => {
