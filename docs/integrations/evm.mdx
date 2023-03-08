@@ -1,0 +1,165 @@
+---
+title: EVM Chains
+slug: /integrations/evm
+---
+
+import { RunnableCode } from "@site/src/components/RunnableCode/RunnableCode";
+import ThemedImage from "@theme/ThemedImage";
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
+# Ethereum Virtual Machine (EVM)
+
+Acurast can be used to provision off-chain data to EVM chains. For that, the `data consumer` creates a job that performs a given task and then registers it on Acurast.
+
+## Integration Example
+
+The following example shows a possible integration approach for an EVM chain.
+
+### Smart contract implementation
+
+Firstly, we implement and deploy the EVM contract. It will be a simple entropy provider, which receives entropy from an Acurast processor and exposes it to other contracts in the EVM environment.
+
+In this example, the contract expects the Acurast processor to be known in advance, though it could be added later, depending on how you want to assign your job to a processor.
+
+For simplicity purposes I will use the address **`0x176583fbcd4e378c138dea7a4630e7b2b759af96`** as a processor.
+
+[Deploy with Remix](https://remix.ethereum.org/#gist=b6c8ae97c33b35b13386e763f8db92b3)
+
+```solidity title="EntropyProvider.sol"
+// SPDX-License-Identifier: None
+pragma solidity ^0.8.0;
+
+contract EntropyProvider {
+    bytes entropy;
+    uint last_update;
+    address processor;
+
+    constructor(address _processor) {
+        processor = _processor;
+    }
+
+    /**
+     * Receive entropy (random bytes) from an Acurast job.
+     */
+    function receive_entropy(bytes memory _entropy) public {
+        // Ensures that only the processor can call this function
+        require(msg.sender == processor, "NOT_ALLOWED");
+        // Update entropy
+        entropy = _entropy;
+        last_update = block.timestamp;
+    }
+
+    /**
+     * A view that exposes the entropy to other contracts.
+     */
+    function consume_entropy(uint maxAge) public view returns (bytes memory) {
+        // Consumers can specify the maximum entropy age they are willing to accept
+        require(block.timestamp - last_update <= maxAge, "ENTROPY_TOO_OLD");
+
+        return entropy;
+    }
+}
+```
+Deployed contract example on goerli chain: [0x2c503cfba7178eb0ac2dc5df45279527d437657a](https://goerli.etherscan.io/address/0x2c503cfba7178eb0ac2dc5df45279527d437657a)
+
+### Job specification
+
+Now that the contract has been deployed, we can prepare the job script that will get executed by the processor to provision the entropy.
+
+The script below computes some random bytes securely and calls the function `receive_entropy` of the contract deployed above. The consumer can also specify the gas limit and maximum costs per gas unit.
+
+<RunnableCode>
+
+```javascript title="JobLogic.js"
+// Destination contract address
+const destination = "<0x evm_contract_address>";
+// Generate entropy
+const entropy = _STD_.random.generateSecureRandomHex();
+// Fulfill entropy
+_STD_.chains.ethereum.fulfill(
+    "https://rpc.ankr.com/eth_goerli",  // RPC
+    destination,                        // Destination contract address
+    entropy,                            // Payload
+    // Transaction parameters
+    {
+        methodSignature: "receive_entropy(bytes)",
+        gasLimit: "9000000",
+        maxFeePerGas: "255000000000",
+        maxPriorityFeePerGas: "2550000000",
+    },
+    // Success callback
+    (opHash) => {
+        print("Succeeded: " + opHash)
+    },
+    // Error callback
+    (err) => {
+        print("Failed: " + err)
+    },
+);
+```
+</RunnableCode>
+<div class="padding-vert--md"></div>
+
+Once you finish implementing the job script, you will have to publish it to IPFS. If you do not know what IPFS is, check out this link https://docs.ipfs.tech/concepts/what-is-ipfs.
+
+You can use [Pinata](https://app.pinata.cloud) to pin the script to the IPFS network.
+
+IPFS link example: [ipfs://QmPcSHumW7DFzBZ3VC9Yc8QuxnaJbfNB7BGKGrNDdn4S3w](https://cloudflare-ipfs.com/ipfs/QmPcSHumW7DFzBZ3VC9Yc8QuxnaJbfNB7BGKGrNDdn4S3w)
+
+### Job registration
+
+Currently, the job registration process requires some technical knowledge which may be difficult to understand by non developer users. We expect the simplify the process in a future release of https://console.acurast.com.
+
+For now, you can register a job by going to [https://polkadot.js.org](https://polkadot.js.org/apps/?rpc=wss://wss.collator-1.acurast.papers.tech/#/extrinsics) and following the steps below.
+
+1. In the extrinsics view, you will need to select extrinsic **`register`** from **`acurast`** pallet;
+2. Then you need to specify the IPFS script provisioned in [job specification section](#job-specification);
+
+<ThemedImage
+  sources={{
+    light: useBaseUrl("/guide/job-registration/step1.png"),
+    dark: useBaseUrl("/guide/job-registration/step1.png"),
+  }}
+/>
+
+<div class="padding-vert--md"></div>
+
+3. You will need to define the Job schedule and script limits:
+
+<ThemedImage
+  sources={{
+    light: useBaseUrl("/guide/job-registration/step2.png"),
+    dark: useBaseUrl("/guide/job-registration/step2.png"),
+  }}
+/>
+<div class="padding-vert--md"></div>
+
+4. You will also need to specify the reward asset that will be used to pay the processors, including the amount:
+
+<ThemedImage
+  width="70%"
+  sources={{
+    light: useBaseUrl("/guide/job-registration/step3.png"),
+    dark: useBaseUrl("/guide/job-registration/step3.png"),
+  }}
+/>
+
+<div class="padding-vert--md"></div>
+
+5. (Optional) You can assign processors directly to the job or restrict the processors by providing a minimum reputation score.
+
+<ThemedImage
+  sources={{
+    light: useBaseUrl("/guide/job-registration/step4.png"),
+    dark: useBaseUrl("/guide/job-registration/step4.png"),
+  }}
+/>
+
+<div class="padding-vert--md"></div>
+
+You can then register the job by clicking in the **`Submit Transaction`** button.
+
+Look at `Network` > `Explorer` and wait for the events:
+
+ - **`acurast.JobRegistrationStored`**
+ - **`acurastMarketplace.JobRegistrationMatched`**

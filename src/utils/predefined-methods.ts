@@ -86,3 +86,16 @@ export const generateSecureRandomHex = (): string => {
     .map((x) => x.toString(16))
     .join("");
 };
+
+export const _STD_ = {
+  chains: {
+    ethereum: {
+      fulfill: async (rpc: string, destination: string, payload: string, extra: Record<string, any>, onSuccess: (opHash: string) => void, onError: (err: any) => void) => {
+        onSuccess("0x0123456789");
+      }
+    }
+  },
+  random: {
+    generateSecureRandomHex,
+  }
+};
