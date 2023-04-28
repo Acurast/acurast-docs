@@ -10,7 +10,7 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
 <head>
   <meta
     name="description"
-    content="Acurast Docs. The Universe in Web3 - Data Delivered On Demand."
+    content="Acurast Docs. The Universe in Web3 - Universal Interoperability."
   />
 </head>
 
@@ -28,45 +28,72 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
 
 # Acurast Documentation
 
-### The Universe in Web3 - Data Delivered On Demand
+### The Universe in Web3 - Universal Interoperability
 
-#### Acurast is the stepping stone to unleash the next wave of Web3 innovation by bringing the real world to the Web3 world. {#introduction}
+#### Interconnecting Web2, Web3, AI, IoT through one unified platform.
 
-The Web3 problem, which is access to verifiable, interoperable, and accessible off-chain data.
+Universal interoperability, onboarding various distinct worlds on a single platform, the Acurast Universe.
 
-Acurast solves this by providing an infrastructure with a multi-chain first approach through its native interoperability layer. Developers gain access to a single abstraction layer that fulfils their off-chain data needs regardless of the ecosystem they develop for.
-
-By leveraging a trusted execution environment (TEE) that is verifiable on-chain, Acurast not only increases security, but it also lowers the required trust in individuals. This leads to lower entry barriers for both Acurast Transmitters and developers (data consumers).
-Furthermore, the trusted execution environment enables developers to generically specify Acurast Jobs, gaining not only access to off-chain data like price feeds, but also to offload computationally intensive tasks that cannot be performed on chain. These data points are made accessible on the Acurast Protocol and are always verifiable.
-
-By providing a protocol-native, permissionless marketplace, Acurast brings data transmitters and data consumers together and delivers a seamless experience, ultimately enabling a data economy. This marketplace is directly linked to the protocol-native reputation system which furthers the security of the ecosystem.
-
-<div class="padding-vert--md"></div>
+Acurast is a permissionless, decentralized blockchain orchestrating and scheduling the participants’ intentions and executes these in a confidential computing context. This provides developers with a distributed, highly scalable arbitrary computation engine ready to be used for the most security sensitive tasks. Allowing projects and enterprises to securely interoperate regardless of the underlying technology.
 
 <ThemedImage
-  alt="Docusaurus themed image"
+  width="800px"
   sources={{
-    light: useBaseUrl("/img/acurast-overview.png"),
-    dark: useBaseUrl("/img/acurast-overview_dark.png"),
+    light: useBaseUrl("/img/acurast-universe.gif"),
+    dark: useBaseUrl("/img/acurast-universe.gif"),
   }}
 />
 
-<div class="padding-vert--md"></div>
+## Architecture
 
-### Developers
+### Consumers
 
-Developers or Data Consumers are the ones that are in need of certain off-chain data or computation on-chain for their decentralized applications. Developers can define an Acurast Job that includes a Script which defines e.g, where data is being fetched from.
+Consumers or Developers are the ones that are in need of interoperability for their decentralized applications. Consumers can define in accessible Javascript code their requirements and get access to computational ressources through the Acurast Marketplace by being matched with Processors.
 
-More details for [Developers](/developers/introduction)
+[Developers →](/developers/introduction)
 
-### Acurast Transmitters
+### Processors
 
-Acurast Transmitters offer their computation to developers and process Acurast Jobs in the Acurast Trusted Virtual Machine that utilizes a Trusted Execution Environment which makes the ouput verifiable.
+Acurast Processors offer their computation to Consumers, fullfilling their interoperability requests and are in turn rewarded by the Consumers for executing and providing a verifiable output on the defined destination chain. At this stage Processors utilize dedicated Android mobile devices as the off-chain infrastructure and get onboarded within minutes.
 
-More details for [Acurast Transmitters](/acurast-transmitters/)
+[Processors →](/acurast-processors/)
 
-### Integrations
+### Marketplace
 
-Through integrations Acurast can manifest its interoperability where various blockchain ecosystem are being supported.
+The Acurast Marketplace is where the demand from Consumers for interoperability requests meets the supply of computational ressources from Processors. Consumers reward one or more Processor for the succesfull fullfillment of their request, through the Marketplace they are automatically matched based on the parameters defined by both sides.
 
-More details on [Integrations](/integrations/substrate)
+[Processors →](/acurast-marketplace/)
+
+## Interoperability Modules
+
+Through Acurast modular interoperability, four modules, focusing on different verticals are introduced. All of them leveraging Acurast's confidential computing layer and the Acurast Marketplace.
+
+### Enterprise - Web2
+
+Focused on the legacy **Web2** world, giving access to public or permissioned APIs and computation. Off-chain data and computation that is being brought on-chain in a verfiable way. Sometimes also reffered as "Oracle".
+
+[Enterprise →](/acurast-protocol/interoperability/enterprise)
+
+### Hyperdrive - Web3
+
+Seamless cross-chain communication between two **Web3** ecosystem, executing context completely trustlessly on an other chain through Acurast's computational layer.
+
+[Hyperdrive →](/acurast-protocol/interoperability/hyperdrive)
+
+### Singularity - AI
+
+Utilizing Aurast's decentralized confidential computing ressources for **Artificial Inteligence** language model learning in a trustless contact where the data context is not exposed.
+
+[Singularity →](/acurast-protocol/interoperability/singularity)
+
+### Mesh - IoT
+
+Leveraging the mobile device nature of the Acurast Processor with its built in Bluetooth modules for communication with **IoT** devices.
+
+[Mesh →](/acurast-protocol/interoperability/mesh)
+
+## Supported Ecosystems & Integrations
+
+As Acurast has interoperability at its core, it supports numerous ecosystem and multiple ways of extending support through integration in various environments such as EVM, WASM, Parachains and more.
+
+[Integrations →](/integrations/substrate)

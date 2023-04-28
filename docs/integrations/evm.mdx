@@ -9,19 +9,21 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
 
 # Ethereum Virtual Machine (EVM)
 
-Acurast can be used to provision off-chain data to EVM chains. For that, the `data consumer` creates a job that performs a given task and then registers it on Acurast.
+Acurast can be used to get access to computational ressources for various use cases and bring them to EVM chains. For that, the `Consumer` creates a Job that performs a given task on the Acurast Marketplace.
 
 ## Integration Example
 
 The following example shows a possible integration approach for an EVM chain.
 
-### Smart contract implementation
+### EVM smart contract implementation
 
-Firstly, we implement and deploy the EVM contract. It will be a simple entropy provider, which receives entropy from an Acurast processor and exposes it to other contracts in the EVM environment.
+The first step is the implementation and deployment of the EVM contract.
 
-In this example, the contract expects the Acurast processor to be known in advance, though it could be added later, depending on how you want to assign your job to a processor.
+The example used is a simple entropy provider, which receives entropy from an Acurast Processor and exposes it to other contracts in the EVM environment.
 
-For simplicity purposes I will use the address **`0x176583fbcd4e378c138dea7a4630e7b2b759af96`** as a processor.
+In this example, the contract expects the Acurast Processor to be known in advance, this can also be adapted at a later stage, depending on how you want to assign your Job to one or more Processors.
+
+For simplicity purposes, this example uses the address **`0x176583fbcd4e378c138dea7a4630e7b2b759af96`** as a Processor.
 
 [Deploy with Remix](https://remix.ethereum.org/#gist=b6c8ae97c33b35b13386e763f8db92b3)
 
@@ -60,13 +62,14 @@ contract EntropyProvider {
     }
 }
 ```
-Deployed contract example on goerli chain: [0x2c503cfba7178eb0ac2dc5df45279527d437657a](https://goerli.etherscan.io/address/0x2c503cfba7178eb0ac2dc5df45279527d437657a)
+
+Deployed contract example on Goerli chain: [0x2c503cfba7178eb0ac2dc5df45279527d437657a](https://goerli.etherscan.io/address/0x2c503cfba7178eb0ac2dc5df45279527d437657a)
 
 ### Job specification
 
-Now that the contract has been deployed, we can prepare the job script that will get executed by the processor to provision the entropy.
+Now that the contract has been deployed, we can prepare the script that will get executed by the Processor to provision the entropy.
 
-The script below computes some random bytes securely and calls the function `receive_entropy` of the contract deployed above. The consumer can also specify the gas limit and maximum costs per gas unit.
+The script below computes some random bytes securely and calls the function `receive_entropy` of the contract deployed above. The Consumer can also specify the gas limit and maximum costs per gas unit.
 
 <RunnableCode>
 
@@ -77,30 +80,31 @@ const destination = "<0x evm_contract_address>";
 const entropy = _STD_.random.generateSecureRandomHex();
 // Fulfill entropy
 _STD_.chains.ethereum.fulfill(
-    "https://rpc.ankr.com/eth_goerli",  // RPC
-    destination,                        // Destination contract address
-    entropy,                            // Payload
-    // Transaction parameters
-    {
-        methodSignature: "receive_entropy(bytes)",
-        gasLimit: "9000000",
-        maxFeePerGas: "255000000000",
-        maxPriorityFeePerGas: "2550000000",
-    },
-    // Success callback
-    (opHash) => {
-        print("Succeeded: " + opHash)
-    },
-    // Error callback
-    (err) => {
-        print("Failed: " + err)
-    },
+  "https://rpc.ankr.com/eth_goerli", // RPC
+  destination, // Destination contract address
+  entropy, // Payload
+  // Transaction parameters
+  {
+    methodSignature: "receive_entropy(bytes)",
+    gasLimit: "9000000",
+    maxFeePerGas: "255000000000",
+    maxPriorityFeePerGas: "2550000000",
+  },
+  // Success callback
+  (opHash) => {
+    print("Succeeded: " + opHash);
+  },
+  // Error callback
+  (err) => {
+    print("Failed: " + err);
+  }
 );
 ```
+
 </RunnableCode>
 <div class="padding-vert--md"></div>
 
-Once you finish implementing the job script, you will have to publish it to IPFS. If you do not know what IPFS is, check out this link https://docs.ipfs.tech/concepts/what-is-ipfs.
+Once you finish implementing the script, you will have to publish it to IPFS. If you do not know what IPFS is, check out this link https://docs.ipfs.tech/concepts/what-is-ipfs.
 
 You can use [Pinata](https://app.pinata.cloud) to pin the script to the IPFS network.
 
@@ -108,12 +112,12 @@ IPFS link example: [ipfs://QmPcSHumW7DFzBZ3VC9Yc8QuxnaJbfNB7BGKGrNDdn4S3w](https
 
 ### Job registration
 
-Currently, the job registration process requires some technical knowledge which may be difficult to understand by non developer users. We expect the simplify the process in a future release of https://console.acurast.com.
+Currently, the Job registration process requires some technical knowledge which may be difficult to understand by non developer users. The process will be simplified in a future release of https://console.acurast.com.
 
-For now, you can register a job by going to [https://polkadot.js.org](https://polkadot.js.org/apps/?rpc=wss://wss.collator-1.acurast.papers.tech/#/extrinsics) and following the steps below.
+At this stage, you can register a Job on [https://polkadot.js.org](https://polkadot.js.org/apps/?rpc=wss://wss.collator-1.acurast.papers.tech/#/extrinsics), follow these steps:
 
 1. In the extrinsics view, you will need to select extrinsic **`register`** from **`acurast`** pallet;
-2. Then you need to specify the IPFS script provisioned in [job specification section](#job-specification);
+2. Then you need to specify the IPFS script provisioned in [Job specification section](#job-specification);
 
 <ThemedImage
   sources={{
@@ -146,7 +150,7 @@ For now, you can register a job by going to [https://polkadot.js.org](https://po
 
 <div class="padding-vert--md"></div>
 
-5. (Optional) You can assign processors directly to the job or restrict the processors by providing a minimum reputation score.
+5. (Optional) You can assign processors directly to the Job or restrict the processors by providing a minimum reputation score.
 
 <ThemedImage
   sources={{
@@ -157,9 +161,9 @@ For now, you can register a job by going to [https://polkadot.js.org](https://po
 
 <div class="padding-vert--md"></div>
 
-You can then register the job by clicking in the **`Submit Transaction`** button.
+You can then register the Job by clicking in the **`Submit Transaction`** button.
 
 Look at `Network` > `Explorer` and wait for the events:
 
- - **`acurast.JobRegistrationStored`**
- - **`acurastMarketplace.JobRegistrationMatched`**
+- **`acurast.JobRegistrationStored`**
+- **`acurastMarketplace.JobRegistrationMatched`**

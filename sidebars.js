@@ -25,12 +25,30 @@ const sidebars = {
       items: ["developers/introduction", "developers/get-started"],
       collapsed: false,
     },
-    "acurast-transmitters",
-    "acurast-protocol",
+    "acurast-processors",
     "acurast-marketplace",
     {
       type: "category",
-      label: "Integrations",
+      label: "Acurast Protocol",
+      items: [
+        "acurast-protocol/introduction",
+        {
+          type: "category",
+          label: "Interoperability Modules",
+          items: [
+            "acurast-protocol/interoperability/enterprise",
+            "acurast-protocol/interoperability/hyperdrive",
+            "acurast-protocol/interoperability/singularity",
+            "acurast-protocol/interoperability/mesh",
+          ],
+          collapsed: false,
+        },
+      ],
+      collapsed: false,
+    },
+    {
+      type: "category",
+      label: "Ecosystems & Integrations",
       items: [
         "integrations/introduction",
         "integrations/substrate",

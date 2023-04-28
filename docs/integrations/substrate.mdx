@@ -7,7 +7,7 @@ slug: /integrations/substrate
 
 [GitHub Repository](https://github.com/Acurast/acurast-core)
 
-The Acurast Receiver Pallet allows a Substrate based chain to integrate the Acurast functionality to be able to securly receive real world data posted by the Acurast Transmitters.
+The Acurast Receiver Pallet allows a Substrate based chain to integrate the Acurast functionality to be able to securly receive real world data posted by the Acurast Processors.
 
 ### Introduction
 
@@ -110,7 +110,7 @@ It uses the XCMP protocol and XCM format for transmitting and interpreting messa
 Allows the registration of a job. A registration consists of:
 
 - An ipfs URL to a `script` (written in Javascript).
-  - The script will be run in the Acurast Trusted Virtual Machine that uses a Trusted Execution Environment (TEE) on the Acurast Data Transmitter.
+  - The script will be run in the Acurast Trusted Virtual Machine that uses a Trusted Execution Environment (TEE) on the Acurast Processors.
 - An optional `allowedSources` list of allowed sources.
   - A list of `AccountId`s that are allowed to `fulfill` the job. If no list is provided, all sources are accepted.
 - An `allowOnlyVerifiedSources` boolean indicating if only verified source can fulfill the job.

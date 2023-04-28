@@ -62,13 +62,12 @@ const config = {
           srcDark: "img/acurast_logo_light.svg",
         },
         items: [
-          // {
-          //   type: 'doc',
-          //   docId: 'intro',
-          //   position: 'left',
-          //   label: 'Tutorial',
-          // },
           { to: "/playground/", label: "Playground", position: "right" },
+          {
+            href: "https://console.acurast.com/",
+            label: "Acurast Console",
+            position: "right",
+          },
           {
             href: "https://github.com/acurast/",
             label: "GitHub",
@@ -91,8 +90,8 @@ const config = {
                 to: "developers/introduction",
               },
               {
-                label: "Data Transmitters",
-                to: "acurast-transmitters",
+                label: "Processors",
+                to: "acurast-processors",
               },
               {
                 label: "Integrations",
