@@ -37,3 +37,8 @@
 .footer--dark {
   --ifm-footer-background-color: #0f0f0f;
 }
+
+.flex {
+  display: flex;
+  column-gap: 40px;
+}
