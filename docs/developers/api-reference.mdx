@@ -1,0 +1,166 @@
+---
+title: API Reference
+slug: /developers/api-reference
+---
+
+# Standard API
+
+## HTTP
+
+A set of methods to allow the script to send HTTP requests.
+
+### GET
+
+A method that sends an HTTP GET request to a specified resource.
+
+```ts
+httpGET(
+    url: string; // The only supported protocol in the URL is `https://`
+    headers: Record<string, string>,
+    onSuccess: (response: string /* JSON string */, certificate: string /* hexadecimal */) => void,
+    onError: (err: any) => void
+)
+```
+### POST
+
+A method that sends an HTTP POST request to a specified resource.
+
+```ts
+httpPOST(
+    url: string; // The only supported protocol in the URL is `https://`
+    body: string; // JSON string
+    headers: Record<string, string>,
+    onSuccess: (response: string /* JSON string */, certificate: string /* hexadecimal */) => void,
+    onError: (err: any) => void
+)
+```
+
+## Utils
+
+Utility methods.
+
+### Generate random bytes
+
+```ts
+const entropy: string = generateSecureRandomHex()
+```
+
+## Chains
+
+Methods to interact and handle data from various Web3 ecosystems.
+
+```ts
+interface _STD_ {
+    chains: {
+        ethereum: {
+            fulfill: (
+                node: string,
+                destination: string, // hexadecimal
+                payload: string, // hexadecimal
+                config: {
+                    methodSignature: string?, // e.g. "fulfill(bytes)"
+                    gasLimit: string, // decimal
+                    maxPriorityFeePerGas: string, // decimal
+                    maxFeePerGas: string, // decimal
+                },
+                onSuccess: (opHash: string) => void,
+                onError: (err: any) => void
+            ) => void
+        };
+        substrate: {
+            codec: {
+                blakeTwo256: (message: string) => string // hexadecimal
+                encodeUnsignedNumber: (number: string | number, bit_length: 8 | 32 | 64 | 128) => string // hexadecimal
+                encodeCompactUnsignedNumber: (number: string | number) => string // hexadecimal
+                encodeBytes: (b: string | Uint8Array) => string // hexadecimal
+                encodeBoolean: (b: boolean) => string // hexadecimal
+                encodeAddress: (address: string) => string // hexadecimal
+                encode: /* generic */
+            };
+            contract: {
+                fulfill: (
+                    nodes: string[],
+                    callIndex: string, // hexadecimal representing the extrinsic to be called
+                    destination: string,
+                    payload: string, // hexadecimal
+                    config: {
+                        callIndex: string,              // hexadecimal
+                        method: string?,                // ink! contract method
+                        value: string?,                 // decimal
+                        refTime: string,                // decimal
+                        proofSize: string,              // decimal
+                        storageDepositLimit: string?,   // decimal
+                    },
+                    onSuccess: (opHash: string) => void,
+                    onError: (err: any) => void
+                ) => void
+            };
+            signer: {
+                setSigner: (curve: "P256" | "SECP256K1") => void;
+            };
+            fulfill: (
+                nodes: string[],
+                payload: string, // hexadecimal
+                config: {
+                    callIndex: string, // hexadecimal
+                },
+                onSuccess: (opHash: string) => void,
+                onError: (err: any) => void
+            ) => void
+        };
+        tezos: {
+            // T: boolean | string | number | T[]
+            encoding: {
+                pack: (value: T | Record<string, T>) => string, // hexadecimal
+                encodeExpr: (value: T | Record<string, T>) => string, // e.g. expr...
+            },
+            // Standard fulfill call. Calls entrypoint with the following signature `(pair int bytes)`
+            fulfill: (
+                nodes: string[],
+                payload: T | Record<string, T>, // hexadecimal
+                config: {
+                    entrypoint: string?,
+                    fee: string, // decimal
+                    gasLimit: string, // decimal
+                    storageLimit: string, // decimal
+                },
+                onSuccess: (opHash: string) => void,
+                onError: (err: any) => void
+            ) => void,
+            // Generic fulfill call
+            customCall: (
+                nodes: string[],
+                payload: T | Record<string, T>, // hexadecimal
+                config: {
+                    entrypoint: string?,
+                    fee: string, // decimal
+                    gasLimit: string, // decimal
+                    storageLimit: string, // decimal
+                },
+                onSuccess: (opHash: string) => void,
+                onError: (err: any) => void
+            ) => void
+        };
+    }
+}
+```
+
+## Application Information
+
+A set of methods and properties to access information about the processor application.
+
+```ts
+interface _STD_ {
+    app_info: {
+        version: string;
+    }
+}
+```
+
+### Version
+
+Access the application version.
+
+```ts
+_STD_.app_info.version
+```
