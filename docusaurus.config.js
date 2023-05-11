@@ -139,7 +139,20 @@ const config = {
       },
       image: "img/social-preview.png",
     }),
-  plugins: [path.join(__dirname, "/plugins/monaco-editor")],
+  plugins: [
+    path.join(__dirname, "/plugins/monaco-editor"),
+    [
+      "@docusaurus/plugin-client-redirects",
+      {
+        redirects: [
+          {
+            to: "/acurast-processors",
+            from: "/acurast-transmitters",
+          },
+        ],
+      },
+    ],
+  ],
 };
 
 module.exports = config;
