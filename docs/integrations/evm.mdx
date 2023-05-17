@@ -110,60 +110,6 @@ You can use [Pinata](https://app.pinata.cloud) to pin the script to the IPFS net
 
 IPFS link example: [ipfs://QmPcSHumW7DFzBZ3VC9Yc8QuxnaJbfNB7BGKGrNDdn4S3w](https://cloudflare-ipfs.com/ipfs/QmPcSHumW7DFzBZ3VC9Yc8QuxnaJbfNB7BGKGrNDdn4S3w)
 
-### Job registration
+## Job Registration
 
-Currently, the Job registration process requires some technical knowledge which may be difficult to understand by non developer users. The process will be simplified in a future release of https://console.acurast.com.
-
-At this stage, you can register a Job on [https://polkadot.js.org](https://polkadot.js.org/apps/?rpc=wss://wss.collator-1.acurast.papers.tech/#/extrinsics), follow these steps:
-
-1. In the extrinsics view, you will need to select extrinsic **`register`** from **`acurast`** pallet;
-2. Then you need to specify the IPFS script provisioned in [Job specification section](#job-specification);
-
-<ThemedImage
-  sources={{
-    light: useBaseUrl("/guide/job-registration/step1.png"),
-    dark: useBaseUrl("/guide/job-registration/step1.png"),
-  }}
-/>
-
-<div class="padding-vert--md"></div>
-
-3. You will need to define the Job schedule and script limits:
-
-<ThemedImage
-  sources={{
-    light: useBaseUrl("/guide/job-registration/step2.png"),
-    dark: useBaseUrl("/guide/job-registration/step2.png"),
-  }}
-/>
-<div class="padding-vert--md"></div>
-
-4. You will also need to specify the reward asset that will be used to pay the processors, including the amount:
-
-<ThemedImage
-  width="70%"
-  sources={{
-    light: useBaseUrl("/guide/job-registration/step3.png"),
-    dark: useBaseUrl("/guide/job-registration/step3.png"),
-  }}
-/>
-
-<div class="padding-vert--md"></div>
-
-5. (Optional) You can assign processors directly to the Job or restrict the processors by providing a minimum reputation score.
-
-<ThemedImage
-  sources={{
-    light: useBaseUrl("/guide/job-registration/step4.png"),
-    dark: useBaseUrl("/guide/job-registration/step4.png"),
-  }}
-/>
-
-<div class="padding-vert--md"></div>
-
-You can then register the Job by clicking in the **`Submit Transaction`** button.
-
-Look at `Network` > `Explorer` and wait for the events:
-
-- **`acurast.JobRegistrationStored`**
-- **`acurastMarketplace.JobRegistrationMatched`**
+Check out [How to get started with the Acurast Console](/developers/introduction#get-started) to register your Job.
