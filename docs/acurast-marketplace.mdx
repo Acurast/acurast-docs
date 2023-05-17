@@ -12,6 +12,16 @@ The marketplace is where the matching engine brings together the advertised reso
 
 Every agreement between processor and consumer are specified in an entity called Acurast Job (in short “job”). The job specifies a set of instructions that is run in the Trusted Execution Environment (TEE) of the processor, its scheduling parameters, the destination of where the resulting data is expected and the commercial terms, the pricing.
 
+<ThemedImage
+  alt="Docusaurus themed image"
+  sources={{
+    light: useBaseUrl("/img/acurast-marketplace-flow.png"),
+    dark: useBaseUrl("/img/acurast-marketplace-flow.png"),
+  }}
+/>
+
+<div class="padding-vert--md"></div>
+
 There are two flows central to the value exchange in Acurast:
 
 - The data flow
@@ -30,3 +40,69 @@ This need is covered by the processor. The processor is offering the service at 
 The consumer defines the budget for the execution made by the processor. It is up to the consumer, to define the currency, allowing them to use besides the native Acurast token also a stabelcoin such as USDt. This allows for clear budgeting on the execution of jobs for both the consumer and the processor.
 
 The processor will receive the payment automatically upon successful execution of the jobs, defined by the consumer.
+
+## Job Registration
+
+:::caution
+
+The process to register Jobs on the Acurast is now more user friendly.
+
+**Check out [How to get started with the Acurast Console](/developers/introduction#get-started).**
+
+:::
+
+<div class="padding-vert--md"></div>
+
+The Job registration process requires some technical knowledge which may be difficult to follow. A Job can be registered through the [https://polkadot.js.org](https://polkadot.js.org/apps/?rpc=wss://wss.collator-1.acurast.papers.tech/#/extrinsics), follow these steps:
+
+1. In the extrinsics view, you will need to select extrinsic **`register`** from **`acurast`** pallet.
+2. Then you need to set the IPFS of your script that you've uploaded.
+
+<ThemedImage
+  sources={{
+    light: useBaseUrl("/guide/job-registration/step1.png"),
+    dark: useBaseUrl("/guide/job-registration/step1.png"),
+  }}
+/>
+
+<div class="padding-vert--md"></div>
+
+3. You will need to define the Job schedule and script limits:
+
+<ThemedImage
+  sources={{
+    light: useBaseUrl("/guide/job-registration/step2.png"),
+    dark: useBaseUrl("/guide/job-registration/step2.png"),
+  }}
+/>
+<div class="padding-vert--md"></div>
+
+4. You will also need to specify the reward asset that will be used to pay the processors, including the amount:
+
+<ThemedImage
+  width="70%"
+  sources={{
+    light: useBaseUrl("/guide/job-registration/step3.png"),
+    dark: useBaseUrl("/guide/job-registration/step3.png"),
+  }}
+/>
+
+<div class="padding-vert--md"></div>
+
+5. (Optional) You can assign processors directly to the Job or restrict the processors by providing a minimum reputation score.
+
+<ThemedImage
+  sources={{
+    light: useBaseUrl("/guide/job-registration/step4.png"),
+    dark: useBaseUrl("/guide/job-registration/step4.png"),
+  }}
+/>
+
+<div class="padding-vert--md"></div>
+
+You can then register the Job by clicking in the **`Submit Transaction`** button.
+
+Look at `Network` > `Explorer` and wait for the events:
+
+- **`acurast.JobRegistrationStored`**
+- **`acurastMarketplace.JobRegistrationMatched`**
