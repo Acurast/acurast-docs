@@ -17,78 +17,83 @@ The first step is the implementation and deployment of the Tezos contract.
 
 The example used is a simple entropy provider written in SmartPy, which receives entropy from an Acurast Processor and exposes it to other contracts on Tezos.
 
+[**SmartPy IDE**](https://smartpy.io/ide?cid=QmQqJBcTzvxtELjDJKtrbk3KwuUXYzcxqJAZ4n7QWqjfC8&k=ef7176cc6737527d0616)
 ```py
 import smartpy as sp
 
-class EntropyProvider(sp.Contract):
-    def __init__(self):
-        self.init_type(
-            sp.TRecord(
-                governance_address = sp.TAddress,
-                entropy=sp.TBytes,
-                last_update=sp.TTimestamp,
-                processors=sp.TSet(sp.TAddress),
-                subscriptions=sp.TBigMap(sp.TAddress, sp.TTimestamp)
-            ).right_comb()
-        )
+@sp.module
+def main():
+    t_storage: type = sp.record(
+        governance_address = sp.address,
+        entropy=sp.bytes,
+        last_update=sp.timestamp,
+        processors=sp.set[sp.address],
+        subscriptions=sp.big_map[sp.address, sp.timestamp]
+    ).layout(("entropy", ("governance_address", ("last_update", ("processors", "subscriptions")))))
 
-    @sp.entrypoint(new_syntax=True)
-    def submit_entropy(self, entropy):
-        # Ensures that only the processor can call this function
-        assert self.data.processors.contains(sp.sender), "NOT_PROCESSOR"
-        # Update entropy
-        self.data.entropy = sp.blake2b(self.data.entropy + entropy)
-        self.data.last_update = sp.now
-
-    @sp.entrypoint()
-    def subscribe(self, address):
-        # The subscription is <block_timestamp> + <mutez amount>
-        ### Both values represent seconds
-        # 1 mutez = 1 second
-        # 1 tez = ~11.57 days
-
-        mutez_to_seconds = sp.fst(sp.ediv(sp.amount, sp.mutez(1)).open_some(sp.unit))
-        expiration = sp.add(sp.now, sp.to_int(mutez_to_seconds))
-        self.data.subscriptions[address] = expiration
-
-    @sp.entry_point(new_syntax=True)
-    def configure(self, actions):
-        # Only the governance address can call this entry point
-        assert self.data.governance_address == sp.sender, "NOT_ALLOWED"
-
-        # Perform actions
-        for action in actions:
-            with sp.match(action):
-                with sp.case.update_governance_address as governance_address:
-                    self.data.governance_address = governance_address
-                with sp.case.update_processors as update_processor_actions:
-                    for update_processor_action in update_processor_actions:
-                        with sp.match(update_processor_action):
-                            with sp.case.add as processor_address:
-                                self.data.processors.add(processor_address)
-                            with sp.case.remove as processor_address:
-                                self.data.processors.remove(processor_address)
+    class EntropyProvider(sp.Contract):
+        def __init__(self, initial_storage):
+            self.data = sp.cast(initial_storage, t_storage)
 
 
-    @sp.entry_point(new_syntax=True)
-    def withdraw(self, address):
-        # Only the governance address can call this entry point
-        assert self.data.governance_address == sp.sender, "NOT_ALLOWED"
-        # Transfer balance
-        sp.send(address, sp.balance)
+        @sp.entrypoint
+        def submit_entropy(self, entropy):
+            # Ensures that only the processor can call this function
+            assert self.data.processors.contains(sp.sender), "NOT_PROCESSOR"
+            # Update entropy
+            self.data.entropy = sp.blake2b(self.data.entropy + entropy)
+            self.data.last_update = sp.now
 
-    @sp.onchain_view()
-    def consume_entropy(self, max_age_in_seconds):
-        # Verify if the consumer has an active subscription
-        subscription = sp.compute(self.data.subscriptions.get(sp.sender, message = "NOT_SUBSCRIBED"))
-        sp.verify(subscription >= sp.now, "SUBSCRIPTION_EXPIRED")
-        # Consumers can specify the maximum entropy age they are willing to accept
-        sp.verify((sp.now - self.data.last_update) <= max_age_in_seconds, "ENTROPY_TOO_OLD")
-        sp.result(self.data.entropy)
+        @sp.entrypoint
+        def subscribe(self, address):
+            # The subscription is <block_timestamp> + <mutez amount>
+            ### Both values represent seconds
+            # 1 mutez = 1 second
+            # 1 tez = ~11.57 days
+
+            mutez_to_seconds = sp.fst(sp.ediv(sp.amount, sp.mutez(1)).unwrap_some())
+            expiration = sp.add(sp.now, sp.to_int(mutez_to_seconds))
+            self.data.subscriptions[address] = expiration
+
+        @sp.entry_point
+        def configure(self, actions):
+            # Only the governance address can call this entry point
+            assert self.data.governance_address == sp.sender, "NOT_ALLOWED"
+
+            # Perform actions
+            for action in actions:
+                with sp.match(action):
+                    with sp.case.update_governance_address as governance_address:
+                        self.data.governance_address = governance_address
+                    with sp.case.update_processors as update_processor_actions:
+                        for update_processor_action in update_processor_actions:
+                            with sp.match(update_processor_action):
+                                with sp.case.add as processor_address:
+                                    self.data.processors.add(processor_address)
+                                with sp.case.remove as processor_address:
+                                    self.data.processors.remove(processor_address)
+
+
+        @sp.entry_point
+        def withdraw(self, address):
+            # Only the governance address can call this entry point
+            assert self.data.governance_address == sp.sender, "NOT_ALLOWED"
+            # Transfer balance
+            sp.send(address, sp.balance)
+
+        @sp.onchain_view()
+        def consume_entropy(self, max_age_in_seconds):
+            # Verify if the consumer has an active subscription
+            subscription = self.data.subscriptions.get(sp.sender, error = "NOT_SUBSCRIBED")
+            assert subscription >= sp.now, "SUBSCRIPTION_EXPIRED"
+            # Consumers can specify the maximum entropy age they are willing to accept
+            assert (sp.now - self.data.last_update) <= max_age_in_seconds, "ENTROPY_TOO_OLD"
+
+            return self.data.entropy
 
 @sp.add_test(name = "EntropyProviderTest")
 def test():
-    scenario = sp.test_scenario()
+    scenario = sp.test_scenario(main)
 
     # Test accounts
     governance = sp.test_account("governance")
@@ -102,8 +107,7 @@ def test():
         processors = sp.set([processor1.address]),
         subscriptions = sp.big_map()
     )
-    contract = EntropyProvider()
-    contract.update_initial_storage(initial_storage)
+    contract = main.EntropyProvider(initial_storage)
 
     scenario += contract
 
@@ -117,25 +121,13 @@ def test():
         sender = processor1.address,
         now = sp.timestamp(100)
     )
-
-sp.add_compilation_target(
-    "EntropyProviderCompilation",
-    contract=EntropyProvider(),
-    storage=sp.record(
-        governance_address = sp.address("tz1XvqmBUa7SkUFRHSygUZsxMwh7i8GpV7iB"),
-        entropy = sp.bytes("0x"),
-        last_update = sp.timestamp(0),
-        processors = sp.set([]),
-        subscriptions = sp.big_map()
-    ),
-)
 ```
 
 ### Job specification
 
 Now that the contract has been deployed, we can prepare the script that will get executed by the Processor to provision the entropy.
 
-The script below computes some random bytes securely and calls the function `entropy` of the contract deployed above. The Consumer can also specify the gas limit and maximum costs per gas unit.
+The script below computes some random bytes securely and calls the function `submit_entropy` of the contract deployed above.
 
 <RunnableCode>
 
