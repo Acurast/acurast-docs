@@ -11,7 +11,7 @@ Acurast can be used on Substrate with an EVM integration. The output of the Acur
 
 The following example shows a possible integration approach for an EVM parachain using [frontier](https://github.com/paritytech/frontier).
 
-The example shows how to route the fulfillment's payload to a smart contract by calling the `fulfill` mehod on it and passing the payload bytes are argument.
+The example shows how to route the fulfillment's payload to a smart contract by calling the `fulfill` method on it and passing the payload bytes as argument.
 
 ```rust
 #[derive(RuntimeDebug, Encode, Decode, MaxEncodedLen, TypeInfo, Clone, PartialEq)]
