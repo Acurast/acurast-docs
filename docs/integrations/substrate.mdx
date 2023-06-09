@@ -7,11 +7,11 @@ slug: /integrations/substrate
 
 [GitHub Repository](https://github.com/Acurast/acurast-core)
 
-The Acurast Receiver Pallet allows a Substrate based chain to integrate the Acurast functionality to be able to securly receive real world data posted by the Acurast Processors.
+The Acurast Receiver Pallet allows a Substrate based chain to integrate the Acurast functionality to be able to securely receive real world data posted by the Acurast Processors.
 
 ### Introduction
 
-The Acurast Fullfilment Receiver Pallet, in combination with the [Acurast P256 crypto](https://github.com/Acurast/acurast-core/tree/main/p256-crypto) package, allows a Parachain to accepts direct fulfillments from Acurast Processors.
+The Acurast Fulfillment Receiver Pallet, in combination with the [Acurast P256 crypto](https://github.com/Acurast/acurast-core/tree/main/p256-crypto) package, allows a Parachain to accept direct fulfillments from Acurast Processors.
 
 The Pallet exposes one extrinsic.
 
@@ -60,7 +60,7 @@ impl OnFulfillment<Runtime> for FulfillmentHandler {
 }
 ```
 
-Provide and implementation of [OnFulfillment] to handle the received fulfillment. The implementation should check that the fulfillment is from a known Acurast Processor account id.
+Provide an implementation of [OnFulfillment] to handle the received fulfillment. The implementation should check that the fulfillment is from a known Acurast Processor account id.
 
 ## P256 crypto
 
@@ -96,7 +96,7 @@ impl frame_system::Config for Runtime {
 
 ## Acurast Proxy Pallet
 
-The Acurast Proxy Pallet is an additional feature and not needed to be implemented yet without the Acurast Marketplace being live on it's own Parachain.
+The Acurast Proxy Pallet is an additional feature and not needed to be implemented yet without the Acurast Marketplace being live on its own Parachain.
 
 The Pallet is meant to be integrated by other parachains to interact with the Acurast parachain and the marketplace.
 
@@ -113,7 +113,7 @@ Allows the registration of a job. A registration consists of:
   - The script will be run in the Acurast Trusted Virtual Machine that uses a Trusted Execution Environment (TEE) on the Acurast Processors.
 - An optional `allowedSources` list of allowed sources.
   - A list of `AccountId`s that are allowed to `fulfill` the job. If no list is provided, all sources are accepted.
-- An `allowOnlyVerifiedSources` boolean indicating if only verified source can fulfill the job.
+- An `allowOnlyVerifiedSources` boolean indicating if only verified sources can fulfill the job.
   - A verified source is one that has provided a valid key attestation.
 - An `extra` structure that can be used to provide custom parameters.
 
