@@ -1,0 +1,57 @@
+---
+title: Node Setup
+slug: /acurast-protocol/node-setup
+---
+
+Step by step guide on how to setup an Acurast node for the Rococo testnet.
+
+## Get the source code and build
+
+Clone the Acurast parachain source code from its Github repo:
+
+```sh
+git clone https://github.com/Acurast/acurast-substrate.git
+```
+
+Make sure to checkout the appropriate tag, `acurast-v0.1.1` at the  time of writing.
+
+```sh
+cd acurast-substrate
+git checkout acurast-v0.1.1
+```
+
+Before building, make sure the [Rust toolchain is installed](https://docs.substrate.io/install/rust-toolchain/).
+
+Build the node:
+
+```sh
+cargo build --release
+```
+
+Then run the node:
+
+```sh
+./target/release/acurast-node --rococo-runtime --bootnodes /ip4/138.201.85.115/tcp/40335/p2p/12D3KooWAYwTLAQu47uBmCvA1uYpJs7ND1mkoCJTdU1Z6VYqgTp1 --parachain-id 2239 --base-path /tmp/para/acurast --port 40335 --ws-port 8846 --rpc-port 8082 --unsafe-ws-external --rpc-methods=unsafe --rpc-external --rpc-cors=all -- --execution wasm --chain rococo.json --port 30345 --ws-port 9979
+```
+
+Replace the `/tmp/para/acurast` path to the location you want the chain data to be stored in. Also adapt the port numbers and the rpc/websocket options as necessary.
+
+The `rococo.json` file in the command above needs to be the Rococo chain spec and can be downloaded [here](https://github.com/paritytech/polkadot/tree/master/node/service/chain-specs).
+
+## Run as a Collator
+
+To run as a collator, first create and identity. One easy way to do it is to use the [subkey](https://docs.substrate.io/reference/command-line-tools/subkey/) tool.
+
+Then, when starting the node, add the `--collator` flag to the command used to run the node, e.g.:
+
+```sh
+./target/release/acurast-node --collator --rococo-runtime --bootnodes /ip4/138.201.85.115/tcp/40335/p2p/12D3KooWAYwTLAQu47uBmCvA1uYpJs7ND1mkoCJTdU1Z6VYqgTp1 --parachain-id 2239 --base-path /tmp/para/acurast --port 40335 --ws-port 8846 --rpc-port 8082 --unsafe-ws-external --rpc-methods=unsafe --rpc-external --rpc-cors=all -- --execution wasm --chain rococo.json --port 30345 --ws-port 9979
+```
+
+Then, setup the identity of the collator by calling the `author_insertKey` rpc as follow:
+
+```sh
+curl -vH 'Content-Type: application/json' --data '{ "jsonrpc":"2.0", "method":"author_insertKey", "params":["nmbs", "<SECRET_SEED>", "<PUBLIC_KEY>"],"id":1 }' http://localhost:8082
+```
+
+Where `<SECRET_SEED>` and `<PUBLIC_KEY>` should be replaced by the values of the generated identity.

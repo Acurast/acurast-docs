@@ -47,6 +47,7 @@ const sidebars = {
           ],
           collapsed: false,
         },
+        "acurast-protocol/node-setup",
       ],
       collapsed: false,
     },
