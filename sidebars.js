@@ -36,7 +36,6 @@ const sidebars = {
       label: "Acurast Protocol",
       items: [
         "acurast-protocol/introduction",
-        "acurast-protocol/node-setup",
         {
           type: "category",
           label: "Interoperability Modules",
@@ -48,6 +47,7 @@ const sidebars = {
           ],
           collapsed: false,
         },
+        "acurast-protocol/node-setup",
       ],
       collapsed: false,
     },
