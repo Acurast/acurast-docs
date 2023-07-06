@@ -27,35 +27,29 @@ use ink;
 
 #[ink::contract]
 mod receiver {
-use ink::prelude::vec::Vec;
-
-    /// Defines the storage of your contract.
-    /// Add new fields to the below struct in order
-    /// to add new static storage fields to your contract.
     #[ink(storage)]
     pub struct Receiver {
-        random_bytes: Vec<u8>,
+        price: u128,
     }
 
     impl Receiver {
         #[ink(constructor)]
         pub fn default() -> Self {
             Self {
-                random_bytes: Default::default(),
+                price: Default::default(),
             }
         }
 
         #[ink(message)]
-        pub fn fulfill(&mut self, bytes: Vec<u8>) {
-            self.random_bytes = bytes;
+        pub fn fulfill(&mut self, price: u128) {
+            self.price = price;
         }
 
         #[ink(message)]
-        pub fn get_bytes(&self) -> Vec<u8> {
-            self.random_bytes.clone()
+        pub fn get_price(&self) -> u128 {
+            self.price
         }
     }
-
 }
 
 ```
