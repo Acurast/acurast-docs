@@ -3,13 +3,22 @@ title: Substrate With WASM
 slug: /integrations/substrate-wasm
 ---
 
-# Substrate With WASM smart contract environment
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
 
-Acurast can be used to fulfill directly on smart contracts deployed on Substrate chains with [pallet-contracts](https://github.com/paritytech/substrate/tree/master/frame/contracts) integration.
+# Substrate With A WASM Smart Contract Environment
 
-### Example integration with WASM smart contract parachain
+Acurast can be used to fulfill directly to smart contracts deployed on Substrate chains with a [pallet-contracts](https://github.com/paritytech/substrate/tree/master/frame/contracts) integration.
 
-The following example shows a simple WASM smart contract implemented with [ink!](https://use.ink/) that can receive random bytes:
+### Example integration with a WASM smart contract
+
+The following example shows simple WASM smart contracts implemented with [ink!](https://use.ink/).
+
+Keep in mind that you can do much more with Acurast and get access to all interoperability modules besides these examples.
+
+<Tabs>
+  <TabItem value="price-feed" label="Price Feed" default>
+This example contract receives a result of the "Price Feed" template on the <a href="https://console.acurast.com/create" target="_blank">Acurast Console</a>.
 
 ```rust
 #![cfg_attr(not(feature = "std"), no_std)]
@@ -18,7 +27,7 @@ use ink;
 
 #[ink::contract]
 mod receiver {
-    use ink::prelude::vec::Vec;
+use ink::prelude::vec::Vec;
 
     /// Defines the storage of your contract.
     /// Add new fields to the below struct in order
@@ -46,30 +55,141 @@ mod receiver {
             self.random_bytes.clone()
         }
     }
+
 }
+
 ```
 
-It is possible to directly call the fulfill method from the processors. The example script below shows how to call the above smart contract:
+  </TabItem>
+
+  <TabItem value="randomness" label="Verifiable Randomness">
+This example contract receives random bytes of the "Verifiable Randomness" template on the <a href="https://console.acurast.com/create" target="_blank">Acurast Console</a>.
+
+```rust
+#![cfg_attr(not(feature = "std"), no_std)]
+
+use ink;
+
+#[ink::contract]
+mod receiver {
+
+    #[ink(storage)]
+
+    pub struct Receiver {
+
+        price: u128,
+
+    }
+
+    /// Defines the storage of your contract.
+    /// Add new fields to the below struct in order
+    /// to add new static storage fields to your contract.
+    #[ink(storage)]
+    pub struct Receiver {
+        random_bytes: Vec<u8>,
+    }
+
+    impl Receiver {
+        #[ink(constructor)]
+        pub fn default() -> Self {
+            Self {
+                random_bytes: Default::default(),
+            }
+        }
+
+        #[ink(message)]
+        pub fn fulfill(&mut self, bytes: Vec<u8>) {
+            self.random_bytes = bytes;
+        }
+
+        #[ink(message)]
+        pub fn get_bytes(&self) -> Vec<u8> {
+            self.random_bytes.clone()
+        }
+    }
+
+}
+
+```
+
+  </TabItem>
+</Tabs>
+
+## Job Specification
+
+Now that the contract has been deployed, we can prepare the script that will get executed by the Processor to provision the price feed or entropy.
+
+Go to the [Acurast Console](https://console.acurast.com/) to test and deploy your script, these templates can also be found there.
+
+<Tabs>
+<TabItem value="price-feed" label="Price Feed" default>
 
 ```javascript
-const callIndex = '0x4606'; // the call index for the 'call' extrinsic
+const callIndex = "0x4606"; // the call index for the 'call' extrinsic
 const destination = "<MY_WASM_CONTRACT_ADDRESS>"; // replace with a contract address that will receive the 'fulfill' call.
 _STD_.chains.substrate.signer.setSigner("SECP256K1"); // the type of signer used for sign the extrinsic call, possible values are SECP256K1 or SECP256R1. What to use depends on what type of address is supported by the chain.
 const entropy = generateSecureRandomHex();
 _STD_.chains.substrate.contract.fulfill(
-    "<SUBSTRATE_NODE_RPC_URL>",
-    callIndex,
-    destination,
-    entropy,
-    {
+  "<SUBSTRATE_NODE_RPC_URL>",
+  callIndex,
+  destination,
+  entropy,
+  {
+    refTime: "3951114240",
+    proofSize: "629760",
+  },
+  (opHash) => {
+    print("Succeeded: " + opHash);
+  },
+  (err) => {
+    print("Failed fulfill: " + err);
+  }
+);
+```
+
+</TabItem>
+
+<TabItem value="randomness" label="Verifiable Randomness">
+
+```javascript
+const callIndex = "0x4606"; // the call index for the 'call' extrinsic.
+const destination = "<MY_WASM_CONTRACT_ADDRESS>"; // contract address that will receive the 'fulfill' call.
+_STD_.chains.substrate.signer.setSigner("SECP256K1"); // the type of signer used for sign the extrinsic call
+httpGET(
+  "https://api.binance.com/api/v3/ticker/price?symbol=AAVEBUSD",
+  {},
+  (response, _certificate) => {
+    const price = JSON.parse(response)["price"] * 10 ** 18;
+    const payload = _STD_.chains.substrate.codec.encodeUnsignedNumber(
+      price,
+      128
+    );
+    _STD_.chains.substrate.contract.fulfill(
+      "https://rpc.shibuya.astar.network",
+      callIndex,
+      destination,
+      payload,
+      {
         refTime: "3951114240",
         proofSize: "629760",
-    },
-    (opHash) => {
-        print("Succeeded: " + opHash)
-    },
-    (err) => {
-        print("Failed fulfill: " + err)
-    },
-)
+      },
+      (opHash) => {
+        print("Succeeded: " + opHash);
+      },
+      (err) => {
+        print("Failed fulfill: " + err);
+      }
+    );
+  },
+  (err) => {
+    print("Failed get price: " + err);
+  }
+);
 ```
+
+</TabItem>
+</Tabs>
+
+## Job Registration
+
+Check out [How to get started with the Acurast Console](/developers/introduction#get-started) to register your Job.
