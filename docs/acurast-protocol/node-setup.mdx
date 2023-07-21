@@ -40,18 +40,50 @@ The `rococo.json` file in the command above needs to be the Rococo chain spec an
 
 ## Run as a Collator
 
-To run as a collator, first create and identity. One easy way to do it is to use the [subkey](https://docs.substrate.io/reference/command-line-tools/subkey/) tool.
-
-Then, when starting the node, add the `--collator` flag to the command used to run the node, e.g.:
+To run as a collator, first start the node, by adding the `--collator` flag to the command used to run the node, e.g.:
 
 ```sh
 ./target/release/acurast-node --collator --rococo-runtime --bootnodes /ip4/138.201.85.115/tcp/40335/p2p/12D3KooWAYwTLAQu47uBmCvA1uYpJs7ND1mkoCJTdU1Z6VYqgTp1 --parachain-id 2239 --base-path /tmp/para/acurast --port 40335 --ws-port 8846 --rpc-port 8082 --unsafe-ws-external --rpc-methods=unsafe --rpc-external --rpc-cors=all -- --execution wasm --chain rococo.json --port 30345 --ws-port 9979
 ```
 
-Then, setup the identity of the collator by calling the `author_insertKey` rpc as follow:
+Then, setup the Nimbus ID of the collator by calling the `author_rotateKeys` rpc as follow:
 
 ```sh
-curl -vH 'Content-Type: application/json' --data '{ "jsonrpc":"2.0", "method":"author_insertKey", "params":["nmbs", "<SECRET_SEED>", "<PUBLIC_KEY>"],"id":1 }' http://localhost:8082
+curl http://127.0.0.1:8082 -H \
+"Content-Type:application/json;charset=utf-8" -d \
+  '{
+    "jsonrpc":"2.0",
+    "id":1,
+    "method":"author_rotateKeys",
+    "params": []
+  }'
 ```
 
-Where `<SECRET_SEED>` and `<PUBLIC_KEY>` should be replaced by the values of the generated identity.
+The collator node should respond with the public key of your new session key, the 64 hexadecimal characters after the 0x prefix represent your Nimbus ID, e.g.:
+
+```sh
+{"jsonrpc": "2.0", "result": "0x72c7ca7ef07941a3caeb520806576b52cb085f7577cc12cd36c2d64dbf73757", "id": 1}
+```
+
+"0x72c7ca7ef07941a3caeb520806576b52cb085f7577cc12cd36c2d64dbf73757" is the Nimbus public key to be used in the following step.
+
+Then, make sure to have at least 20,010 ACRST tokens: 20,000 ACRST to join the candidates pool and 10 ACRST for extrinsics fees, please request that amount to Acurast Team on Discord or Telegram.
+
+After that open the Polkadot JS apps wallet and connect to Acurast Testnet on Rococo Relaychain (https://polkadot.js.org/apps/#/explorer), then go to:
+Developer --> extrinsic --> select the account you are willing to use for your collator --> select "session" pallet --> select "setKeys" --> copy-paste the Nimbus key obtained before on "keys" field --> put "0x00" on "proof" field --> click on "Submit Transaction" and sign the extrinsic --> wait for block confirmation
+
+Then, go to:
+Developer --> JavaScript --> create new script or just delete an existing one --> copy-paste the following script --> click on "Play" button --> take a note of the "Candidate pool size" (you will need it in the next step)
+
+Get candidatePool size script
+```sh
+// Simple script to get candidate pool size
+const candidatePool = await api.query.parachainStaking.candidatePool();
+console.log(Candidate pool size is: ${candidatePool.length});
+```
+
+Then go to:
+Developer --> extrinsic --> select the account you are willing to use for your collator --> select "parachainStaking" pallet --> select "joinCandidates" --> put "20000000000000000" on "bond" field --> put "Candidate pool size" number as noted before on "candidateCount" field --> click on "Submit Transaction" and sign the extrinsic --> wait for block confirmation
+
+Congrats! Your collator should be joined the candidates pool, if there are free slots available in the active set, your collator should start producing blocks at the beginning of next session.
+The team will control the number of candidates and will increase the "totalSelected" amount in order to allow everyone to be active in the set, at opposite you will need more tokens in order to overcome the last one in the list and become an active collator.
