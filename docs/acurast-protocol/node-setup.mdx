@@ -40,7 +40,7 @@ The `rococo.json` file in the command above needs to be the Rococo chain spec an
 
 ## Run as a Collator
 
-To run as a collator, first star the node, by adding the `--collator` flag to the command used to run the node, e.g.:
+To run as a collator, first start the node, by adding the `--collator` flag to the command used to run the node, e.g.:
 
 ```sh
 ./target/release/acurast-node --collator --rococo-runtime --bootnodes /ip4/138.201.85.115/tcp/40335/p2p/12D3KooWAYwTLAQu47uBmCvA1uYpJs7ND1mkoCJTdU1Z6VYqgTp1 --parachain-id 2239 --base-path /tmp/para/acurast --port 40335 --ws-port 8846 --rpc-port 8082 --unsafe-ws-external --rpc-methods=unsafe --rpc-external --rpc-cors=all -- --execution wasm --chain rococo.json --port 30345 --ws-port 9979
