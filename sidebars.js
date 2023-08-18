@@ -56,10 +56,10 @@ const sidebars = {
       label: "Ecosystems & Integrations",
       items: [
         "integrations/introduction",
+        "integrations/evm",
         "integrations/substrate",
         "integrations/substrate-wasm",
         "integrations/tezos",
-        "integrations/evm",
       ],
       collapsed: false,
     },

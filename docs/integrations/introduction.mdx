@@ -19,12 +19,12 @@ Reach out to us on [hi@acurast.com](mailto:hi@acurast.com), on [Discord](https:/
 
 Acurast supports ecosystems that have an active developer community and smart contract environments.
 
-|                                                               | Network  | Environment | Production | Native Job Creation |
-| ------------------------------------------------------------- | -------- | ----------- | ---------- | ------------------- |
-| ![Astar](/img/astar-symbol.svg "Astar") **Astar**             | Shibuya  | WASM & EVM  | Testnet    | ❌ \*               |
-| ![Tezos](/img/tezos-symbol.svg "Tezos") **Tezos**             | Mainnet  | -           | ✅         | ❌                  |
-| ![Tezos](/img/tezos-symbol.svg "Tezos") **Tezos**             | Ghostnet | -           | Testnet    | ✅                  |
-| ![Moonbeam](/img/moonbeam-symbol.svg "Moonbeam") **Moonbeam** | Moonbase | EVM         | Testnet    | ❌ \*               |
+|                                                               | Network  | Environment | Production | [Level 2 Integration](#level-2) |
+| ------------------------------------------------------------- | -------- | ----------- | ---------- | ------------------------------- |
+| ![Astar](/img/astar-symbol.svg "Astar") **Astar**             | Shibuya  | WASM & EVM  | Testnet    | ❌ \*                           |
+| ![Tezos](/img/tezos-symbol.svg "Tezos") **Tezos**             | Mainnet  | -           | ✅         | ❌                              |
+| ![Tezos](/img/tezos-symbol.svg "Tezos") **Tezos**             | Ghostnet | -           | Testnet    | ✅                              |
+| ![Moonbeam](/img/moonbeam-symbol.svg "Moonbeam") **Moonbeam** | Moonbase | EVM         | Testnet    | ❌ \*                           |
 
 _\* In Development_
 
@@ -32,35 +32,56 @@ Support for additional ecosystems are added on a regular basis.
 
 <div class="padding-vert--md"></div>
 
+## Integration Levels
+
+### Level 1
+
+With a _Level 1_ integration, the Acurast Protocol is capable to accept Jobs for the given destination ecosystem e.g., Ethereum smart contract. Developers are creating their Job requests through the Acurast Console directly on the Acurast Protocol, funding the rewards with Acurast Tokens. Processors are capable of interacting with the destination directly, signing transactions and injecting them.
+
+**Key takeaways:**
+
+- Processors can interact with the destination and submit their output
+- Consumers create Acurast Jobs through the Acurast Console directly on the Acurast Protocol which requires an Acurast Wallet and Acurast Tokens
+
+### Level 2
+
+A _Level 2_ integration provides a much improved developer experience and streamlined onboarding. An Acurast Proxy contract is deployed in the destination ecosystem that establishes a bi-directional cross-chain communication channel with [Acurast Hyperdrive](/acurast-protocol/interoperability/hyperdrive) to the Acurast Protocol. Users e.g. on Ethereum can connect with their Ethereum wallet to the Acurast Console and create a Job by interacting with the Proxy contract and rewarding Processors in the native currency. The created request is forwarded to the Acurast Protocol where that matches with eligible Processors that in turn then provide their output to the destination.
+
+**Key takeaways:**
+
+- Consumers create Acurast Jobs through the Acurast Console with a wallet from their ecosystem e.g., Metamask for Ethereum
+- Rewards are paid in a native asset e.g., ETH
+- Acurast Hyperdrive is used for cross-chain communication
+
 ## Integrations
 
 Support for Acurast in a Web3 ecosystem can be achieved through various integration approaches:
-
-### Substrate
-
-Acurast supports with its Pallet the integration on a Substrate level, enabling Substrate-based chains to receive the output from Acurast Jobs.
-
-Learn about an integration with [Substrate](/integrations/substrate/)
-
-### Substrate with WASM
-
-Acurast supports with its integration of the Pallet the routing to WASM based environment, making the output consumable on a Substrate chain with a WASM environment.
-
-Learn about an integration with [Substrate with WASM](/integrations/substrate-wasm/)
-
-### Tezos
-
-Acurast supports Tezos smart contracts as the destination of outputs from Acurast Processors directly as the required secp256r1 is supported natively by Tezos.
-
-Learn about Acurast on [Tezos](/integrations/tezos/)
 
 ### EVM
 
 Acurast can be used to get access to computational resources for various use cases and bring them to EVM chains.
 
-Learn about Acurast on [EVM Chains](/integrations/evm/)
+Learn about Acurast on **[EVM Chains ↗](/integrations/evm/)**
 
-### Upcoming Integrations
+### Substrate
+
+Acurast supports with its Pallet the integration on a Substrate level, enabling Substrate-based chains to receive the output from Acurast Jobs.
+
+Learn about an integration with **[Substrate ↗](/integrations/substrate/)**
+
+### Substrate with WASM
+
+Acurast supports with its integration of the Pallet the routing to WASM based environment, making the output consumable on a Substrate chain with a WASM environment.
+
+Learn about an integration with **[Substrate with WASM ↗](/integrations/substrate-wasm/)**
+
+### Tezos
+
+Acurast supports Tezos smart contracts as the destination of outputs from Acurast Processors directly as the required secp256r1 is supported natively by Tezos.
+
+Learn about Acurast on **[Tezos ↗](/integrations/tezos/)**
+
+## Upcoming Integrations
 
 More details will be available soon about the upcoming integrations, these include the following ecosystems:
 
