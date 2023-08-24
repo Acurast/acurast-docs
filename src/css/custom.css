@@ -42,3 +42,8 @@
   display: flex;
   column-gap: 40px;
 }
+
+.theme-doc-sidebar-item-link-level-1 a,
+a.menu__link.menu__link--sublist.menu__link--sublist-caret {
+  font-weight: bold;
+}
