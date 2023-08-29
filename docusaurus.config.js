@@ -54,6 +54,9 @@ const config = {
         indexName: "acurast",
         searchParameters: {},
       },
+      colorMode: {
+        defaultMode: "dark",
+      },
       navbar: {
         title: "Docs",
         logo: {
@@ -148,6 +151,10 @@ const config = {
           {
             to: "/acurast-processors",
             from: "/acurast-transmitters",
+          },
+          {
+            to: "/modules/",
+            from: "/interoperability/",
           },
         ],
       },
