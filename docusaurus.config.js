@@ -153,8 +153,20 @@ const config = {
             from: "/acurast-transmitters",
           },
           {
-            to: "/modules/",
-            from: "/interoperability/",
+            to: "/acurast-protocol/modules/enterprise",
+            from: "/acurast-protocol/interoperability/enterprise",
+          },
+          {
+            to: "/acurast-protocol/modules/hyperdrive",
+            from: "/acurast-protocol/interoperability/hyperdrive",
+          },
+          {
+            to: "/acurast-protocol/modules/mesh",
+            from: "/acurast-protocol/interoperability/mesh",
+          },
+          {
+            to: "/acurast-protocol/modules/singularity",
+            from: "/acurast-protocol/interoperability/singularity",
           },
         ],
       },
