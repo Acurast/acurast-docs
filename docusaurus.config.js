@@ -54,6 +54,9 @@ const config = {
         indexName: "acurast",
         searchParameters: {},
       },
+      colorMode: {
+        defaultMode: "dark",
+      },
       navbar: {
         title: "Docs",
         logo: {
@@ -148,6 +151,22 @@ const config = {
           {
             to: "/acurast-processors",
             from: "/acurast-transmitters",
+          },
+          {
+            to: "/acurast-protocol/modules/enterprise",
+            from: "/acurast-protocol/interoperability/enterprise",
+          },
+          {
+            to: "/acurast-protocol/modules/hyperdrive",
+            from: "/acurast-protocol/interoperability/hyperdrive",
+          },
+          {
+            to: "/acurast-protocol/modules/mesh",
+            from: "/acurast-protocol/interoperability/mesh",
+          },
+          {
+            to: "/acurast-protocol/modules/singularity",
+            from: "/acurast-protocol/interoperability/singularity",
           },
         ],
       },

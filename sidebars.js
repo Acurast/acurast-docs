@@ -38,12 +38,12 @@ const sidebars = {
         "acurast-protocol/introduction",
         {
           type: "category",
-          label: "Interoperability Modules",
+          label: "Modules",
           items: [
-            "acurast-protocol/interoperability/enterprise",
-            "acurast-protocol/interoperability/hyperdrive",
-            "acurast-protocol/interoperability/singularity",
-            "acurast-protocol/interoperability/mesh",
+            "acurast-protocol/modules/enterprise",
+            "acurast-protocol/modules/hyperdrive",
+            "acurast-protocol/modules/singularity",
+            "acurast-protocol/modules/mesh",
           ],
           collapsed: false,
         },
