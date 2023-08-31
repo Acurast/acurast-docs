@@ -168,6 +168,10 @@ const config = {
             to: "/acurast-protocol/modules/singularity",
             from: "/acurast-protocol/interoperability/singularity",
           },
+          {
+            to: "/developers/get-started",
+            from: "/developers/introduction",
+          },
         ],
       },
     ],

@@ -22,11 +22,7 @@ const sidebars = {
     {
       type: "category",
       label: "Developers",
-      items: [
-        "developers/introduction",
-        "developers/get-started",
-        "developers/api-reference",
-      ],
+      items: ["developers/get-started", "developers/api-reference"],
       collapsed: false,
     },
     "acurast-processors",

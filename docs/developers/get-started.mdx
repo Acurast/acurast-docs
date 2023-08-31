@@ -1,28 +1,101 @@
 ---
-title: How To Get Started
+title: Get Started
 slug: /developers/get-started
 ---
 
-# How To Get Started
+import { RunnableCode } from "@site/src/components/RunnableCode/RunnableCode";
+import ThemedImage from "@theme/ThemedImage";
+import useBaseUrl from "@docusaurus/useBaseUrl";
 
-Developers can already use Acurast today to build their Web3 applications enabled by Acurast.
+# Developers
 
-## Phase 0
+Consumers or Developers are the ones that are in need of computation for their applications. Consumers can define in accessible Javascript code their requirements and get access to computational resources through the Acurast Marketplace by being matched with Processors.
 
-Phase 0 is an interim phase, until the Acurast Protocol and the Acurast Marketplace are live which is targeted for 3 2023 on Kusama. This approach already enables developers to use the Acurast Trusted Virtual Machine of the Acurast Processors.
+The so-called Acurast Jobs are executed by Processors in their Trusted Execution Environment that provide the Output of the Job and a Proof of Execution to the defined destination chain.
 
-1. Follow the steps outlined on [Get Started](/developers/introduction#get-started).
-2. Test your script on the Acurast Console and do a test deployment on the relevant testnet.
-3. For a production environment [reach out](https://acurast.com#contact) to us and provide us your Script and your required destination network e.g. Polkadot:Moonbeam
-4. We'll match you with Acurast Processors and have them run your Script.
-5. Your output will be pushed to your destination by the Acurast Processors and you can start using it in your Web3 application.
+**Developers can define their requirements in code and have access complete access to [Acurast's Modules](/acurast-protocol/modules/enterprise)**
 
-## Phase 1
+<ThemedImage
+  sources={{
+    light: useBaseUrl("/img/acurast-consumer-flow.png"),
+    dark: useBaseUrl("/img/acurast-consumer-flow.png"),
+  }}
+/>
 
-With the launch of the Acurast Protocol and the Acurast Marketplace.
+## Get Started
 
-1. Create a Script for your use case on the Acurast Console, take a look at the [Examples](introduction#examples/).
-2. Run and test your Script on the Acurast Console, see the details to [Get Started](/developers/introduction#get-started).
-3. Create an Acurast Job on the Acurast Console with your Script, Service Level Agreement and reward as well as other parameters
-4. The Marketplace matches you with Acurast Processors.
-5. Your output will be pushed to your destination by the Acurast Processors and you can start using it in your Web3 application.
+Get access to computational resources through the Acurast Console. Read more on the steps on [How To Get Started](/developers/get-started), based on your production or testing needs.
+
+Not sure if your ecosystem is supported? Take a look at [Ecosystems & Integrations](/integrations/introduction).
+
+<div class="padding-vert--md"></div>
+
+<ThemedImage
+  sources={{
+    light: useBaseUrl("/img/acurast-consumer.png"),
+    dark: useBaseUrl("/img/acurast-console.png"),
+  }}
+/>
+
+1. Go to the [Acurast Console](https://console.acurast.com/) and log in with your [Talisman Wallet](https://www.talisman.xyz/wallet) or your [PolkadotJS Extension](https://polkadot.js.org/extension/).
+1. Fund Account - Get Testnet funds for your account with "Fund Account", to be able to create Jobs.
+1. Go to "Create Job" and select your destination, the ecosystem you're building in.
+1. Select an existing template, adapt it or write your own code that fits your needs. Test your code with "Test Code".
+1. Select your own Processor or use public ones.
+1. Define your execution schedule with the parameters such as start and endtime, interval etc.
+1. Specify your usage parameters.
+1. Specify your additional parameters such as the reward.
+1. Publish your Job and wait for your first fulfillment.
+
+## Examples
+
+Code examples for the [Acurast Enterprise](/acurast-protocol/modules/enterprise) module for off-chain data and computation.
+
+### HTTPS GET Request
+
+Request from an API with the result of an asset price.
+
+<RunnableCode>
+
+```ts
+httpGET(
+  "https://api.binance.com/api/v3/ticker/price?symbol=BNBBTC",
+  {},
+  (response, certificate) => {
+    console.log("response", response);
+    const price = JSON.parse(response)["price"] * 10 ** 6;
+    console.log("price", price);
+    const payload = { price: price, timestamp: Date.now() / 1000 };
+    const packedPayload = pack(payload);
+    const signature = sign(payload);
+    httpPOST(
+      "https://oracle.free.beeceptor.com",
+      JSON.stringify({
+        signature: signature,
+        certificate: certificate,
+        payload: packedPayload,
+      }),
+      {},
+      (response, certificate) => {},
+      (errorMessage) => {}
+    );
+  },
+  (errorMessage) => {}
+);
+```
+
+</RunnableCode>
+
+<div class="padding-vert--md"></div>
+
+### Verifiable Randomness
+
+Getting a randomized output from the Trusted Execution Environment.
+
+<RunnableCode>
+
+```ts
+return fulfill(generateSecureRandomHex());
+```
+
+</RunnableCode>
