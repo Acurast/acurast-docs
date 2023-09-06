@@ -21,7 +21,7 @@ const sidebars = {
     "introduction",
     {
       type: "category",
-      label: "Developers",
+      label: "Consumers",
       items: ["developers/get-started", "developers/api-reference"],
       collapsed: false,
     },
