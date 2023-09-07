@@ -65,7 +65,6 @@ const config = {
           srcDark: "img/acurast_logo_light.svg",
         },
         items: [
-          { to: "/playground/", label: "Playground", position: "right" },
           {
             href: "https://console.acurast.com/",
             label: "Acurast Console",
