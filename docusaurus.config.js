@@ -71,6 +71,11 @@ const config = {
             position: "right",
           },
           {
+            href: "https://faucet.acurast.com/",
+            label: "Faucet",
+            position: "right",
+          },
+          {
             href: "https://github.com/acurast/",
             label: "GitHub",
             position: "right",
