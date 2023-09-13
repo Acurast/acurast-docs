@@ -26,7 +26,7 @@ const sidebars = {
       collapsed: false,
     },
     "acurast-processors",
-    "acurast-marketplace",
+    "acurast-orchestrator",
     {
       type: "category",
       label: "Acurast Protocol",
