@@ -22,7 +22,7 @@ const sidebars = {
     {
       type: "category",
       label: "Consumers",
-      items: ["developers/get-started", "developers/api-reference"],
+      items: ["developers/get-started", "developers/create-address", "developers/api-reference"],
       collapsed: false,
     },
     "acurast-processors",
