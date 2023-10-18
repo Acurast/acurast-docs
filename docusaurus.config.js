@@ -94,7 +94,7 @@ const config = {
               },
               {
                 label: "Developers",
-                to: "developers/introduction",
+                to: "developers/get-started",
               },
               {
                 label: "Processors",
@@ -171,11 +171,7 @@ const config = {
           {
             to: "/acurast-protocol/modules/singularity",
             from: "/acurast-protocol/interoperability/singularity",
-          },
-          {
-            to: "/developers/get-started",
-            from: "/developers/introduction",
-          },
+          }
         ],
       },
     ],
