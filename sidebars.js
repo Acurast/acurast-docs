@@ -40,10 +40,10 @@ const sidebars = {
             "acurast-protocol/architecture/application-layer",
             "acurast-protocol/architecture/execution-layer",
             "acurast-protocol/architecture/consensus-layer",
+            "acurast-protocol/architecture/networks",
           ],
           collapsed: true,
         },
-        "acurast-protocol/networks",
         {
           type: "category",
           label: "Modules",
