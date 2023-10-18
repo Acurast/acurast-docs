@@ -31,7 +31,19 @@ const sidebars = {
       type: "category",
       label: "Acurast Protocol",
       items: [
-        "acurast-protocol/introduction",
+        {
+          type: "category",
+          label: "Architecture",
+          items: [
+            "acurast-protocol/architecture/architecture",
+            "acurast-protocol/architecture/end-to-end",
+            "acurast-protocol/architecture/application-layer",
+            "acurast-protocol/architecture/execution-layer",
+            "acurast-protocol/architecture/consensus-layer",
+          ],
+          collapsed: true,
+        },
+        "acurast-protocol/networks",
         {
           type: "category",
           label: "Modules",

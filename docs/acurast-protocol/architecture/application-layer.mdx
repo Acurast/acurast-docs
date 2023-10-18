@@ -1,0 +1,80 @@
+---
+title: Application Layer
+slug: /acurast-protocol/application-layer
+---
+
+import ThemedImage from "@theme/ThemedImage";
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
+In the Internet of today, almost every application relies heavily on auxiliary systems. Whether external APIs are used for authentication, basic infrastructure (hosting), data availability, reliance, which can benefit from extending or replacing services and core elements with zero trust applications, essentially eliminating a host of threat events. The possibilities with Acurast are near-endless since today's centralized Internet is heavily centralized both logically and in terms of trust anchors. 
+
+Acurast's Zero Trust architecture transforms the way applications are designed and deployed. Acurast achieves an unparalleled Developer Experience (DevEx) by offering the [Acurast Console](https://console.acurast.com) to developers, where a self-service model allows developers to integrate and develop their applications. The following subsections outline potential algorithms and use-cases that can be deployed in a zero trust manner through Acurast.
+
+### Zero-Knowledge Proof Applications
+
+Zero-Knowledge Proof protocols find vast application in blockchains [[1]](#references). Potential use cases range from anonymous voting systems [[2]](#references), to secure and privacy-preserving digital assets exchange, secure remote biometric authentication, or Proof-of-Reserves [[3]](#references).
+
+Acurast can be leveraged in multiple areas of ZKP applications, for instance, to offload high intensity computation in a zero trust manner [[4]](#references), or to form sub-consortia of processors that can, for instance, mix and generate proofs that the mixing has been performed correctly. 
+
+### Privacy-Preserving Mixing
+
+With ZKPs, privacy mixing can occur in a way that allows transactions to be validated without exposing the details of those transactions. However, the mixing is not limited to Web3 transactions and can be extended to other data sensitive to privacy (*e.g.,* metadata of internet traffic or metadata of files). 
+
+### Secure Multi-Party Computation
+Secure Multi-Party Computation (SMPC) is a cryptographic primitive that enables distributed parties to conduct joint computations without revealing their own private inputs and outputs to the computation [[7]](#references). For instance, doctors may query a database containing private information, or banks may invest in a fund that must satisfy both banks private constraints. Usually, one trusted entity must know the inputs from all the participants, however, if no Trusted Third Party (TTP) is available or suitable, privacy concerns are evident [[7]](#references). With Acurast, a processors can be selected for SMPC algorithms to execute *e.g.,* a permissionless poker game [[8]](#references).
+
+### Blockchain Infrastructure
+Blockchain networks' rising adoption and complexity of blockchain networks has led to an increasing need for a reliable blockchain infrastructure. Novel incentive structures (*e.g.,* slashing in PoS) have intensified this further. It is crucial that this infrastructure is neither logically nor physically centralized because it would introduce new trust assumptions that undermine the permissionless nature of blockchains. For these services, Acurast can serve as a decentralized, serverless backend. 
+
+### Incorruptible Sequencer
+A huge issue in public blockchains is Blockchain Extractable Value (BEV), and Miner Extractable Value (MEV), where DeFi users are at risk of being attacked [[9]](#references) (*e.g.,* frontrunning and sandwich attacks [[10]](#references). With Acurast, processors can serve as confidential and zero trust sequencers, ensuring that the order of transactions is deterministic and immune to external influence.
+
+### Beyond Oracles: Serverless Applications
+Oracles and on-chain automation are key ingredients of blockchain infrastructure. While oracles enable external data to be imported into the blockchain, oracles mainly deal with data retrieval and validation, ensuring that accurate and reliable data is fed into smart contracts. However, on-chain automation has a broader scope, encompassing automated liquidity provision, periodic settlements, debt restructuring, yield harvesting, and much more. The emphasis here is on action and execution based on specific conditions.
+On-chain automation is about executing predefined actions without manual intervention, based on conditions or triggers that may come from oracles or on-chain data and events. 
+
+### Native Cross-Chain DeFi
+Native cross-chain DeFi capabilities have been developed to allow seamless interactions and transactions between blockchains, creating a more inclusive and expansive financial ecosystem. Applying Account Abstraction allows for the design of accounts that can interact and integrate across various platforms and protocols, simplifying user experiences and opening the door for innovative use cases. 
+
+### Data Availability as-a-Service
+(DAaaS) provides decentralized storage solutions to ensure data remains accessible and intact, fortifying the robustness of the entire decentralized ecosystem. 
+
+### Decentralized Scraping Infrastructure
+Of all the Internet traffic in 2022, 47.4 % was automated traffic, also commonly referred to bots [[5]](#references). Of that automated traffic, 30.2 % were bad bots, while good bots are on the rise too, accounting for 17.3 %. The percentage of human traffic continues its downward trend, from 57.7 % in 2021 to 52.6 % in 2022. Bots, in that context do not refer to volumetric Distributed Denial-of-Service attacks, but the bot activity on layer 7 of the OSI model. In general, good bots are important for various business models and applications, since they are scraping data and feed models for decision making or business logic directly.
+
+With Acurast, the scraping infrastructure can be fully decentralized logically and physically, leveraging the network of processor resources that confidentially execute these tasks, without leaking any data about the querying party. For example, when intelligence is gathered (*e.g.,* for investment or merger decisions), a large amount of data must be scraped confidentially. 
+
+### Artifical Intelligence
+
+The recent surge of Artificial Intelligence (AI) applications has led to increased research and development in these areas. While the potential of these technologies are vast, the risks associated to the centralized deployment and privacy of data is crucial to assess carefully. In Acurast, the *Singularity* module allows the execution of AI in a decentralized and confidential fashion. *E.g.,* Acurast enables Large Language Models (LLM) to be executed in a federated, privacy-preserving, and trustless way [[11]](#references).
+
+
+### Internet of Things 
+In general terms, the Internet of Things (IoT) refers to interconnected computing devices that form a network and monitor environmental variables (*e.g.,* health care [[12]](#references). Often, due to its limited resources, heterogeneity, and lack of computing power, IoT faces many security and privacy challenges. Data is transferred between IoT devices without human intervention, making zero trust an essential aspect in network and trust management. The Acurast *Mesh* module creates space for novel IoT use cases. Depending on the processor used, built-in Bluetooth modules or WiFi direct connections can be used to collect metrics or data and confidentially process the data.
+
+
+#### References 
+
+[1] X. Sun, F. R. Yu, P. Zhang, Z. Sun, W. Xie, and X. Peng, *A Survey on Zero-Knowledge Proof in Blockchain,* IEEE Network, Vol. 35, No. 4, pp. 198–205, 2021.
+
+[2] C. Killer, M. Eck, B. Rodrigues, J. von der Assen, R. Staubli, and B. Stiller, *ProvotuMN: Decentralized, Mix-Net-based, and Receipt-free Voting System,* in 2022 IEEE International Conference on Blockchain and Cryptocurrency (ICBC), 2022, pp. 1–9.
+
+[3] C. Killer, B. Rodrigues, E. J. Scheid, M. F. Franco, and B. Stiller, *Blockchain-based Voting Considered Harmful?* IEEE Transactions on Network and Service Management, pp. 1–1, 2022.
+
+[4] N. Ni and Y. Zhu, *Enabling Zero Knowledge Proof by Accelerating zk-SNARK Kernels on GPU,* Journal of Parallel and Distributed Computing, vol. 173, pp. 20–31, 2023.
+
+[5] Imperva, “Imperva 2023 Bad Bot Report,” https://www.imperva.com/resources/resource-library/reports/2023-imperva-bad-bot-report/, May, 2023.
+
+[6] D. C. Nguyen, M. Ding, P. N. Pathirana, A. Seneviratne, J. Li, and H. V. Poor, *Federated Learning for Internet of Things: A Comprehensive Survey,* IEEE Communications Surveys and Tutorials, Vol. 23, No. 3, pp. 1622–1658, 2021.
+
+[7] W. Du and M. J. Atallah, *Secure Multi-Party Computation Problems and Their Applications: A Review and Open Problems,* in Proceedings of the 2001 Workshop on New Security Paradigms, ser. NSPW ’01. New York, NY, USA: Association for Computing Machinery, 2001, p. 13–22. Available on: https://doi.org/10.1145/508171.508174
+
+[8] R. Kumaresan, T. Moran, and I. Bentov, “How to use bitcoin to play decentralized poker,” in Proceedings of the 22nd ACM SIGSAC Conference on Computer and Communications Security, Ser. CCS ’15. New York, NY, USA: Association for Computing Machinery, 2015, p. 195–206. [Online]. Available on: https://doi.org/10.1145/2810103.2813712
+
+[9] L. Zhou, X. Xiong, J. Ernstberger, S. Chaliasos, Z. Wang, Y. Wang, K. Qin, R. Wattenhofer, D. Song, and A. Gervais, *SoK: Decentralized Finance (DeFi) Attacks,* 2023
+
+[10] P. Daian, S. Goldfeder, T. Kell, Y. Li, X. Zhao, I. Bentov, L. Breidenbach, and A. Juels, *Flash Boys 2.0: Frontrunning, Transaction Reordering, and Consensus Instability in Decentralized Exchanges*, 2019.
+
+[11] D. C. Nguyen, M. Ding, P. N. Pathirana, A. Seneviratne, J. Li, and H. V. Poor, *Federated Learning for Internet of Things: A Comprehensive Survey,* IEEE Communications Surveys and Tutorials, vol. 23, no. 3, pp. 1622–1658, 2021.
+
+[12] S. B. Baker, W. Xiang, and I. Atkinson, *Internet of Things for Smart Healthcare: Technologies, Challenges, and Opportunities,* IEEE Access, Vol. 5, pp. 26 521–26 544, 2017.
