@@ -153,6 +153,10 @@ const config = {
       {
         redirects: [
           {
+            to: "/acurast-protocol/introduction",
+            from: "/acurast-protocol/architecture",
+          },
+          {
             to: "/acurast-processors",
             from: "/acurast-transmitters",
           },
@@ -171,7 +175,7 @@ const config = {
           {
             to: "/acurast-protocol/modules/singularity",
             from: "/acurast-protocol/interoperability/singularity",
-          }
+          },
         ],
       },
     ],
