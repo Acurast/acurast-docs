@@ -153,10 +153,6 @@ const config = {
       {
         redirects: [
           {
-            to: "/acurast-protocol/architecture",
-            from: "/acurast-protocol/introduction",
-          },
-          {
             to: "/acurast-processors",
             from: "/acurast-transmitters",
           },
