@@ -1,0 +1,40 @@
+---
+title: Networks
+slug: /acurast-protocol/architecture/networks
+---
+
+Acurast will bootstrap three distinct networks: (a) the Acurast Testnet, (b) the Acurast Canary, and (c) the Acurast Mainnet.
+
+### Acurast Testnet
+
+The test network uses tokens with no governance and no staking utility. The service level provided is for test applications and experimental Proof-of-Concepts. The Acurast Testnet provides instant update cycles, whenever the code is ready, following the philosophy “Build, Break, and Fix Faster”. Testnet updates do not require governance, the Testnet is linked to the [Rococo](https://substrate.io/developers/rococo-network/) relay network.
+
+- [Block Explorer ↗](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fws.acurast-rococo.diamond.papers.tech#/explorer)
+- [Acurast Console ↗](https://console.acurast.com)
+
+### Acurast Canary
+
+The canary network uses tokens with governance and staking utility. The service level provided is for production-grade applications. Acurast Canary provides shorter update cycles than the Mainnet, and also faster releases and deprecation of features. The canary network follows quarterly update cycles with a 9-month support span. Forkless network upgrades are activated and validated through the Canary network’s governance process, and it is linked to the [Kusama](https://kusama.network/) relay network.
+
+1. **Pre-Net**
+   Launched on programmer’s day September 13th, 2023. The Pre-Net launched without the governance process and has the Acurast Association’s collators producing blocks. Since there is no block reward, there will be no inflation in this phase. The purpose of this phase is to allow Developers and Processors to onboard and start exchanging their resources, all while providing a production-grade service level. During the pre-net phase, the governance and token transfers will remain disabled and no active transferring of tokens is expected at this stage.
+
+   Therefore, developers who want to build zero-trust applications can request tokens through the social engagement faucet, more on this shortly.
+
+1. **Alpha-Net**
+   Launching later this year. The purpose of this phase is to onboard external Collators and enable nominated Proof of Stake for the selection of those Collators.
+
+   Comparable to Curve’s voted escrow model, the stake weight is based on the user’s selected lock time duration of the stake provided. The exact mechanics will be outlined in a future blog post.
+
+   With the activation of the Alpha-Net, the block production will be rewarded, the rewards will be paid out of the Acurast protocol’s adaptive inflation model. Sudo will remain active for this phase.
+
+1. **Beta-Net**
+   With an ETA of 2 months post-Alpha-Net launch. This phase removes sudo and migrates governance to the active stakers and enables token transfers.
+
+   Acurast Canary will pave the road for the Acurast Mainnet launch going forward.
+
+### Acurast Mainnet
+
+The Acurast Mainnet uses tokens with governance and staking utility. The service level provided is for production-grade applications. The Mainnet follows yearly update cycles including features only after thorough battle testing on the Acurast Canary with a long-term support span of 5 years. The Mainnet also follows forkless upgrades activated through the Mainnet governance process and it is linked to the [Polkadot](https://www.polkadot.network/) relay network.
+
+Anticipated launch later in 2024 connected to Polkadot.

@@ -1,0 +1,54 @@
+---
+title: End-to-End Zero Trust Job Execution
+slug: /acurast-protocol/architecture/end-to-end
+---
+
+import ThemedImage from "@theme/ThemedImage";
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
+Acurast introduces a paradigm shift in verifiable and confidential computation, advancing the way decentralized applications are developed and deployed. To emphasize the inner workings of Acurast, the following description follows a `job` from definition and deployment to completion (*c.f.,* Fig. 1).
+
+
+<ThemedImage
+  width="800px"
+  sources={{
+    light: useBaseUrl("/img/end-to-end-light.svg"),
+    dark: useBaseUrl("/img/end-to-end-light.svg"),
+  }}
+/>
+<p style={{color: "gray", fontSize: "small" }}>Figure 1: End-to-End Zero Trust Job Execution </p>
+
+### (1) ``Job`` Registration
+As a first step, consumers define their `job` details. For example, at what destination the `job` should be *settled*, i.e., on which protocol the `job` output should be persisted (e.g., on Bitcoin Mainnet). After that, the consumer can select `ready-to-deploy` templates, which can be adapted and changed to the consumer's needs, or a custom `job` can be defined. 
+
+Depending integration level of the destination ecosystem with Acurast, the pre-payments for gas fees and rewards are settled in the native currency the consumer prefers (e.g., native TEZ for Tezos or ETH for Ethereum) or in native Acurast ACU tokens. 
+
+Next, the consumer must state on which processors the `job` should be executed, either (a) on personal processors, or (b) on selected, known processors (e.g., known trusted entities), or (c) on public processors. For (a), a processor reward is not required, since it is a permissioned setting. For (b) a reward is optional, and for (c) the liquid matching engine and the Acurast orchestrator will match processor resources with consumers' `job`s.
+
+In addition, more details of the `job` need to be declared, such as  *scheduling* parameters, including start time, end time, the interval between executions, as well as the duration in milliseconds and the maximum start delay in milliseconds. Furthermore, specific resource management parameters, such as memory usage, network requests, and storage requirements of the `job` need to be declared. Finally, the reward for the execution of the `job` should be declared, as well as the minimum reputation (only applies to (c) public processors). Then the `job` will be persisted on the Acurast Consensus Layer and reaches `OPEN` state (c.f., Fig. 2).
+
+<ThemedImage
+  width="400px"
+  sources={{
+    light: useBaseUrl("/img/job-states-light.svg"),
+    dark: useBaseUrl("/img/job-states-dark.svg"),
+  }}
+/>
+
+<p style={{color: "gray", fontSize: "small" }}>Figure 2: States of a job </p>
+
+### (2) `Job` Acknowledgment
+Second, the processor acknowledges the `job` and fetches the details from the Acurast chain. Depending on the fulfillment definition of the respective `job`, the Merkle root of the `job` with proof of assignment is persisted on the target destination (e.g., on a different target chain). Now the `job` reaches the `MATCHED` state, and no other processors will attempt to acknowledge it. 
+
+A prerequisite for assigning the `job` to the processor is that the processor can execute the `job` in full, following the *all-or-nothing* principle. Since `job`s can have different scheduling configurations (e.g., on demand, every minute, etc.). Therefore, if the processor acknowledges that all slots can be adhered to, the `job` reaches the `ASSIGNED` state.
+
+### (3) `Job` Execution
+Next, the `job_script` is executed in the processor runtime. In the illustrated example of Fig. 1, the execution is performed inside of the Acurast Secure Hardware Runtime (ASHR), *i.e.,* because *confidentiality* is ascertained by secure hardware *e.g.,* an isolated and external coprocessor (Google's Titan M2 Chip). Other runtimes (e.g., the Acurast Zero-Knowledge Runtime (AZKR)) may provide additional soundness guarantees.
+
+### (4) `Job` Fulfillment
+\textbf{(4) `job` Fulfillment:} Once the `job` execution is completed, the output is delivered to the declared destination, which could be another Web3 system (e.g., Tezos, Ethereum) or a Web2 system (e.g., REST-API, FL model) that receives the output. In case of a cross-chain transaction, the processor settles the gas fees on the destination chain, since the consumer has locked the necessary reward and gas fee amount up front when registering the `job`.
+
+### (5) `Job` Reporting
+After completion, the processor reports back to the Acurast Consensus Layer, more specifically to the reputation engine. If fulfillment was successful, the report contains a transaction hash of the target chain containing the fulfillment transaction. In case of failure, the report contains error messages. Finally, the `job` is now in `DONE` state.
+
+To assure the reliability of the Acurast protocol, the reputation engine is continuously fed with reliability metrics, for instance right after `job` completion or failure. 

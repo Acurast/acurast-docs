@@ -11,6 +11,7 @@ const config = {
   tagline: "On Demand Oracle Machine",
   url: "https://docs.acurast.com",
   baseUrl: "/",
+  // GitHub pipeline throws a broken link that doesn't appear on a local build for some reason.
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "throw",
   favicon: "img/favicon.svg",
@@ -94,7 +95,7 @@ const config = {
               },
               {
                 label: "Developers",
-                to: "developers/introduction",
+                to: "developers/get-started",
               },
               {
                 label: "Processors",
@@ -165,16 +166,20 @@ const config = {
             from: "/acurast-protocol/interoperability/hyperdrive",
           },
           {
-            to: "/acurast-protocol/modules/mesh",
+            to: "/acurast-protocol/modules/singularity-mesh",
+            from: "/acurast-protocol/modules/mesh",
+          },
+          {
+            to: "/acurast-protocol/modules/singularity-mesh",
             from: "/acurast-protocol/interoperability/mesh",
           },
           {
-            to: "/acurast-protocol/modules/singularity",
+            to: "/acurast-protocol/modules/singularity-mesh",
             from: "/acurast-protocol/interoperability/singularity",
           },
           {
-            to: "/developers/get-started",
-            from: "/developers/introduction",
+            to: "/acurast-protocol/modules/singularity-mesh",
+            from: "/acurast-protocol/modules/singularity",
           },
         ],
       },

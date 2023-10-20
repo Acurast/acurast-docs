@@ -35,15 +35,26 @@ const sidebars = {
       type: "category",
       label: "Acurast Protocol",
       items: [
-        "acurast-protocol/introduction",
+        {
+          type: "category",
+          label: "Architecture",
+          items: [
+            "acurast-protocol/architecture/architecture",
+            "acurast-protocol/architecture/end-to-end",
+            "acurast-protocol/architecture/application-layer",
+            "acurast-protocol/architecture/execution-layer",
+            "acurast-protocol/architecture/consensus-layer",
+            "acurast-protocol/architecture/networks",
+          ],
+          collapsed: false,
+        },
         {
           type: "category",
           label: "Modules",
           items: [
             "acurast-protocol/modules/enterprise",
             "acurast-protocol/modules/hyperdrive",
-            "acurast-protocol/modules/singularity",
-            "acurast-protocol/modules/mesh",
+            "acurast-protocol/modules/singularity-mesh",
           ],
           collapsed: false,
         },
