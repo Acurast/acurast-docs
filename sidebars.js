@@ -75,6 +75,7 @@ const sidebars = {
       ],
       collapsed: false,
     },
+    "networks",
   ],
 };
 
