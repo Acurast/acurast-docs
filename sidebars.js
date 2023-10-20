@@ -54,8 +54,7 @@ const sidebars = {
           items: [
             "acurast-protocol/modules/enterprise",
             "acurast-protocol/modules/hyperdrive",
-            "acurast-protocol/modules/singularity",
-            "acurast-protocol/modules/mesh",
+            "acurast-protocol/modules/singularity-mesh",
           ],
           collapsed: false,
         },
