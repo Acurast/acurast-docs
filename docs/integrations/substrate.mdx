@@ -11,7 +11,7 @@ The Acurast Receiver Pallet allows a Substrate based chain to integrate the Acur
 
 ### Introduction
 
-The Acurast Fulfillment Receiver Pallet, in combination with the [Acurast P256 crypto](https://github.com/Acurast/acurast-core/tree/main/p256-crypto) package, allows a Parachain to accept direct fulfillments from Acurast Processors.
+The Acurast Fulfillment Receiver Pallet, in combination with the [Acurast P256 crypto](https://github.com/Acurast/acurast-core/tree/main/p256-crypto) package, allows a Substrate (Polkadot SDK) enabled chain to accept direct fulfillments from Acurast Processors.
 
 The Pallet exposes one extrinsic.
 
@@ -22,7 +22,7 @@ Allows to post the [Fulfillment] of a job. The fulfillment structure consists of
 - The ipfs url of the `script` executed.
 - The `payload` bytes representing the output of the `script`.
 
-### Parachain Integration
+### Substrate Integration
 
 Implement `pallet_acurast_fulfillment_receiver::Config` for your `Runtime` and add the Pallet:
 
@@ -116,7 +116,7 @@ impl OnFulfillment<Runtime> for FulfillmentHandler {
 
 [GitHub Repository](https://github.com/Acurast/acurast-core/tree/main/p256-crypto)
 
-This crate provides types that allow to add P256 (a.k.a secp256r1) signature verification support to substrate based chains.
+This crate provides types that allow to add P256 (a.k.a secp256r1) signature verification support to Substrate (Polkadot SDK) based chains.
 
 ### Setup
 
@@ -129,7 +129,7 @@ acurast-p256-crypto = { git = "https://github.com/Acurast/acurast-core.git" }
 
 ### Integration
 
-Use the `acurast_p256_crypto::MultiSignature` as your parachain `Signature` type:
+Use the `acurast_p256_crypto::MultiSignature` as your Substrate `Signature` type:
 
 ```rust
 use acurast_p256_crypto::MultiSignature;
