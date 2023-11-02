@@ -22,11 +22,7 @@ const sidebars = {
     {
       type: "category",
       label: "Consumers",
-      items: [
-        "developers/get-started",
-        "developers/create-address",
-        "developers/api-reference",
-      ],
+      items: ["developers/get-started", "developers/api-reference"],
       collapsed: false,
     },
     "acurast-processors",
@@ -44,7 +40,7 @@ const sidebars = {
             "acurast-protocol/architecture/application-layer",
             "acurast-protocol/architecture/execution-layer",
             "acurast-protocol/architecture/consensus-layer",
-            "acurast-protocol/architecture/networks",
+            "acurast-protocol/architecture/instances",
           ],
           collapsed: false,
         },
@@ -75,6 +71,7 @@ const sidebars = {
       collapsed: false,
     },
     "networks",
+    "wallets",
   ],
 };
 

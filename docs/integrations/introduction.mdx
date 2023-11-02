@@ -14,20 +14,20 @@ Acurast is built with interoperability at its core and is able to support variou
 
 Acurast supports ecosystems that have an active developer community and smart contract environments.
 
-|                                                                                                           | Network           | Environment | [Level 2 Integration](#level-2) |
-| --------------------------------------------------------------------------------------------------------- | ----------------- | ----------- | ------------------------------- |
-| ![Aleph Zero](/img/A0-symbol_dark.svg "Aleph Zero") **Aleph Zero**                                        | In Development    | WASM        | ❌ \*                           |
-| ![Arbitrum](/img/arbitrum_symbol.svg "Arbitrum") **Arbitrum**                                             | Mainnet           | EVM         | ❌ \*                           |
-| ![Astar](/img/astar_symbol.svg "Astar") **Astar**                                                         | Mainnet, Shibuya  | WASM & EVM  | ❌ \*                           |
-| ![Base](/img/base_symbol.svg "Base") **Base**                                                             | Mainnet           | EVM         | ❌ \*                           |
-| ![Binance Smart Chain](/img/binance-smart-chain_symbol.svg "Binance Smart Chain") **Binance Smart Chain** | Mainnet           | EVM         | ❌ \*                           |
-| ![Ethereumn](/img/ethereum_symbol.svg "Ethereum") **Ethereum**                                            | Mainnet           | EVM         | ❌ \*                           |
-| ![Moonbeam](/img/moonbeam_symbol.svg "Moonbeam") **Moonbeam**                                             | Mainnet, Moonbase | EVM         | ❌ \*                           |
-| ![Optimism](/img/optimism_symbol.svg "Optimism") **Optimism**                                             | Mainnet           | EVM         | ❌ \*                           |
-| ![Pendulum](/img/pendulum_symbol.svg "Pendulum") **Pendulum**                                             | Testnet           | EVM         | ❌                              |
-| ![Polygon](/img/polygon_symbol.svg "Polygon") **Polygon**                                                 | Mainnet           | EVM         | ❌ \*                           |
-| ![Tezos](/img/tezos_symbol.svg "Tezos") **Tezos**                                                         | Mainnet, Ghostnet | Tezos       | ✅                              |
-| ![aeternity](/img/aeternity_symbol.svg "aeternity") **æternity**                                          | In Development    | æternity    | ❌ \*                           |
+|                                                                                                           | Network                   | Environment      | [Level 1 Integration ↗](#level-1) | [Level 2 Integration ↗](#level-2) |
+| --------------------------------------------------------------------------------------------------------- | ------------------------- | ---------------- | --------------------------------- | --------------------------------- |
+| ![Aleph Zero](/img/A0-symbol_dark.svg "Aleph Zero") **Aleph Zero**                                        | In Development            | WASM             | ❌ \*                             | ❌ \*                             |
+| ![Arbitrum](/img/arbitrum_symbol.svg "Arbitrum") **Arbitrum**                                             | Mainnet, Goerli           | EVM              | ✅                                | ❌ \*                             |
+| ![Astar](/img/astar_symbol.svg "Astar") **Astar**                                                         | Mainnet, Shibuya, zKatana | WASM, EVM, zKEVM | ✅                                | ❌ \*                             |
+| ![Base](/img/base_symbol.svg "Base") **Base**                                                             | Mainnet, Goerli           | EVM              | ✅                                | ❌ \*                             |
+| ![Binance Smart Chain](/img/binance-smart-chain_symbol.svg "Binance Smart Chain") **Binance Smart Chain** | Mainnet, Testnet          | EVM              | ✅                                | ❌ \*                             |
+| ![Ethereumn](/img/ethereum_symbol.svg "Ethereum") **Ethereum**                                            | Mainnet                   | EVM              | ✅                                | ❌ \*                             |
+| ![Moonbeam](/img/moonbeam_symbol.svg "Moonbeam") **Moonbeam**                                             | Mainnet, Moonbase         | EVM              | ✅                                | ❌ \*                             |
+| ![Optimism](/img/optimism_symbol.svg "Optimism") **Optimism**                                             | Mainnet, Goerli           | EVM              | ✅                                | ❌ \*                             |
+| ![Pendulum](/img/pendulum_symbol.svg "Pendulum") **Pendulum**                                             | Testnet                   | EVM              | ✅                                | ❌                                |
+| ![Polygon](/img/polygon_symbol.svg "Polygon") **Polygon**                                                 | Mainnet, Mumbai           | EVM              | ✅                                | ❌ \*                             |
+| ![Tezos](/img/tezos_symbol.svg "Tezos") **Tezos**                                                         | Mainnet, Ghostnet         | Tezos            | ✅                                | ✅                                |
+| ![aeternity](/img/aeternity_symbol.svg "aeternity") **æternity**                                          | In Development            | æternity         | ❌ \*                             | ❌ \*                             |
 
 _\* In Development_
 
@@ -67,6 +67,7 @@ A simplified representation of the Level 1 flow:
 
 - Processors can interact with the destination and submit their output
 - Consumers create Acurast Jobs through the Acurast Console directly on the Acurast Protocol which requires an Acurast Wallet and Acurast Tokens
+- Consumers need to fund transaction fees of the Processors with the asset of the destination ecosystem
 
 ### Level 2
 
@@ -89,7 +90,7 @@ A simplified representation of the Level 2 flow:
 **Key takeaways:**
 
 - Consumers create Acurast Jobs through the Acurast Console with a wallet from their ecosystem e.g., Metamask for Ethereum
-- Rewards are paid in a native asset e.g., ETH
+- Rewards and transaction fees are paid in a native asset e.g., ETH
 - Acurast Hyperdrive is used for cross-chain communication
 
 ## Integrations
@@ -124,6 +125,8 @@ Learn about Acurast on **[Tezos ↗](/integrations/tezos/)**
 
 More details will be available soon about the upcoming integrations, these include the following ecosystems:
 
+- Bitcoin
 - Cosmos
 - NEAR
+- Mina
 - Additional EVM Chains

@@ -24,28 +24,43 @@ The so-called Acurast Jobs are executed by Processors in their Trusted Execution
 
 ## Get Started
 
-Get access to computational resources through the Acurast Console. [Create a new address](/developers/create-address) if you don't yet have one.
+Head to [Integration Levels ↗](/integrations/introduction) for more details:
 
-Not sure if your ecosystem is supported? Take a look at [Ecosystems & Integrations](/integrations/introduction).
+### Level 2
 
-<div class="padding-vert--md"></div>
-
-<ThemedImage
-  sources={{
-    light: useBaseUrl("/img/acurast-consumer.png"),
-    dark: useBaseUrl("/img/acurast-console.png"),
-  }}
-/>
-
-1. Go to the [Acurast Console](https://console.acurast.com/) and log in with your [Talisman Wallet](https://www.talisman.xyz/wallet) or your [PolkadotJS Extension](https://polkadot.js.org/extension/).
-1. Fund Account - Get Testnet funds for your account with "Fund Account", to be able to create Jobs.
+1. Go to the [Acurast Console](https://console.acurast.com/) and log in with a supported wallet of your Ecosystem e.g., Metamask for Ethereum
+1. Fund Account - Get Acurast Canary (cACU) asset for your account, to be able to create Jobs, with "Fund Account" or head directly to the [Faucet](https://faucet.acurast.com/).
 1. Go to "Create Job" and select your destination, the ecosystem you're building in.
 1. Select an existing template, adapt it or write your own code that fits your needs. Test your code with "Test Code".
-1. Select your own Processor or use public ones.
-1. Define your execution schedule with the parameters such as start and endtime, interval etc.
-1. Specify your usage parameters.
-1. Specify your additional parameters such as the reward.
-1. Publish your Job and wait for your first fulfillment.
+1. Select "Public Processors"
+   1. Alternatively select one or more of your "Personal Processors"
+   1. or enter the address of one or more "Specific Processors"
+1. Define your "Execution Schedule" with the parameters such as start and endtime, interval etc.
+1. Specify "Additional Parameters"
+   1. The number of Processors and their reputation
+   1. The fulfillment fee, the transaction/gas fees for each submission
+   1. The reward, paid in the native asset of your ecosystem e.g., ETH
+1. Publish your Job, it will be matched, acknowledged and then wait for your first fulfillment.
+
+### Level 1
+
+1. Go to the [Acurast Console](https://console.acurast.com/) and log in with a supported Acurast wallet.
+1. Fund Account - Get Acurast Canary (cACU) asset for your account, to be able to create Jobs, with "Fund Account" or head directly to the [Faucet](https://faucet.acurast.com/).
+1. Go to "Create Job" and select your destination, the ecosystem you're building in.
+1. Select an existing template, adapt it or write your own code that fits your needs. Test your code with "Test Code".
+1. Select "Public Processors".
+   1. Alternatively select one or more of your "Personal Processors"
+   1. or enter the address of one or more "Specific Processors"
+1. Define your "Execution Schedule" with the parameters such as start and endtime, interval etc.
+1. Specify "Additional Parameters"
+   1. The number of Processors and their reputation
+   1. The reward, paid in the native asset of your ecosystem e.g., ETH
+1. Publish your Job, it will be matched, acknowledged
+1. Head to the "Job Details", check the address of each Processor for your destination ecosystem.
+   1. Send transaction/gas fees to your unique address, that the Processor is able to inject the signed output directly.
+1. Wait for your first fulfillment
+
+Not sure if your ecosystem is supported? Take a look at [Ecosystems & Integrations](/integrations/introduction).
 
 ## Examples
 
