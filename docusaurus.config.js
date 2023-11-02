@@ -181,6 +181,14 @@ const config = {
             to: "/acurast-protocol/modules/singularity-mesh",
             from: "/acurast-protocol/modules/singularity",
           },
+          {
+            to: "/acurast-protocol/architecture/instances",
+            from: "/acurast-protocol/architecture/networks",
+          },
+          {
+            to: "/wallets",
+            from: "/developers/create-address",
+          },
         ],
       },
     ],
