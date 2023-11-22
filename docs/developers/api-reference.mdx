@@ -60,6 +60,7 @@ interface _STD_ {
                 config: {
                     methodSignature: string?, // e.g. "fulfill(bytes)"
                     gasLimit: string, // decimal
+                    useLegacyTransaction: boolean?, // This property needs to be set to `true` when fulfilling to networks that do not support eip-1559
                     maxPriorityFeePerGas: string, // decimal
                     maxFeePerGas: string, // decimal
                 },
