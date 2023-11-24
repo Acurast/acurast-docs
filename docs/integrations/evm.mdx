@@ -107,3 +107,69 @@ _STD_.chains.ethereum.fulfill(
 ## Job Registration
 
 Check out [How to get started with the Acurast Console](/developers/get-started) to register your Job.
+
+
+## Chainlink price feeds deployments
+
+We have deployed a few price oracles that can be used to connect your smart contracts to asset pricing data like the `BTC / USD` feed.
+
+### How to consume the price from the oracle?
+
+```sol
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.6.0;
+
+import "@chainlink/contracts/src/v0.6/interfaces/AggregatorInterface.sol";
+
+contract DataConsumer {
+    AggregatorInterface internal dataFeed;
+
+    /**
+     * Network: zkatana
+     * Aggregator: BTC/USD
+     */
+    constructor() {
+        dataFeed = AggregatorInterface(
+            0xDBb23274EE9354367155C290c673733374d57967
+        );
+    }
+
+    /**
+     * Returns the latest answer.
+     */
+    function getLatestAnswer() public view returns (int256) {
+        int256 answer = dataFeed.latestAnswer();
+        return answer;
+    }
+}
+```
+
+### zkatana (Astar zkEVM)
+
+| Symbol | Address   |
+|:--:|:--:|
+| ASTR/USD | [0xde4F97786EAB4e47b96A0A65EdD7755895077073](https://zkatana.blockscout.com/address/0xde4F97786EAB4e47b96A0A65EdD7755895077073) |
+| BTC/USD | [0xDBb23274EE9354367155C290c673733374d57967](https://zkatana.blockscout.com/address/0xDBb23274EE9354367155C290c673733374d57967) |
+| ETH/USD | [0x448786CD6E53E706AEdd984C620D63d48B720e6A](https://zkatana.blockscout.com/address/0x448786CD6E53E706AEdd984C620D63d48B720e6A) |
+| BNB/USD | [0xb6B94e18957376ac6d22bAF31C7BF1661B238F4A](https://zkatana.blockscout.com/address/0xb6B94e18957376ac6d22bAF31C7BF1661B238F4A) |
+| USDT/USD | [0xD12ad062A6bFBB27024a7B76E4EF7FDC5bf49Aeb](https://zkatana.blockscout.com/address/0xD12ad062A6bFBB27024a7B76E4EF7FDC5bf49Aeb) |
+| USDC/USD | [0x2E23a70dfe6059f9F2DC35C1e940e3B3288BDE04](https://zkatana.blockscout.com/address/0x2E23a70dfe6059f9F2DC35C1e940e3B3288BDE04) |
+| DAI/USD | [0xEC6985D9eA362fb85fEa72263169C375F8f065E7](https://zkatana.blockscout.com/address/0xEC6985D9eA362fb85fEa72263169C375F8f065E7) |
+| stETH/USD | [0xA2FB708105a412710Df254D7406A27764408A657](https://zkatana.blockscout.com/address/0xA2FB708105a412710Df254D7406A27764408A657) |
+| DOT/USD | [0x208f799E0EE205bc6607Fae430485c66F9fe6012](https://zkatana.blockscout.com/address/0x208f799E0EE205bc6607Fae430485c66F9fe6012) |
+| MATIC/USD | [0x77Ed3BAc1B3Dd4DBB8D2636b6f3adFd4f21d15B3](https://zkatana.blockscout.com/address/0x77Ed3BAc1B3Dd4DBB8D2636b6f3adFd4f21d15B3) |
+
+### BoB (Build on Bitcoin)
+
+| Symbol | Address   |
+|:--:|:--:|
+| ASTR/BTC | [0x7daEe65f9aA9028926deCE01cCfD0bD1B9320522](https://explorerl1-fluffy-bob-7mjgi9pmtg.t.conduit.xyz/address/0x7daEe65f9aA9028926deCE01cCfD0bD1B9320522) |
+| BTC/BTC | [0x80A5AA35dD52C1Fb55DbD384dD170860b14ae5fF](https://explorerl1-fluffy-bob-7mjgi9pmtg.t.conduit.xyz/address/0x80A5AA35dD52C1Fb55DbD384dD170860b14ae5fF) |
+| ETH/BTC | [0x026Ff0A14806D07DbB73FCe54BCD6cEf82bB62EB](https://explorerl1-fluffy-bob-7mjgi9pmtg.t.conduit.xyz/address/0x026Ff0A14806D07DbB73FCe54BCD6cEf82bB62EB) |
+| BNB/BTC | [0x2af55bc02Ca0C5e84d7667d45ec25fF315517339](https://explorerl1-fluffy-bob-7mjgi9pmtg.t.conduit.xyz/address/0x2af55bc02Ca0C5e84d7667d45ec25fF315517339) |
+| USDT/BTC | [0x0c5f26263dA046CAf41F6907D977e3151A682dC6](https://explorerl1-fluffy-bob-7mjgi9pmtg.t.conduit.xyz/address/0x0c5f26263dA046CAf41F6907D977e3151A682dC6) |
+| USDC/BTC | [0xda2723e3C7fa809a40DFa7Eab9110529F4942B8c](https://explorerl1-fluffy-bob-7mjgi9pmtg.t.conduit.xyz/address/0xda2723e3C7fa809a40DFa7Eab9110529F4942B8c) |
+| DAI/BTC | [0x57e796ff645719FC98b9Be0b3731F1605Ed98c5e](https://explorerl1-fluffy-bob-7mjgi9pmtg.t.conduit.xyz/address/0x57e796ff645719FC98b9Be0b3731F1605Ed98c5e) |
+| stETH/BTC | [0xaB7e9f13a1Fa8ed0dA264830F68ec31fF8E1E9a2](https://explorerl1-fluffy-bob-7mjgi9pmtg.t.conduit.xyz/address/0xaB7e9f13a1Fa8ed0dA264830F68ec31fF8E1E9a2) |
+| DOT/BTC | [0x5365DC31CfA4347D273023C7bE5153CE89eE34f9](https://explorerl1-fluffy-bob-7mjgi9pmtg.t.conduit.xyz/address/0x5365DC31CfA4347D273023C7bE5153CE89eE34f9) |
+| MATIC/BTC | [0x7E5ddfF7bc9DCbf9eE38a89767DeF6dEF2b4Bf95](https://explorerl1-fluffy-bob-7mjgi9pmtg.t.conduit.xyz/address/0x7E5ddfF7bc9DCbf9eE38a89767DeF6dEF2b4Bf95) |
