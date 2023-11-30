@@ -1,0 +1,328 @@
+---
+title: Job Runtime Environment
+slug: /acurast-protocol/job-runtime-environment
+---
+
+The job's script running on Processors has access to the following a set of APIs.
+
+## **Top level functions**
+
+```javascript
+/**
+ * Prints the given message to the console.
+ * @param {string} message the message to print.
+ */
+function print(message);
+
+/**
+ * Performs an HTTP GET request.
+ * @param {string} url the url to connect to.
+ * @param {Record<string, string>} headers the request's headers, for example: { 'Accept': 'application/json' }.
+ * @param {HttpSuccess} success the success callback function.
+ * @param {HttpError} error the error callback function.
+ */
+function httpGET(url, headers, success, error);
+
+/**
+ * Performs an HTTP GET request.
+ * @param {string} url the url to connect to.
+ * @param {string} body a string representing the request's body.
+ * @param {Record<string, string>} headers the request's headers, for example: { 'Content-Type': 'application/json' }.
+ * @param {HttpSuccess} success the success callback function.
+ * @param {HttpError} error the error callback function.
+ */
+function httpPOST(url, body, headers, success, error);
+
+/**
+ * @callback HttpSuccess
+ * @param {string} payload the http request response payload as text.
+ * @param {string} certificate a hex string representing the server certificate.
+ */
+type HttpSuccess = (payload, certificate) => void;
+
+/**
+ * @callback HttpError
+ * @param {string} message an error message.
+ */
+type HttpError = (message) => void;
+
+/**
+ * Reads value from the environment.
+ * @param {string} key The key used to get the value from the environment.
+ * @returns The string value for the given key or undefined.
+ */
+function environment(key);
+```
+
+## **The \_STD\_ object**
+
+At the top level, a `_STD_` object is defined. This object exposes additional functionalities.
+
+### **Random**
+
+```javascript
+/**
+ * Generates random bytes.
+ * @returns Hex string representing random bytes.
+ */
+_STD_.random.generateSecureRandomHex();
+```
+
+### **Environment Variables**
+
+```javascript
+/**
+ * Environment object populated with the environment variables defined during job creation.
+ * For example, to access a variable defined with the "MY_KEY" key do: _STD_.env["MY_KEY"].
+ */
+_STD_.env;
+```
+
+### **Websocket**
+
+```javascript
+/**
+ * @param {string | string[]} url to the acurast websocket service.
+ * @param {WsSuccess} success the success callback.
+ * @param {WsError} error the error callback.
+ */
+_STD_.ws.open(url, success, error);
+
+/**
+ * @param {WsSuccess} success the success callback.
+ * @param {WsError} error the error callback.
+ */
+_STD_.ws.close(success, error);
+
+/**
+ * @param {WsHandler} handler the handler called on every incoming message.
+ */
+_STD_.ws.registerPayloadHandler(handler);
+
+/**
+ * @param {string} recipient the public key in hex format of the recipient.
+ * @param {string} payload the payload to send as a hex string.
+ */
+_STD_.ws.send(recipient, payload);
+
+/**
+ * @callback WsSuccess
+ */
+type WsSuccess = () => void;
+
+/**
+ * @callback WsError
+ * @param {string} message an error message.
+ */
+type WsError = (message) => void;
+
+/**
+ * @callback WsHandler
+ * @param {WsPayload} payload an error message.
+ */
+type WsHandler = (payload) => void;
+
+type WsPayload = { sender: string, recipient: string, payload: string };
+```
+
+### **Substrate functions**
+
+```javascript
+/**
+ * Calls the `fulfill` extrinsic on the target substrate chain.
+ * @param {string | string[]} nodes the node URL or array of node URLs.
+ * @param {string} payload the string representation of the fulfill payload.
+ * @param {object} extra an object with extra arguments. It needs to provide a `callIndex` which is the hex representation of the `fulfill` extrinsic's call index on the target substrate chain.
+ * @param {SubstrateSuccess} success the success callback.
+ * @param {SubstrateError} error the error callback.
+ */
+_STD_.chains.substrate.fulfill(nodes, payload, extra, success, error);
+
+/**
+ * @callback SubstrateSuccess
+ * @param {string} operationHash the operation hash of the submitted extrinsic.
+ */
+type SubstrateSuccess = (operationHash) => void;
+
+/**
+ * @callback SubstrateError
+ * @param {string[]} message an error message.
+ */
+type SubstrateError = (message) => void;
+```
+
+## **Substrate signer functions**
+
+```javascript
+/**
+ * Sets the curve type to use when signing.
+ * @param {'SECP256K1' | 'SECP256R1'} curveType
+ */
+_STD_.chains.substrate.signer.setSigner(curveType);
+```
+
+### **Substrate codec functions**
+
+```javascript
+/**
+ * Hashes the given string using blake2b 256 bit.
+ * @param {string} value
+ * @returns The blake2b hash of the input value.
+ */
+_STD_.chains.substrate.codec.blakeTwo256(value);
+
+/**
+ * Encodes a number to the SCALE encoding.
+ * @param {number | string} value the number to encode.
+ * @param {8 | 32 | 64 | 128} bitSize the number's bit size.
+ * @returns Hex string representing the SCALE encoded number.
+ */
+_STD_.chains.substrate.codec.encodeUnsignedNumber(value, bitSize);
+
+/**
+ * Encodes a number to the compact SCALE encoding.
+ * @param {number | string} value the number to encode.
+ * @returns Hex string representing the compact SCALE encoded number.
+ */
+_STD_.chains.substrate.codec.encodeCompactUnsignedNumber(value);
+
+/**
+ * Encodes bytes to SCALE encoding.
+ * @param {string | ArrayBuffer} value hex string or an ArrayBuffer representing the bytes to encode.
+ * @returns Hex string representing the SCALE encoded bytes.
+ */
+_STD_.chains.substrate.codec.encodeBytes(value);
+
+/**
+ * Encodes a boolean value to SCALE encoding.
+ * @param {boolean} value the boolean value to encode.
+ * @returns Hex string representing the SCALE encoded boolean.
+ */
+_STD_.chains.substrate.codec.encodeBoolean(value);
+
+/**
+ * Encodes a substrate address to SCALE encoding.
+ * @param value the address to encode.
+ * @returns Hex string representing the SCALE encoded address.
+ */
+_STD_.chains.substrate.codec.encodeAddress(value);
+
+/**
+ * Encodes a substrate address to a `MultiAddress` SCALE encoded vale.
+ * @param value the address to encode.
+ * @returns Hex string representing the SCALE encoded multi address.
+ */
+_STD_.chains.substrate.codec.encodeMultiAddress(value: string);
+```
+
+### **Substrate contract functions**
+
+```javascript
+/**
+ * Calls the `fulfill` extrinsic on a contract deployed on a chain integrating the substrate contract pallet (`pallet-contract`).
+ * @param {string | stirng[]} nodes the node URL or array of node URLs.
+ * @param {string} callIndex an hex string representing the call index of the `call` extrinsic of `pallet-contract`.
+ * @param {string} destination the contract address.
+ * @param {string} data the contract call arguments as an hex string.
+ * @param {object} extra objet containing additional arguments, it has to at least provide `refTime` and `proofSize` as string values. Additionally it can provide a `value` as a string representing the amount to transfer with the contract call, `method` as a string representing the method name to use instead of `fulfill` and `storageDepositLimit` as a string value. Example: `{ refTime: "3951114240", proofSize: "629760" }`.
+ * @param {SubstrateSuccess} success the success callback.
+ * @param {SubstrateError} error the error callback.
+ */
+_STD_.chains.substrate.contract.fulfill(
+  nodes,
+  callIndex,
+  destination,
+  data,
+  extra,
+  success,
+  error
+);
+```
+
+### **Tezos functions**
+
+```javascript
+/**
+ * Calls the `fulfill` entrypoint on the Tezos Acurast Proxy contract.
+ * @param {string | string[]} nodes the node URL or array of node URLs.
+ * @param {any} payload the second argument for the `fulfill` entrypoint call on the Acurast Proxy contract. It represents a Michelson value that will be packed to bytes.
+ * @param {object} extra object with extra arguments, it has to at least provide the values for the `fee`, `gasLimit` and `storageLimit` as numbers. Additionally it can provide an `entrypoint` as a string to use instead of `fulfill`. Example: `{ fee: 1500, gasLimit: 3000, storageLimit: 0 }`.
+ * @param {TezosSuccess} success the success callback.
+ * @param {TezosError} error the error callback.
+ */
+_STD_.chains.tezos.fulfill(nodes, payload, extra, success, error);
+
+/**
+ * Calls a custom entrypoint on a Tezos contract.
+ * @param {string | string[]} nodes the node URL or array of node URLs.
+ * @param {any} payload a Michelson value representing the arguments of the entrypoint being called.
+ * @param {object} extra object with extra arguments, it has to at least provide the values for the `fee`, `gasLimit` and `storageLimit` as numbers. Additionally it can provide an `entrypoint` as a string to use instead of `fulfill` and `destination` as a string for the contract address to use instead of the default Acurast Proxy contract. Example: `{ fee: 1500, gasLimit: 3000, storageLimit: 0 }`.
+ * @param {TezosSuccess} success the success callback.
+ * @param {TezosError} error the error callback.
+ */
+_STD_.chains.tezos.customCall(nodes, payload, extra, success, error);
+
+/**
+ * @callback TezosSuccess
+ * @param {string} operationHash the operation hash of the submitted operation.
+ */
+type TezosSuccess = (operationHash) => void;
+
+/**
+ * @callback TezosError
+ * @param {string[]} message an error message.
+ */
+type TezosError = (message) => void;
+```
+
+### **Tezos encoding functions**
+
+```javascript
+/**
+ * Packs the given micheline structure.
+ * @param value an object representing a micheline structure.
+ * @returns Hex string representing the packed value.
+ */
+_STD_.chains.tezos.encoding.pack(value);
+
+/**
+ * Encodes the given micheline structure into a hex value that can be used as key for big map values.
+ * @param value an object representing a micheline structure.
+ * @returns Hex string representing the script hash encoded value.
+ */
+_STD_.chains.tezos.encoding.encodeExpr(value);
+```
+
+### **Ethereum functions**
+
+```javascript
+/**
+ * Calls `fulfill` on a ethereum contract.
+ *
+ * The `extra` argument to provide for a Ethereum `fulfill` call is an object that can provide the following:
+ * - `methodSignature`: an optional string representing the method signature, if not provided `fulfill(bytes)` is used.
+ * - `gasLimit`: a string representing the transaction's gas limit, if not provided '9000000' is used.
+ * - `maxPriorityFeePerGas`: a string representing the transaction's maxPriorityFeePerGas, if not provided '0' is used.
+ * - `maxFeePerGas`: a string representing the transaction's maxFeePerGas, if not provided '0'.
+ *
+ * @param {string} url the node URL.
+ * @param {string} destination the contract's address.
+ * @param {string} payload a hex string representing the arguments for the method call.
+ * @param {object} extra object with extra arguments.
+ * @param {EthereumSuccess} success the success callback.
+ * @param {EthereumError} error the success callback.
+ */
+_STD_.chains.ethereum.fulfill(url, destination, payload, extra, success, error);
+
+/**
+ * @callback EthereumSuccess
+ * @param {string} operationHash the operation hash of the submitted operation.
+ */
+type EthereumSuccess = (operationHash) => void;
+
+/**
+ * @callback EthereumError
+ * @param {string[]} message an error message.
+ */
+type EthereumError = (message) => void;
+```
