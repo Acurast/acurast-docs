@@ -55,6 +55,7 @@ const sidebars = {
           collapsed: false,
         },
         "acurast-protocol/node-setup",
+        "acurast-protocol/job-creation",
       ],
       collapsed: false,
     },
