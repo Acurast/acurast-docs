@@ -6,9 +6,9 @@ slug: /acurast-protocol/job-creation
 import ThemedImage from "@theme/ThemedImage";
 import useBaseUrl from "@docusaurus/useBaseUrl";
 
-Use the [Acurast Console](https://console.acurast.com) to specify a job and post it on Acurast to be executed by a processor.
+Use the [Acurast Console](https://console.acurast.com) to specify a job and post it on Acurast to be executed by Processors.
 
-## Protocol and Templates Selection
+### Protocol and Templates Selection
 
 <ThemedImage
   width="640px"
@@ -20,7 +20,7 @@ Use the [Acurast Console](https://console.acurast.com) to specify a job and post
 
 Select the protocol / chain the job should fulfill on and select a job template as a starting point. Alternatively it is possible to just start with a blank template.
 
-## Job Script
+### Job Script
 
 <ThemedImage
   width="640px"
@@ -30,9 +30,9 @@ Select the protocol / chain the job should fulfill on and select a job template 
   }}
 />
 
-Adapt the job script so that it performs the task you need. The above images show the template for publishing a price on ethereum.
+Adapt the job script so that it performs the task you need. The above images show the template for publishing a price on Ethereum.
 
-## Job Schedule
+### Job Schedule
 
 <ThemedImage
   width="640px"
@@ -58,17 +58,21 @@ It is recommended to not have a start time sooner than 10 minutes from the prese
   }}
 />
 
-It is possible to specify environment variables that the script can access at runtime. This is useful when the script needs to use data that should be secret, for example an API.
+It is possible to specify environment variables that the script can access at runtime. This is useful when the script needs to use data that should be secret, for example an API key allowing permissioned access to the API.
 
-If an environment variable is specified like in the picture above, it will be accessible from the script by doing the following:
+If an environment variable is specified like in pictured above, it will be accessible from the script with:
 
 ```javascript
 const myApiKey = _STD_.env["MY_API_KEY"];
 ```
 
-The environment variables will be encrypted and only the processor assigned to the job will be able to use them.
+:::info
 
-Using environment variables will require a processor with the `DataEncryption` module enabled.
+The environment variables will be encrypted and only the Processor assigned to the job will be able to use them. Not even the owner of the device will be able to access this variable as it can only be encrypted within the Trusted Execution Environment of the devices.
+
+:::
+
+Using environment variables will require a processor with the `DataEncryption` module enabled which wille be activated automatically in your job when adding one or more environment variables.
 
 <ThemedImage
   width="640px"
@@ -78,7 +82,7 @@ Using environment variables will require a processor with the `DataEncryption` m
   }}
 />
 
-## Job Reward and Publish
+### Job Reward and Publish
 
 <ThemedImage
   width="640px"
@@ -90,8 +94,7 @@ Using environment variables will require a processor with the `DataEncryption` m
 
 Specify the number of processors that should be assigned to run the job, the minimum reputation each processor needs to have and the reward per job execution, then publish the job.
 
-
-## Job Creation Progress
+### Job Creation Progress
 
 <ThemedImage
   width="640px"
@@ -106,9 +109,9 @@ After publishing the job, a job creation progress screen is displayed, showing t
 - Job is registered on chain
 - Job is matched to one or more processors
 - Job is acknowledged by the matched processors
-    - At this point, if environment variables were specified, then the `Set` or `Set All` buttons should be pressed to encrypt and publish those variables on chain.
+  - At this point, if environment variables were specified, then the `Set` or `Set All` buttons should be pressed to encrypt and publish those variables on chain.
 
-Pressing the `Go to Job` button will open the job details page where all the job's details are displayed and job environment variables can be updated.
+`Go to Job` will open the job details page where all the job's details are displayed and the environment variables can be updated.
 
 <ThemedImage
   width="640px"
@@ -118,8 +121,8 @@ Pressing the `Go to Job` button will open the job details page where all the job
   }}
 />
 
-In the `Assigned Processors` section, the list of assigned processors is displayed. 
+In the `Assigned Processors` section, the list of assigned processors is displayed.
 
 Each processor will use a dedicated account for the user creating the job, thus here you can see the various addresses the processor will use when interacting with the various chains (selected from the drop down menus).
 
-If you see the `Transaction Fees Required` warning, it means that the chain has an L1 integration with Acurast and the user is responsible for those accounts to have enough balance to pay for the transaction fees.
+If you see the `Transaction Fees Required` warning, it means that the chain has a [Level 1](/integrations/introduction#integration-levels) integration with Acurast and the user is responsible for those accounts to have enough balance to pay for the transaction fees.

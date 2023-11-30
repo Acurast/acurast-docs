@@ -3,7 +3,7 @@ title: Job Runtime Environment
 slug: /acurast-protocol/job-runtime-environment
 ---
 
-The job's script running on the processor has access to the following a set of APIs.
+The job's script running on Processors has access to the following a set of APIs.
 
 ## **Top level functions**
 
@@ -228,7 +228,15 @@ _STD_.chains.substrate.codec.encodeMultiAddress(value: string);
  * @param {SubstrateSuccess} success the success callback.
  * @param {SubstrateError} error the error callback.
  */
-_STD_.chains.substrate.contract.fulfill(nodes, callIndex, destination, data, extra, success, error);
+_STD_.chains.substrate.contract.fulfill(
+  nodes,
+  callIndex,
+  destination,
+  data,
+  extra,
+  success,
+  error
+);
 ```
 
 ### **Tezos functions**
