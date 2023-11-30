@@ -46,10 +46,10 @@ mod simple_oracle {
     }
 
     impl SimpleOracle {
-        
+
         #[ink(constructor)]
         pub fn new(admin: Option<AccountId>) -> Self {
-            Self { 
+            Self {
                 prices: Mapping::new(),
                 allow_list: Mapping::new(),
                 admin,
@@ -64,13 +64,13 @@ mod simple_oracle {
         #[ink(message)]
         pub fn fulfill(&mut self, values: Vec<(Vec<u8>, u128)>) -> Result<()> {
             if !self.allow_list.contains(self.env().caller()) {
-                return Err(Error::CallerNotInAllowList);   
+                return Err(Error::CallerNotInAllowList);
             }
 
             for (key, value) in values {
                 self.prices.insert(key, &value);
             }
-            
+
             Ok(())
         }
 
@@ -125,52 +125,6 @@ mod simple_oracle {
             assert_eq!(simple_oracle.get(vec![0]), Some(10));
         }
     }
-}
-```
-
-The javascript job that can fulfill to such a contract looks like the following:
-
-```javascript
-const callIndex = '<#CALL_INDEX#>'; // the call index for the 'call' extrinsic.
-const destination = "<#CONTRACT_ADDRESS#>"; // contract address that will receive the 'fulfill' call.
-_STD_.chains.substrate.signer.setSigner("SECP256K1"); // the type of signer used for sign the extrinsic call
-const symbol = "AAVEBUSD";
-httpGET(
-    "https://api.binance.com/api/v3/ticker/price?symbol=" + symbol,
-    {},
-    (response, _certificate) => {
-        const price = Number(JSON.parse(response)["price"]) * 10 ** 18;
-      	const key = stringToHex(symbol);
-        const payload = _STD_.chains.substrate.codec.encodeCompactUnsignedNumber(1) + _STD_.chains.substrate.codec.encodeBytes(key) + _STD_.chains.substrate.codec.encodeUnsignedNumber(price, 128);
-        _STD_.chains.substrate.contract.fulfill(
-            "<#NODE_URL#>",
-            callIndex,
-            destination,
-            payload,
-            {
-                refTime: "1470675162",
-                proofSize: "37458",
-            },
-            (opHash) => {
-                print("Succeeded: " + opHash)
-            },
-            (err) => {
-                print("Failed fulfill: " + err)
-            },
-        )
-    },
-    (err) => {
-        print("Failed get price: " + err)
-    }
-);
-
-function stringToHex(str) {
-    let hexString = '';
-    for (let i = 0; i < str.length; i++) {
-        let hex = str.charCodeAt(i).toString(16);
-        hexString += hex.length === 1 ? '0' + hex : hex;
-    }
-    return hexString;
 }
 ```
 
@@ -239,26 +193,50 @@ Go to the [Acurast Console](https://console.acurast.com/) to test and deploy you
 <TabItem value="price-feed" label="Price Feed" default>
 
 ```javascript
-const callIndex = "0x4606"; // the call index for the 'call' extrinsic
-const destination = "<MY_WASM_CONTRACT_ADDRESS>"; // replace with a contract address that will receive the 'fulfill' call.
-_STD_.chains.substrate.signer.setSigner("SECP256K1"); // the type of signer used for sign the extrinsic call, possible values are SECP256K1 or SECP256R1. What to use depends on what type of address is supported by the chain.
-const entropy = generateSecureRandomHex();
-_STD_.chains.substrate.contract.fulfill(
-  "<SUBSTRATE_NODE_RPC_URL>",
-  callIndex,
-  destination,
-  entropy,
-  {
-    refTime: "3951114240",
-    proofSize: "629760",
-  },
-  (opHash) => {
-    print("Succeeded: " + opHash);
+const callIndex = "<#CALL_INDEX#>"; // the call index for the 'call' extrinsic.
+const destination = "<#CONTRACT_ADDRESS#>"; // contract address that will receive the 'fulfill' call.
+_STD_.chains.substrate.signer.setSigner("SECP256K1"); // the type of signer used for sign the extrinsic call
+const symbol = "AAVEBUSD";
+httpGET(
+  "https://api.binance.com/api/v3/ticker/price?symbol=" + symbol,
+  {},
+  (response, _certificate) => {
+    const price = Number(JSON.parse(response)["price"]) * 10 ** 18;
+    const key = stringToHex(symbol);
+    const payload =
+      _STD_.chains.substrate.codec.encodeCompactUnsignedNumber(1) +
+      _STD_.chains.substrate.codec.encodeBytes(key) +
+      _STD_.chains.substrate.codec.encodeUnsignedNumber(price, 128);
+    _STD_.chains.substrate.contract.fulfill(
+      "<#NODE_URL#>",
+      callIndex,
+      destination,
+      payload,
+      {
+        refTime: "1470675162",
+        proofSize: "37458",
+      },
+      (opHash) => {
+        print("Succeeded: " + opHash);
+      },
+      (err) => {
+        print("Failed fulfill: " + err);
+      }
+    );
   },
   (err) => {
-    print("Failed fulfill: " + err);
+    print("Failed get price: " + err);
   }
 );
+
+function stringToHex(str) {
+  let hexString = "";
+  for (let i = 0; i < str.length; i++) {
+    let hex = str.charCodeAt(i).toString(16);
+    hexString += hex.length === 1 ? "0" + hex : hex;
+  }
+  return hexString;
+}
 ```
 
 </TabItem>
