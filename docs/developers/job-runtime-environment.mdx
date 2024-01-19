@@ -299,7 +299,7 @@ _STD_.chains.tezos.encoding.encodeExpr(value);
 /**
  * Calls `fulfill` on a ethereum contract.
  *
- * The `extra` argument to provide for a Ethereum `fulfill` call is an object that can provide the following:
+ * The `extra` argument is an object that can provide the following:
  * - `methodSignature`: an optional string representing the method signature, if not provided `fulfill(bytes)` is used.
  * - `gasLimit`: a string representing the transaction's gas limit, if not provided '9000000' is used.
  * - `maxPriorityFeePerGas`: a string representing the transaction's maxPriorityFeePerGas, if not provided '0' is used.
@@ -325,4 +325,105 @@ type EthereumSuccess = (operationHash) => void;
  * @param {string[]} message an error message.
  */
 type EthereumError = (message) => void;
+```
+
+### **Aeternity functions**
+
+```javascript
+/**
+ * Calls `fulfill` on an aeternity contract.
+ * 
+ * The `extra` argument is an object that can provide the following:
+ * - `functionName`: an optional string representing the method name, if not provided `fulfill` is used.
+ * - `gasLimit`: a string representing the transaction's gas limit, if not provided '25000' is used.
+ * - `gasPrice`: a string representing the transaction's gas price, if not provided '1000000000' is used.
+ * 
+ * @param {string} url the node URL.
+ * @param {string} destination the contract's address.
+ * @param {[object]} payload an array of encoded values. The objects inside this array need to be constructed using the functions found under `_STD_.chains.aeternity.data`.
+ * @param {object} extra object with extra arguments.
+ * @param {AeternitySuccess} success the success callback.
+ * @param {AeternityError} error the success callback.
+ */
+_STD_.chains.aeternity.fulfill(url, destination, payload, extra, success, error);
+
+/**
+ * @callback EthereumSuccess
+ * @param {string} operationHash the operation hash of the submitted operation.
+ */
+type AeternitySuccess = (operationHash) => void;
+
+/**
+ * @callback EthereumError
+ * @param {string[]} message an error message.
+ */
+type AeternityError = (message) => void;
+```
+
+### **Aeternity data encoding functions**
+
+```javascript
+/**
+ * Returns an object representing an integer that can be used as payload in the `fulfill` call.
+ * 
+ * @param {number | string} value a value representing an integer.
+ * @returns an object representing an integer that can be used as payload in the `fulfill` call.
+ */
+_STD_.chains.aeternity.data.int(value);
+
+/**
+ * Returns an object representing a string that can be used as payload in the `fulfill` call.
+ * 
+ * @param {string} value a string value.
+ * @returns an object representing a string that can be used as payload in the `fulfill` call.
+ */
+_STD_.chains.aeternity.data.string(value);
+
+/**
+ * Returns an object representing bytes that can be used as payload in the `fulfill` call.
+ * 
+ * @param {string} value an hex string representing the bytes.
+ * @returns an object representing bytes that can be used as payload in the `fulfill` call.
+ */
+_STD_.chains.aeternity.data.bytes(value);
+
+/**
+ * Returns an object representing a list of objects that can be used as payload in the `fulfill` call.
+ * 
+ * @param {object[]} values an array of objects that were created using the functions found under `_STD_.chains.aeternity.data`.
+ * @returns an object representing a list of objects that can be used as payload in the `fulfill` call
+ */
+_STD_.chains.aeternity.data.list(values);
+
+/**
+ * Returns an object representing a tuple can be used as payload in the `fulfill` call.
+ * 
+ * @param {object[]} values an array of objects that were created using the functions found under `_STD_.chains.aeternity.data`.
+ * @returns an object representing a tuple can be used as payload in the `fulfill` call.
+ */
+_STD_.chains.aeternity.data.tuple(values);
+
+/**
+ * Returns an object representing a map can be used as payload in the `fulfill` call.
+ * 
+ * The input value is an array of arrays of objects. The items need to be an array of size 2, 
+ * where the first element represents a map key and the second element represents its value:
+ * 
+ * _STD_.chains.aeternity.data.map([
+ *  [_STD_.chains.aeternity.data.string("key1"), _STD_.chains.aeternity.data.string("value1")], 
+ *  [_STD_.chains.aeternity.data.string("key2"), _STD_.chains.aeternity.data.string("value2")] 
+ * ]);
+ * 
+ * @param {object[][]} values an array of arrays of objects that were created using the functions found under `_STD_.chains.aeternity.data`.
+ * @returns an object representing a map can be used as payload in the `fulfill` call.
+ */
+_STD_.chains.aeternity.data.map(values);
+
+/**
+ * Returns an object representing an account pubkey can be used as payload in the `fulfill` call.
+ * 
+ * @param {string} value a string representing an account pubkey .
+ * @returns an object representing an account pubkey can be used as payload in the `fulfill` call.
+ */
+_STD_.chains.aeternity.data.account_pubkey(value);
 ```
