@@ -1,0 +1,128 @@
+---
+title: Job Creation
+slug: /developers/job-creation
+---
+
+import ThemedImage from "@theme/ThemedImage";
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
+Use the [Acurast Console](https://console.acurast.com) to specify a job and post it on Acurast to be executed by Processors.
+
+### Protocol and Templates Selection
+
+<ThemedImage
+  width="640px"
+  sources={{
+    light: useBaseUrl("/img/protocol-template-select.png"),
+    dark: useBaseUrl("/img/protocol-template-select.png"),
+  }}
+/>
+
+Select the protocol / chain the job should fulfill on and select a job template as a starting point. Alternatively it is possible to just start with a blank template.
+
+### Job Script
+
+<ThemedImage
+  width="640px"
+  sources={{
+    light: useBaseUrl("/img/job-script.png"),
+    dark: useBaseUrl("/img/job-script.png"),
+  }}
+/>
+
+Adapt the job script so that it performs the task you need. The above images show the template for publishing a price on Ethereum.
+
+### Job Schedule
+
+<ThemedImage
+  width="640px"
+  sources={{
+    light: useBaseUrl("/img/job-schedule.png"),
+    dark: useBaseUrl("/img/job-schedule.png"),
+  }}
+/>
+
+Specify if the job should be matched to the available public processors or if it should run on a specific ones.
+
+Additionally, specify start and end times for the job, the execution interval and the duration.
+
+It is recommended to not have a start time sooner than 10 minutes from the present.
+
+## Job Environment Variables
+
+<ThemedImage
+  width="640px"
+  sources={{
+    light: useBaseUrl("/img/job-env-variables.png"),
+    dark: useBaseUrl("/img/job-env-variables.png"),
+  }}
+/>
+
+It is possible to specify environment variables that the script can access at runtime. This is useful when the script needs to use data that should be secret, for example an API key allowing permissioned access to the API.
+
+If an environment variable is specified like in pictured above, it will be accessible from the script with:
+
+```javascript
+const myApiKey = _STD_.env["MY_API_KEY"];
+```
+
+:::info
+
+The environment variables will be encrypted and only the Processor assigned to the job will be able to use them. Not even the owner of the device will be able to access this variable as it can only be encrypted within the Trusted Execution Environment of the devices.
+
+:::
+
+Using environment variables will require a processor with the `DataEncryption` module enabled which wille be activated automatically in your job when adding one or more environment variables.
+
+<ThemedImage
+  width="640px"
+  sources={{
+    light: useBaseUrl("/img/job-required-modules.png"),
+    dark: useBaseUrl("/img/job-required-modules.png"),
+  }}
+/>
+
+### Job Reward and Publish
+
+<ThemedImage
+  width="640px"
+  sources={{
+    light: useBaseUrl("/img/job-reward.png"),
+    dark: useBaseUrl("/img/job-reward.png"),
+  }}
+/>
+
+Specify the number of processors that should be assigned to run the job, the minimum reputation each processor needs to have and the reward per job execution, then publish the job.
+
+### Job Creation Progress
+
+<ThemedImage
+  width="640px"
+  sources={{
+    light: useBaseUrl("/img/job-creation.png"),
+    dark: useBaseUrl("/img/job-creation.png"),
+  }}
+/>
+
+After publishing the job, a job creation progress screen is displayed, showing the various initial stage of the job creation:
+
+- Job is registered on chain
+- Job is matched to one or more processors
+- Job is acknowledged by the matched processors
+  - At this point, if environment variables were specified, then the `Set` or `Set All` buttons should be pressed to encrypt and publish those variables on chain.
+
+`Go to Job` will open the job details page where all the job's details are displayed and the environment variables can be updated.
+
+<ThemedImage
+  width="640px"
+  sources={{
+    light: useBaseUrl("/img/job-details.png"),
+    dark: useBaseUrl("/img/job-details.png"),
+  }}
+/>
+
+In the `Assigned Processors` section, the list of assigned processors is displayed.
+
+Each processor will use a dedicated account for the user creating the job, thus here you can see the various addresses the processor will use when interacting with the various chains (selected from the drop down menus).
+
+If you see the `Transaction Fees Required` warning, it means that the chain has a [Level 1](/integrations/introduction#integration-levels) integration with Acurast and the user is responsible for those accounts to have enough balance to pay for the transaction fees.

@@ -11,7 +11,7 @@ The Acurast Receiver Pallet allows a Substrate based chain to integrate the Acur
 
 ### Introduction
 
-The Acurast Fulfillment Receiver Pallet, in combination with the [Acurast P256 crypto](https://github.com/Acurast/acurast-core/tree/main/p256-crypto) package, allows a Parachain to accept direct fulfillments from Acurast Processors.
+The Acurast Fulfillment Receiver Pallet, in combination with the [Acurast P256 crypto](https://github.com/Acurast/acurast-core/tree/main/p256-crypto) package, allows a Substrate (Polkadot SDK) enabled chain to accept direct fulfillments from Acurast Processors.
 
 The Pallet exposes one extrinsic.
 
@@ -22,7 +22,7 @@ Allows to post the [Fulfillment] of a job. The fulfillment structure consists of
 - The ipfs url of the `script` executed.
 - The `payload` bytes representing the output of the `script`.
 
-### Parachain Integration
+### Substrate Integration
 
 Implement `pallet_acurast_fulfillment_receiver::Config` for your `Runtime` and add the Pallet:
 
@@ -48,7 +48,7 @@ pub struct FulfillmentHandler;
 impl OnFulfillment<Runtime> for FulfillmentHandler {
     fn on_fulfillment(
         from: <Runtime as frame_system::Config>::AccountId,
-        _fulfillment: pallet_acurast_fulfillment_receiver::Fulfillment,
+        fulfillment: pallet_acurast_fulfillment_receiver::Fulfillment,
     ) -> sp_runtime::DispatchResultWithInfo<frame_support::weights::PostDispatchInfo> {
         /// check if origin is a valid Acurast Processor AccountId
         if !is_valid(&from) {
@@ -60,13 +60,63 @@ impl OnFulfillment<Runtime> for FulfillmentHandler {
 }
 ```
 
-Provide an implementation of [OnFulfillment] to handle the received fulfillment. The implementation should check that the fulfillment is from a known Acurast Processor account id.
+Provide an implementation of `OnFulfillment` to handle the received fulfillment. The implementation should check that the fulfillment is from a known Acurast Processor account id.
+
+For example, if the job calling the `fulfill` extrisic has the following script:
+
+```javascript
+httpGET(
+    "https://api.binance.com/api/v3/ticker/price?symbol=AAVEBUSD",
+    {},
+    (response, _certificate) => {
+        const price = JSON.parse(response)["price"] * 10 ** 18;
+        const payload = _STD_.chains.substrate.codec.encodeUnsignedNumber(price, 128);
+        _STD_.chains.substrate.fulfill(
+            "<URL_TO_YOUR_SUBSTRATE_NODE>", // replace with your substrate node URL
+            payload,
+            {
+                callIndex: '0x4100', // replace with the call index for the 'fulfill' extrinsic of the pallet-acurast-fulfillment-receiver pallet.
+            },
+            (opHash) => {
+                print("Succeeded: " + opHash)
+            },
+            (err) => {
+                print("Failed fulfill: " + err)
+            },
+        )
+    },
+    (err) => {
+        print("Failed get price: " + err)
+    }
+);
+```
+
+The script above will produce a `fulfill` extrinsic call to the pallet at the specified call index with the payload being the SCALE encoded number representing a price. The following snipped shows how to decode the payload into a number on the receiving side:
+
+```rust
+pub struct FulfillmentHandler;
+impl OnFulfillment<Runtime> for FulfillmentHandler {
+    fn on_fulfillment(
+        from: <Runtime as frame_system::Config>::AccountId,
+        fulfillment: pallet_acurast_fulfillment_receiver::Fulfillment,
+    ) -> sp_runtime::DispatchResultWithInfo<frame_support::weights::PostDispatchInfo> {
+        /// check if origin is a valid Acurast Processor AccountId
+        if !is_valid(&from) {
+            return Err(DispatchError::BadOrigin.into());
+        }
+        // parse payload
+        let price: u128 = codec::decode_from_bytes(fulfillment.payload.into());
+        // do something with price
+        Ok(().into())
+    }
+}
+```
 
 ## P256 crypto
 
 [GitHub Repository](https://github.com/Acurast/acurast-core/tree/main/p256-crypto)
 
-This crate provides types that allow to add P256 (a.k.a secp256r1) signature verification support to substrate based chains.
+This crate provides types that allow to add P256 (a.k.a secp256r1) signature verification support to Substrate (Polkadot SDK) based chains.
 
 ### Setup
 
@@ -79,7 +129,7 @@ acurast-p256-crypto = { git = "https://github.com/Acurast/acurast-core.git" }
 
 ### Integration
 
-Use the `acurast_p256_crypto::MultiSignature` as your parachain `Signature` type:
+Use the `acurast_p256_crypto::MultiSignature` as your Substrate `Signature` type:
 
 ```rust
 use acurast_p256_crypto::MultiSignature;

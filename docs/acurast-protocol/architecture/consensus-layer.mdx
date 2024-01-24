@@ -1,0 +1,19 @@
+---
+title: Consensus Layer
+slug: /acurast-protocol/architecture/consensus-layer
+---
+
+import ThemedImage from "@theme/ThemedImage";
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
+The Permissionless Consensus layer forms the base of the Acurast protocol and is based on a variant of the Nominated Proof-of-Stake (NPoS) algorithm [[1]](#references). Unlike traditional Proof-of-Stake (PoS) networks, there are *validators* and *nominators* in NPoS. Block validators verify transactions to be included in the next block, similar to traditional PoS block validators. The key difference is that instead of being randomly chosen, the *validator* nodes are *nominated* by another node. 
+
+In Acurast's NPoS, an unlimited amount of token holders can participate as *nominators*, backing a limited set of *validators* with their stake. Having a limited set of *validators* assures the long-term scalability of the consensus, allowing the increase of the maximum threshold through governance decisions. An unlimited set of *nominators* assure that higher value is at stake, assuring a high level of security. Due to its upgradable runtimes, consensus parameters are configurable by governance decisions, *e.g.,* The maximum number of *validators*, and the minimum amount of stake for *validators*. 
+
+The Acurast NPoS system heavily leverages nominators to ensure network integrity. Nominators and validators have multiple aligned incentives. Nominators hold a financial stake in the system, which means that they could suffer a loss if a validator acts maliciously. In addition, nominators are financially rewarded for selecting a reliable and high-performance validator. Both nominators and validators have reputational stakes, with the credibility of nominators affected by their validator choices. Finally, the limited number of validator slots in NPoS structures creates a competitive environment, pushing nominators to select the most efficient validators, but also democratizes the process, making voting power essential.
+
+NPoS has proven to be an efficient way to achieve high levels of security, scalability, and decentralization over time. Congruent to [[1]](#references), nominators share the rewards, or eventual slashings, with the validators they nominated on a *per-staked-ACU* basis. 
+
+#### References 
+
+[1] J. Burdges, A. Cevallos, P. Czaban, R. Habermeier, S. Hosseini, F. Lama, H. K. Alper, X. Luo, F. Shirazi, A. Stewart, and G. Wood, *Overview of Polkadot and its Design Considerations,* 2020.

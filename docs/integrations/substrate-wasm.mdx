@@ -18,40 +18,114 @@ Keep in mind that you can do much more with Acurast and get access to all module
 
 <Tabs>
   <TabItem value="price-feed" label="Price Feed" default>
-This example contract receives a result of the "Price Feed" template on the <a href="https://console.acurast.com/create" target="_blank">Acurast Console</a>.
+
+This example contract can store muliple prices for different symbols in the `prices` map. Furthermore, only processors that have their address added to the `allow_list` through the `allow` method will be able to provide a price.
 
 ```rust
-#![cfg_attr(not(feature = "std"), no_std)]
-
-use ink;
+#![cfg_attr(not(feature = "std"), no_std, no_main)]
 
 #[ink::contract]
-mod receiver {
-    #[ink(storage)]
-    pub struct Receiver {
-        price: u128,
+mod simple_oracle {
+    use ink::storage::Mapping;
+    use ink::prelude::vec::Vec;
+
+    #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
+    #[cfg_attr(feature = "std", derive(scale_info::TypeInfo))]
+    pub enum Error {
+        CallerNotInAllowList,
+        NotAdmin
     }
 
-    impl Receiver {
+    pub type Result<T> = core::result::Result<T, Error>;
+
+    #[ink(storage)]
+    pub struct SimpleOracle {
+        prices: Mapping<Vec<u8>, u128>,
+        allow_list: Mapping<AccountId, ()>,
+        admin: Option<AccountId>,
+    }
+
+    impl SimpleOracle {
+
         #[ink(constructor)]
-        pub fn default() -> Self {
+        pub fn new(admin: Option<AccountId>) -> Self {
             Self {
-                price: Default::default(),
+                prices: Mapping::new(),
+                allow_list: Mapping::new(),
+                admin,
             }
         }
 
-        #[ink(message)]
-        pub fn fulfill(&mut self, price: u128) {
-            self.price = price;
+        #[ink(constructor)]
+        pub fn default() -> Self {
+            Self::new(None)
         }
 
         #[ink(message)]
-        pub fn get_price(&self) -> u128 {
-            self.price
+        pub fn fulfill(&mut self, values: Vec<(Vec<u8>, u128)>) -> Result<()> {
+            if !self.allow_list.contains(self.env().caller()) {
+                return Err(Error::CallerNotInAllowList);
+            }
+
+            for (key, value) in values {
+                self.prices.insert(key, &value);
+            }
+
+            Ok(())
+        }
+
+        #[ink(message)]
+        pub fn allow(&mut self, account: AccountId) -> Result<()> {
+            if let Some(admin) = self.admin {
+                if self.env().caller() != admin {
+                    return Err(Error::NotAdmin)
+                }
+            }
+            self.allow_list.insert(account, &());
+            Ok(())
+        }
+
+        #[ink(message)]
+        pub fn disallow(&mut self, account: AccountId) -> Result<()> {
+            if let Some(admin) = self.admin {
+                if self.env().caller() != admin {
+                    return Err(Error::NotAdmin)
+                }
+            }
+            self.allow_list.remove(account);
+            Ok(())
+        }
+
+        /// Returns the current value for given key.
+        #[ink(message)]
+        pub fn get(&self, key: Vec<u8>) -> Option<u128> {
+            self.prices.get(key)
+        }
+    }
+
+    #[cfg(test)]
+    mod tests {
+        /// Imports all the definitions from the outer scope so we can use them here.
+        use super::*;
+
+        /// We test if the default constructor does its job.
+        #[ink::test]
+        fn default_works() {
+            let simple_oracle = SimpleOracle::default();
+            assert_eq!(simple_oracle.get(Default::default()), None);
+        }
+
+        /// We test a simple use case of our contract.
+        #[ink::test]
+        fn it_works() {
+            let mut simple_oracle = SimpleOracle::new(None);
+            assert_eq!(simple_oracle.get(Default::default()), None);
+            simple_oracle.allow(AccountId::from([1; 32])).expect("can allow account");
+            simple_oracle.fulfill(vec![(vec![0], 10)]).expect("fulfill works");
+            assert_eq!(simple_oracle.get(vec![0]), Some(10));
         }
     }
 }
-
 ```
 
   </TabItem>
@@ -119,26 +193,50 @@ Go to the [Acurast Console](https://console.acurast.com/) to test and deploy you
 <TabItem value="price-feed" label="Price Feed" default>
 
 ```javascript
-const callIndex = "0x4606"; // the call index for the 'call' extrinsic
-const destination = "<MY_WASM_CONTRACT_ADDRESS>"; // replace with a contract address that will receive the 'fulfill' call.
-_STD_.chains.substrate.signer.setSigner("SECP256K1"); // the type of signer used for sign the extrinsic call, possible values are SECP256K1 or SECP256R1. What to use depends on what type of address is supported by the chain.
-const entropy = generateSecureRandomHex();
-_STD_.chains.substrate.contract.fulfill(
-  "<SUBSTRATE_NODE_RPC_URL>",
-  callIndex,
-  destination,
-  entropy,
-  {
-    refTime: "3951114240",
-    proofSize: "629760",
-  },
-  (opHash) => {
-    print("Succeeded: " + opHash);
+const callIndex = "<#CALL_INDEX#>"; // the call index for the 'call' extrinsic.
+const destination = "<#CONTRACT_ADDRESS#>"; // contract address that will receive the 'fulfill' call.
+_STD_.chains.substrate.signer.setSigner("SECP256K1"); // the type of signer used for sign the extrinsic call
+const symbol = "AAVEBUSD";
+httpGET(
+  "https://api.binance.com/api/v3/ticker/price?symbol=" + symbol,
+  {},
+  (response, _certificate) => {
+    const price = Number(JSON.parse(response)["price"]) * 10 ** 18;
+    const key = stringToHex(symbol);
+    const payload =
+      _STD_.chains.substrate.codec.encodeCompactUnsignedNumber(1) +
+      _STD_.chains.substrate.codec.encodeBytes(key) +
+      _STD_.chains.substrate.codec.encodeUnsignedNumber(price, 128);
+    _STD_.chains.substrate.contract.fulfill(
+      "<#NODE_URL#>",
+      callIndex,
+      destination,
+      payload,
+      {
+        refTime: "1470675162",
+        proofSize: "37458",
+      },
+      (opHash) => {
+        print("Succeeded: " + opHash);
+      },
+      (err) => {
+        print("Failed fulfill: " + err);
+      }
+    );
   },
   (err) => {
-    print("Failed fulfill: " + err);
+    print("Failed get price: " + err);
   }
 );
+
+function stringToHex(str) {
+  let hexString = "";
+  for (let i = 0; i < str.length; i++) {
+    let hex = str.charCodeAt(i).toString(16);
+    hexString += hex.length === 1 ? "0" + hex : hex;
+  }
+  return hexString;
+}
 ```
 
 </TabItem>
@@ -186,4 +284,4 @@ httpGET(
 
 ## Job Registration
 
-Check out [How to get started with the Acurast Console](/developers/introduction#get-started) to register your Job.
+Check out [How to get started with the Acurast Console](/developers/get-started) to register your Job.
