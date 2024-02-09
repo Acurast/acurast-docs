@@ -287,10 +287,26 @@ _STD_.chains.tezos.encoding.pack(value);
 
 /**
  * Encodes the given micheline structure into a hex value that can be used as key for big map values.
- * @param value an object representing a micheline structure.
+ * @param {object} value an object representing a micheline structure.
  * @returns Hex string representing the script hash encoded value.
  */
 _STD_.chains.tezos.encoding.encodeExpr(value);
+```
+
+### **Tezos message signing**
+
+```javascript
+/**
+ * Signs the given message and returns the signature.
+ * 
+ * Before signing, the message is prepended with the utf8 bytes of the 
+ * string 'acusig' and the script's ipfs hash ('acusig' + SCRIPT_HASH + message),
+ * then the resulting bytes are hashed with blake2b256.
+ * 
+ * @param {string} message an hex string representing the bytes to sign
+ * @return Hex string representing the signature
+ */
+_STD_.chains.tezos.signer.sign(message);
 ```
 
 ### **Ethereum functions**
@@ -325,6 +341,22 @@ type EthereumSuccess = (operationHash) => void;
  * @param {string[]} message an error message.
  */
 type EthereumError = (message) => void;
+```
+
+### **Ethereum message signing**
+
+```javascript
+/**
+ * Signs the given message and returns the signature.
+ * 
+ * Before signing, the message is prepended with the utf8 bytes of the 
+ * string 'acusig' and the script's ipfs hash ('acusig' + SCRIPT_HASH + message),
+ * then the resulting bytes are hashed with Keccak256.
+ * 
+ * @param {string} message an hex string representing the bytes to sign
+ * @return Hex string representing the signature
+ */
+_STD_.chains.ethereum.signer.sign(message);
 ```
 
 ### **Aeternity functions**
