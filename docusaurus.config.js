@@ -159,11 +159,11 @@ const config = {
             from: "/acurast-transmitters",
           },
           {
-            to: "/acurast-protocol/modules/enterprise",
+            to: "/developers/get-started",
             from: "/acurast-protocol/interoperability/enterprise",
           },
           {
-            to: "/acurast-protocol/modules/hyperdrive",
+            to: "/developers/get-started",
             from: "/acurast-protocol/interoperability/hyperdrive",
           },
           {
