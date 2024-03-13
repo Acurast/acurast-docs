@@ -13,8 +13,8 @@
 
 /* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #4e55fe;
-  --ifm-color-primary-dark: #2d35fe;
+  --ifm-color-primary: #c0e700;
+  --ifm-color-primary-dark: #9dc106;
   --ifm-color-primary-darker: #1c25fe;
   --ifm-color-primary-darkest: #010ae7;
   --ifm-color-primary-light: #6f75fe;
@@ -24,16 +24,6 @@
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
-[data-theme="dark"] {
-  --ifm-color-primary: #4e55fe;
-  --ifm-color-primary-dark: #2d35fe;
-  --ifm-color-primary-darker: #1c25fe;
-  --ifm-color-primary-darkest: #010ae7;
-  --ifm-color-primary-light: #6f75fe;
-  --ifm-color-primary-lighter: #8085fe;
-  --ifm-color-primary-lightest: #b1b4ff;
-}
 .footer--dark {
   --ifm-footer-background-color: #0f0f0f;
 }
@@ -46,4 +36,12 @@
 .theme-doc-sidebar-item-link-level-1 a,
 a.menu__link.menu__link--sublist.menu__link--sublist-caret {
   font-weight: bold;
+}
+
+.navbar__logo {
+  margin-right: 0;
+}
+
+.navbar__title {
+  margin-bottom: 3px;
 }

@@ -57,6 +57,7 @@ const config = {
       },
       colorMode: {
         defaultMode: "dark",
+        disableSwitch: true,
       },
       navbar: {
         title: "Docs",
@@ -166,19 +167,19 @@ const config = {
             from: "/acurast-protocol/interoperability/hyperdrive",
           },
           {
-            to: "/acurast-protocol/modules/singularity-mesh",
+            to: "/developers/get-started",
             from: "/acurast-protocol/modules/mesh",
           },
           {
-            to: "/acurast-protocol/modules/singularity-mesh",
+            to: "/developers/get-started",
             from: "/acurast-protocol/interoperability/mesh",
           },
           {
-            to: "/acurast-protocol/modules/singularity-mesh",
+            to: "/developers/get-started",
             from: "/acurast-protocol/interoperability/singularity",
           },
           {
-            to: "/acurast-protocol/modules/singularity-mesh",
+            to: "/developers/get-started",
             from: "/acurast-protocol/modules/singularity",
           },
           {
@@ -188,6 +189,18 @@ const config = {
           {
             to: "/wallets",
             from: "/developers/create-address",
+          },
+          {
+            to: "/developers/get-started",
+            from: "/acurast-protocol/modules/singularity-mesh",
+          },
+          {
+            to: "/developers/get-started",
+            from: "/acurast-protocol/modules/hyperdrive",
+          },
+          {
+            to: "/developers/get-started",
+            from: "/acurast-protocol/modules/enterprise",
           },
         ],
       },

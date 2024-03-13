@@ -7,7 +7,7 @@ import ThemedImage from "@theme/ThemedImage";
 import useBaseUrl from "@docusaurus/useBaseUrl";
 
 Acurast separates the consensus, execution, and application layer (c.f., Fig. 1).
-Acurast's Zero Trust architecture transforms the way applications are designed and deployed. The modular nature allows native settlements and universal interoperability of ecosystems, i.e., Web3 → Web3 and Web3 → Web2. Ultimately, Acurast serves as a decentralized application platform that ensures the privacy and verifiability of data, without introducing new trusted entities.
+Acurast's cloud architecture transforms the way applications are designed and deployed. The modular nature allows native settlements and universal interoperability of ecosystems, i.e., Web3 → Web3 and Web3 → Web2. Ultimately, Acurast serves as a decentralized application platform that ensures the privacy and verifiability of data, without introducing new trusted entities.
 
 <ThemedImage
   width="300px"
@@ -23,15 +23,15 @@ Acurast's Zero Trust architecture transforms the way applications are designed a
 
 ### Consensus Layer
 
-The consensus layer is the permissionless foundation of Acurast, where the Orchestrator matches consumer's jobs to processors, as outlined in the End-to-End flow (_c.f.,_ [End-to-End Zero Trust Job Execution](/acurast-protocol/architecture/end-to-end) ). The second core part of the consensus layer is the reputation engine (_c.f.,_ ), which as sures that the reputation scores of processors are correctly updated and incentivize honest behavior.
+The consensus layer is the permissionless foundation of Acurast, where the Orchestrator matches consumer's jobs to processors, as outlined in the End-to-End flow (_c.f.,_ [End-to-End Job Execution](/acurast-protocol/architecture/end-to-end) ). The second core part of the consensus layer is the reputation engine (_c.f.,_ ), which as sures that the reputation scores of processors are correctly updated and incentivize honest behavior.
 
-### Zero Trust Execution Layer
+### Execution Layer
 
-The Zero Trust Execution Layer has two significant components. The first one is composed of the different processor runtimes, namely the Acurast Secure Hardware Runtime (_c.f.,_ [ASHR](/acurast-protocol/architecture/execution-layer#acurast-secure-hardware-runtime-ashr)) and the Acurast Zero-Knowledge Runtime (_c.f.,_ [AZKR](/acurast-protocol/architecture/execution-layer#acurast-zero-knowledge-runtime)). The second key component is the Acurast Universal Interoperability Layer, which contains [multiple Modules](/acurast-protocol/modules/enterprise) that enable native interaction with different ecosystems.
+The Execution Layer has two significant components. The first one is composed of the different processor runtimes, namely the Acurast Secure Hardware Runtime (_c.f.,_ [ASHR](/acurast-protocol/architecture/execution-layer#acurast-secure-hardware-runtime-ashr)) and the Acurast Zero-Knowledge Runtime (_c.f.,_ [AZKR](/acurast-protocol/architecture/execution-layer#acurast-zero-knowledge-runtime)). The second key component is the Acurast Universal Interoperability Layer, which contains [multiple Modules](/acurast-protocol/modules/enterprise) that enable native interaction with different ecosystems.
 
 ### Application Layer
 
-The third layer is the application layer, where Web2 or Web3 applications run (\cf Sec.~\ref{sec:application_layer}). Although a host of DeFi protocols already make use of Acurast, Acurast will infuse the development of a wide range of use cases that were previously not possible to implement in a zero trust and decentralized manner.
+The third layer is the application layer, where Web2 or Web3 applications run (\cf Sec.~\ref{sec:application_layer}). Although a host of DeFi protocols already make use of Acurast, Acurast will infuse the development of a wide range of use cases that were previously not possible to implement in a confidential and decentralized manner.
 
 ## Implementation
 

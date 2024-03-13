@@ -22,7 +22,12 @@ const sidebars = {
     {
       type: "category",
       label: "Consumers",
-      items: ["developers/get-started", "developers/job-creation", "developers/job-runtime-environment", "developers/on-demand-jobs"],
+      items: [
+        "developers/get-started",
+        "developers/job-creation",
+        "developers/job-runtime-environment",
+        "developers/on-demand-jobs",
+      ],
       collapsed: false,
     },
     "acurast-processors",
@@ -41,16 +46,6 @@ const sidebars = {
             "acurast-protocol/architecture/execution-layer",
             "acurast-protocol/architecture/consensus-layer",
             "acurast-protocol/architecture/instances",
-          ],
-          collapsed: false,
-        },
-        {
-          type: "category",
-          label: "Modules",
-          items: [
-            "acurast-protocol/modules/enterprise",
-            "acurast-protocol/modules/hyperdrive",
-            "acurast-protocol/modules/singularity-mesh",
           ],
           collapsed: false,
         },
