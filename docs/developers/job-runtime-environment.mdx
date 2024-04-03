@@ -49,7 +49,7 @@ type HttpError = (message) => void;
 /**
  * Reads value from the environment.
  * @param {string} key The key used to get the value from the environment.
- * @returns The string value for the given key or undefined.
+ * @return {string} The string value for the given key or undefined.
  */
 function environment(key);
 ```
@@ -63,7 +63,7 @@ At the top level, a `_STD_` object is defined. This object exposes additional fu
 ```javascript
 /**
  * Generates random bytes.
- * @returns Hex string representing random bytes.
+ * @return {string} Hex string representing random bytes.
  */
 _STD_.random.generateSecureRandomHex();
 ```
@@ -167,7 +167,7 @@ _STD_.chains.substrate.signer.setSigner(curveType);
 /**
  * Hashes the given string using blake2b 256 bit.
  * @param {string} value
- * @returns The blake2b hash of the input value.
+ * @return {string} The blake2b hash of the input value.
  */
 _STD_.chains.substrate.codec.blakeTwo256(value);
 
@@ -175,42 +175,42 @@ _STD_.chains.substrate.codec.blakeTwo256(value);
  * Encodes a number to the SCALE encoding.
  * @param {number | string} value the number to encode.
  * @param {8 | 32 | 64 | 128} bitSize the number's bit size.
- * @returns Hex string representing the SCALE encoded number.
+ * @return {string} Hex string representing the SCALE encoded number.
  */
 _STD_.chains.substrate.codec.encodeUnsignedNumber(value, bitSize);
 
 /**
  * Encodes a number to the compact SCALE encoding.
  * @param {number | string} value the number to encode.
- * @returns Hex string representing the compact SCALE encoded number.
+ * @return {string} Hex string representing the compact SCALE encoded number.
  */
 _STD_.chains.substrate.codec.encodeCompactUnsignedNumber(value);
 
 /**
  * Encodes bytes to SCALE encoding.
  * @param {string | ArrayBuffer} value hex string or an ArrayBuffer representing the bytes to encode.
- * @returns Hex string representing the SCALE encoded bytes.
+ * @return {string} Hex string representing the SCALE encoded bytes.
  */
 _STD_.chains.substrate.codec.encodeBytes(value);
 
 /**
  * Encodes a boolean value to SCALE encoding.
  * @param {boolean} value the boolean value to encode.
- * @returns Hex string representing the SCALE encoded boolean.
+ * @return {string} Hex string representing the SCALE encoded boolean.
  */
 _STD_.chains.substrate.codec.encodeBoolean(value);
 
 /**
  * Encodes a substrate address to SCALE encoding.
  * @param value the address to encode.
- * @returns Hex string representing the SCALE encoded address.
+ * @return {string} Hex string representing the SCALE encoded address.
  */
 _STD_.chains.substrate.codec.encodeAddress(value);
 
 /**
  * Encodes a substrate address to a `MultiAddress` SCALE encoded vale.
  * @param value the address to encode.
- * @returns Hex string representing the SCALE encoded multi address.
+ * @return {string} Hex string representing the SCALE encoded multi address.
  */
 _STD_.chains.substrate.codec.encodeMultiAddress(value: string);
 ```
@@ -281,14 +281,14 @@ type TezosError = (message) => void;
 /**
  * Packs the given micheline structure.
  * @param value an object representing a micheline structure.
- * @returns Hex string representing the packed value.
+ * @return {string} Hex string representing the packed value.
  */
 _STD_.chains.tezos.encoding.pack(value);
 
 /**
  * Encodes the given micheline structure into a hex value that can be used as key for big map values.
  * @param {object} value an object representing a micheline structure.
- * @returns Hex string representing the script hash encoded value.
+ * @return {string} Hex string representing the script hash encoded value.
  */
 _STD_.chains.tezos.encoding.encodeExpr(value);
 ```
@@ -304,7 +304,7 @@ _STD_.chains.tezos.encoding.encodeExpr(value);
  * then the resulting bytes are hashed with blake2b256.
  * 
  * @param {string} message an hex string representing the bytes to sign
- * @return Hex string representing the signature
+ * @return {string} Hex string representing the signature
  */
 _STD_.chains.tezos.signer.sign(message);
 ```
@@ -354,9 +354,59 @@ type EthereumError = (message) => void;
  * then the resulting bytes are hashed with Keccak256.
  * 
  * @param {string} message an hex string representing the bytes to sign
- * @return Hex string representing the signature
+ * @return {string} Hex string representing the signature
  */
 _STD_.chains.ethereum.signer.sign(message);
+```
+
+### **Bitcoin functions**
+
+```javascript
+/**
+ * Returns the public key for the bitcoin chain.
+ * 
+ * @since 1.5.0 (version code 28)
+ * 
+ * @return {string} Hex string representing the public key
+ */
+_STD_.chains.bitcoin.getPublicKey();
+```
+
+### **Bitcoin message signing**
+
+```javascript
+/**
+ * Signs the given message and returns the signature.
+ * 
+ * Before signing, the message is prepended with the utf8 bytes of the 
+ * string 'acusig' and the script's ipfs hash ('acusig' + SCRIPT_HASH + message).
+ * 
+ * @since 1.4.0 (version code 26)
+ * 
+ * @param {string} message an hex string representing the bytes to sign
+ * @return {string} Hex string representing the signature
+ */
+_STD_.chains.bitcoin.signer.sign(message);
+
+/**
+ * Signs the given message and returns the signature.
+ * 
+ * @since 1.4.0 (version code 26)
+ *
+ * @param {string} message an hex string representing the bytes to sign
+ * @return {string} Hex string representing the signature
+ */
+_STD_.chains.bitcoin.signer.rawSign(message);
+
+/**
+ * Hashes the given value using SHA256.
+ * 
+ * @since 1.4.0 (version code 26)
+ *
+ * @param {string} value an hex string representing the bytes to hash
+ * @return {string} Hex string representing the sha256 hash
+ */
+_STD_.chains.bitcoin.signer.sha256(value);
 ```
 
 ### **Aeternity functions**
@@ -370,6 +420,8 @@ _STD_.chains.ethereum.signer.sign(message);
  * - `gasLimit`: a string representing the transaction's gas limit, if not provided '25000' is used.
  * - `gasPrice`: a string representing the transaction's gas price, if not provided '1000000000' is used.
  * 
+ * @since 1.3.32
+ * 
  * @param {string} url the node URL.
  * @param {string} destination the contract's address.
  * @param {[object]} payload an array of encoded values. The objects inside this array need to be constructed using the functions found under `_STD_.chains.aeternity.data`.
@@ -378,6 +430,15 @@ _STD_.chains.ethereum.signer.sign(message);
  * @param {AeternityError} error the success callback.
  */
 _STD_.chains.aeternity.fulfill(url, destination, payload, extra, success, error);
+
+/**
+ * Returns the Aeternity address.
+ * 
+ * @since 1.3.34 (version code 19)
+ * 
+ * @return {string} The Aeternity address
+ */
+_STD_.chains.aeternity.getAddress();
 
 /**
  * @callback EthereumSuccess
@@ -398,40 +459,50 @@ type AeternityError = (message) => void;
 /**
  * Returns an object representing an integer that can be used as payload in the `fulfill` call.
  * 
+ * @since 1.3.32
+ * 
  * @param {number | string} value a value representing an integer.
- * @returns an object representing an integer that can be used as payload in the `fulfill` call.
+ * @return {object} an object representing an integer that can be used as payload in the `fulfill` call.
  */
 _STD_.chains.aeternity.data.int(value);
 
 /**
  * Returns an object representing a string that can be used as payload in the `fulfill` call.
  * 
+ * @since 1.3.32
+ * 
  * @param {string} value a string value.
- * @returns an object representing a string that can be used as payload in the `fulfill` call.
+ * @return {object} an object representing a string that can be used as payload in the `fulfill` call.
  */
 _STD_.chains.aeternity.data.string(value);
 
 /**
  * Returns an object representing bytes that can be used as payload in the `fulfill` call.
  * 
+ * @since 1.3.32
+ * 
  * @param {string} value an hex string representing the bytes.
- * @returns an object representing bytes that can be used as payload in the `fulfill` call.
+ * @return {object} an object representing bytes that can be used as payload in the `fulfill` call.
  */
 _STD_.chains.aeternity.data.bytes(value);
 
 /**
  * Returns an object representing a list of objects that can be used as payload in the `fulfill` call.
  * 
+ * @since 1.3.32
+ * 
  * @param {object[]} values an array of objects that were created using the functions found under `_STD_.chains.aeternity.data`.
- * @returns an object representing a list of objects that can be used as payload in the `fulfill` call
+ * @return {object} an object representing a list of objects that can be used as payload in the `fulfill` call
  */
 _STD_.chains.aeternity.data.list(values);
 
 /**
  * Returns an object representing a tuple can be used as payload in the `fulfill` call.
  * 
+ * @since 1.3.32
+ * 
  * @param {object[]} values an array of objects that were created using the functions found under `_STD_.chains.aeternity.data`.
- * @returns an object representing a tuple can be used as payload in the `fulfill` call.
+ * @return {object} an object representing a tuple can be used as payload in the `fulfill` call.
  */
 _STD_.chains.aeternity.data.tuple(values);
 
@@ -446,16 +517,20 @@ _STD_.chains.aeternity.data.tuple(values);
  *  [_STD_.chains.aeternity.data.string("key2"), _STD_.chains.aeternity.data.string("value2")] 
  * ]);
  * 
+ * @since 1.3.32
+ * 
  * @param {object[][]} values an array of arrays of objects that were created using the functions found under `_STD_.chains.aeternity.data`.
- * @returns an object representing a map can be used as payload in the `fulfill` call.
+ * @return {object} an object representing a map can be used as payload in the `fulfill` call.
  */
 _STD_.chains.aeternity.data.map(values);
 
 /**
  * Returns an object representing an account pubkey can be used as payload in the `fulfill` call.
  * 
+ * @since 1.3.32
+ * 
  * @param {string} value a string representing an account pubkey .
- * @returns an object representing an account pubkey can be used as payload in the `fulfill` call.
+ * @return {object} an object representing an account pubkey can be used as payload in the `fulfill` call.
  */
 _STD_.chains.aeternity.data.account_pubkey(value);
 ```
