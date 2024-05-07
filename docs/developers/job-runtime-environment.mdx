@@ -370,6 +370,17 @@ _STD_.chains.ethereum.signer.sign(message);
  * @return {string} Hex string representing the public key
  */
 _STD_.chains.bitcoin.getPublicKey();
+
+/**
+ * Returns an extended public key for the given derivation path.
+ *
+ * @since 1.7.0 (version code 38)
+ *
+ * @param {string} version an hex string representing the bytes that will be prepended to the extended public key bytes before the base58check encoding
+ * @param {string} derivationPath the derivation path to use. Currently, the only valid value is "m/0/1".
+ * @return {string} String representing the extended public key
+ */
+_STD_.chains.bitcoin.getExtendedPublicKey(version, derivationPath);
 ```
 
 ### **Bitcoin message signing**
@@ -407,6 +418,86 @@ _STD_.chains.bitcoin.signer.rawSign(message);
  * @return {string} Hex string representing the sha256 hash
  */
 _STD_.chains.bitcoin.signer.sha256(value);
+
+/**
+ * Signs the given message with a key derived with the given derivation path and returns the signature.
+ * 
+ * Before signing, the message is prepended with the utf8 bytes of the 
+ * string 'acusig' and the script's ipfs hash ('acusig' + SCRIPT_HASH + message).
+ * 
+ * @since 1.7.0 (version code 38)
+ * 
+ * @param {string} message an hex string representing the bytes to sign
+ * @param {string} derivationPath the derivation path to use. Currently, the only valid value is "m/0/1"
+ * @return {string} Hex string representing the signature
+ */
+_STD_.chains.bitcoin.signer.signHD(message, derivationPath)
+
+/**
+ * Signs the given message with a key derived with the given derivation path and returns the signature.
+ * 
+ * @since 1.7.0 (version code 38)
+ *
+ * @param {string} message an hex string representing the bytes to sign
+ * @param {string} derivationPath the derivation path to use. Currently, the only valid value is "m/0/1"
+ * @return {string} Hex string representing the signature
+ */
+_STD_.chains.bitcoin.signer.rawSignHD(message, derivationPath)
+```
+
+### **Bitcoin utils functions**
+
+```javascript
+/**
+ * Derives the given extended public key.
+ *
+ * @since 1.7.0 (version code 38)
+ *
+ * @param {string} xpub a string representing the extended public key to derive
+ * @param {string} derivationPath the derivation path to use
+ * @return {string} Hex string representing the derivced public key
+ */
+_STD_.chains.bitcoin.utils.derivePublicKey(xpub, derivationPath)
+
+/**
+ * Encodes the given bytes using base58check.
+ *
+ * @since 1.7.0 (version code 38)
+ *
+ * @param {string} value an hex string representing the bytes to encode
+ * @return {string} The base58check encoded value
+ */
+_STD_.chains.bitcoin.utils.base58CheckEncode(value)
+
+/**
+ * Encodes the given bytes using base58.
+ *
+ * @since 1.7.0 (version code 38)
+ *
+ * @param {string} value an hex string representing the bytes to encode
+ * @return {string} The base58 encoded value
+ */
+_STD_.chains.bitcoin.utils.base58Encode(value)
+
+/**
+ * Decodes the given base58check value.
+ *
+ * @since 1.7.0 (version code 38)
+ *
+ * @param {string} value a string representing the base58check value to decode
+ * @return {string} Hex string representing the decoded value
+ */
+_STD_.chains.bitcoin.utils.base58CheckDecode(value)
+
+/**
+ * Decodes the given base58 value.
+ *
+ * @since 1.7.0 (version code 38)
+ *
+ * @param {string} value a string representing the base58 value to decode
+ * @return {string} Hex string representing the decoded value
+ */
+_STD_.chains.bitcoin.utils.base58Decode(value)
 ```
 
 ### **Aeternity functions**
