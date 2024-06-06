@@ -239,6 +239,23 @@ _STD_.chains.substrate.contract.fulfill(
 );
 ```
 
+### **Substrate Gear functions**
+
+```javascript
+/**
+ * Sends a message to an active Gear program extrinsic on a chain integrating the Gear protocol.
+ * @param {string | stirng[]} nodes the node URL or array of node URLs.
+ * @param {string} callIndex an hex string representing the call index of the `gear.sendMessage` extrinsic.
+ * @param {string} destination the active program address.
+ * @param {string} data an hex string encoding the method and arguments to call on the program.
+ * @param {object} extra objet containing additional arguments, it has to provide `gasLimit` as a string, `value` as a string and `keepAlive` as a boolean. Example: `{ gasLimit: "2000000000", value: "0", keepAlive: true }`.
+ * @param {SubstrateSuccess} success the success callback.
+ * @param {SubstrateError} error the error callback.
+ */
+_STD_.chains.substrate.gear.sendMessage(nodes, callIndex, destination, data, extra, success, error);
+
+```
+
 ### **Tezos functions**
 
 ```javascript
