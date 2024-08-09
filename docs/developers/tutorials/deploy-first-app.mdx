@@ -1,0 +1,360 @@
+---
+title: Deploy your first App on Acurast
+slug: /developers/tutorials/deploy-first-app
+---
+
+import ThemedImage from "@theme/ThemedImage";
+import useBaseUrl from "@docusaurus/useBaseUrl";
+import TOCInline from "@theme/TOCInline";
+
+## Introduction
+
+This tutorial will guide you through deploying a simple application on Acurast. By the end of this guide, you'll have your first project ready and deployment up and running.
+
+## Table Of Contents
+
+<TOCInline
+  toc={toc}
+  maxHeadingLevel={3}
+/>
+
+## Prerequisites
+
+- Basic knowledge of Node.js and the Command Line
+
+## Setting up the Project
+
+### Writing the code
+
+First, let's start by creating a simple node.js project. You can find the code of the example, including all the build steps and configurations, on [GitHub](https://github.com/Acurast/acurast-example-apps/blob/509f8245ca72e41a3a961959fba185a2a3a37474/apps/app-fetch/src/index.ts)
+
+If you're interested only in the Acurast part of the tutorial, feel free to skip to the "Installing the Acurast CLI" step.
+
+The app we will build is pretty straight forward. First, we make a request to an API to fetch the BTC/USD price. Then we make another request to send the price, along with some other data, to an API.
+
+```typescript
+const WEBHOOK_URL = "REPLACE_ME"; // TODO: Replace with your https://webhook.site/ URL
+
+const BASE_URL = "https://min-api.cryptocompare.com";
+const SYMBOL = "BTC";
+const TARGET_CURRENCY = "USD";
+
+declare const _STD_: any;
+
+if (typeof _STD_ === "undefined") {
+  // If _STD_ is not defined, we know it's not running in the Acurast Cloud.
+  // Define _STD_ here for local testing.
+  console.log("Running in local environment");
+  (global as any)._STD_ = {
+    app_info: { version: "local" },
+    job: { getId: () => "local" },
+    device: { getAddress: () => "local" },
+  };
+}
+
+fetch(`${BASE_URL}/data/price?fsym=${SYMBOL}&tsyms=${TARGET_CURRENCY}`)
+  .then((response) => response.json())
+  .then((data) => {
+    const price = data[TARGET_CURRENCY];
+    return fetch(WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        price,
+        timestamp: Date.now(),
+        acurast: {
+          version: _STD_.app_info.version,
+          deploymentId: _STD_.job.getId(),
+          deviceAddress: _STD_.device.getAddress(),
+        },
+      }),
+    })
+      .then((postResponse) => console.log("Success:", postResponse.status))
+      .catch((error) => console.error("Error posting data:", error));
+  })
+  .catch((error) => console.error("Error getting data:", error));
+```
+
+Make sure to replace "REPLACE_ME" with your own link. To get your own link, simply open https://webhook.site/ and copy the URL that is located under "Your unique URL". It will look something like this `https://webhook.site/04450188-d4ab-4d8b-b060-d334bff641e1`. If you stay on that page, you will see all incoming GET and POST requests.
+
+If you take a closer look at the script, you will see that we access an object called `_STD_`. This is the "standard object" available in the [Acurast Runtime Environment](https://docs.acurast.com/developers/job-runtime-environment/). It exposes some functionality like allowing you to sign data with a secure key, or get the identifier of the processor the script is running on.
+
+In our example, we access the App Version, Deployment ID (previously Job ID) and Device Address. We also add a fallback for those values in case the script is ran locally for testing. You should remove any "testing" code before deploying your script in production.
+
+### Building the project
+
+To deploy a project on the Acurast cloud, it needs to be bundled into a single js file. In our example, we use webpack. You can find the configuration in the example project on [GitHub](https://github.com/Acurast/acurast-example-apps/blob/509f8245ca72e41a3a961959fba185a2a3a37474/apps/app-fetch/)
+
+Running `npm run bundle` will then output a single js file which includes all necessary dependencies.
+
+The is located in `dist/bundle.js` and looks something like this:
+
+```javascript
+// bundle.js
+(()=>{"use strict";"undefined"==typeof _STD_&&(console.log("Running in local environment"),global._STD_={app_info:{version:"local"},job:{getId:()=>"local"},device:{getAddress:()=>"local"}}),fetch("https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=USD").then((e=>e.json())).then((e=>{const o=e.USD;return fetch("REPLACE_ME",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({price:o,timestamp:Date.now(),acurast:{version:_STD_.app_info.version,deploymentId:_STD_.job.getId(),deviceAddress:_STD_.device.getAddress()}})}).then((e=>console.log("Success:",e.status))).catch((e=>console.error("Error posting data:",e)))})).catch((e=>console.error("Error getting data:",e)))})();
+```
+
+This is the file that will be deployed to the Acurast Cloud. You can run it locally with `node dist/bundle.js` to test it.
+
+## Setting up the Acurast CLI
+
+Now that our script is ready, we need to set up the Acurast CLI. The CLI is a tool that allows you to deploy and manage your applications on the Acurast Cloud.
+
+### Installation
+
+Let's install the Acurast CLI globally using npm:
+
+```bash
+npm install -g @acurast/cli
+```
+
+To verify that the installation worked, you can run `acurast` in the terminal and it will show you the help page:
+
+```text
+tutorial % acurast
+     _                            _      ____ _     ___ 
+    / \   ___ _   _ _ __ __ _ ___| |_   / ___| |   |_ _|
+   / _ \ / __| | | | '__/ _` / __| __| | |   | |    | | 
+  / ___ \ (__| |_| | | | (_| \__ \ |_  | |___| |___ | | 
+ /_/   \_\___|\__,_|_|  \__,_|___/\__|  \____|_____|___|
+                                                        
+Usage: acurast [options] [command]
+
+A cli to interact with the Acurast Network.
+
+Options:
+  -v, --version               output the version number
+  -h, --help                  display help for command
+
+Commands:
+  deploy [options] [project]  Deploy the current project to the Acurast platform.
+  init                        Create an acurast.json and .env file
+  live [options] [project]    Run the code in a live code environment on a remote processor
+  open                        Open Acurast websites in your browser
+  help [command]              display help for command
+```
+
+### Adding Acurast Config to the Project
+
+The next step is to add the Acurast Config to our project. To do that, run the following command:
+
+```bash
+acurast init
+```
+
+This will start an interactive guide, which will create `acurast.json` and `.env` files.
+
+```text
+tutorial % acurast init
+Initializing Acurast CLI
+There is no .env file, creating one now...
+.env file created. Visit https://github.com/Acurast/acurast-cli to learn more.
+
+The CLI will use the following address: 5GNimXAQhayQq8m8SxJt3xQmG2L3pGzeTkHopx9iPnrS6uHP
+
+Visit the faucet to get some tokens: https://faucet.acurast.com?address=5GNimXAQhayQq8m8SxJt3xQmG2L3pGzeTkHopx9iPnrS6uHP
+
+No package.json file found. This is unusual. Are you sure you are in the right directory?
+? Enter the name of the project: tutorial
+? Should the app be run one time or in an interval? One Time
+? Enter the duration (eg. 1s, 5min or 2h): 1min
+? What is the bundled javascript file to run? dist/bundle.js
+
+🎉 Successfully created "acurast.json" and ".env" files
+
+You can deploy your app using 'acurast deploy'
+```
+
+During the setup process, we set default values for most of the parameters, and they should work well for our example. You can always open the `acurast.json` file and change the configuration there. In the [CLI Docs](https://github.com/Acurast/acurast-cli?tab=readme-ov-file#configuration-details) you will find more information about the possible configurations.
+
+These are the files that were generated:
+
+acurast.json:
+
+```json
+{
+  "projects": {
+    "tutorial": {
+      "projectName": "tutorial",
+      "fileUrl": "dist/bundle.js",
+      "network": "canary",
+      "onlyAttestedDevices": true,
+      "assignmentStrategy": {
+        "type": "Single"
+      },
+      "execution": {
+        "type": "onetime",
+        "maxExecutionTimeInMs": 60000
+      },
+      "maxAllowedStartDelayInMs": 10000,
+      "usageLimit": {
+        "maxMemory": 0,
+        "maxNetworkRequests": 0,
+        "maxStorage": 0
+      },
+      "numberOfReplicas": 1,
+      "requiredModules": [],
+      "minProcessorReputation": 0,
+      "maxCostPerExecution": 1000000000,
+      "includeEnvironmentVariables": [],
+      "processorWhitelist": []
+    }
+  }
+}
+```
+
+.env:
+
+```text
+ACURAST_MNEMONIC=bounce crack ostrich put entry comic wage all tilt nature rebel position
+# ACURAST_IPFS_URL=
+# ACURAST_IPFS_API_KEY=
+```
+
+### Edit .env file
+
+To deploy our application, we still need to do two things.
+
+1. Create a Pinata account and add API keys
+2. Get some funds from the faucet
+
+> [!TIP]
+> You can import the mnemonic that was generated and stored in the .env file and import it in Talisman (Browser Extension) to access the same account in the [Web Console](https://console.acurast.com/).
+
+First, let's head to [Pinata](https://www.pinata.cloud/), create an account and get our API keys. 
+
+You can set `ACURAST_IPFS_URL=https://api.pinata.cloud`, and `ACURAST_IPFS_API_KEY` should equal something like `eyJhb...eyJ1c.UtRF...__...AhjE`
+
+Save everything in the .env file.
+
+Now, let's put some funds on your new account. You can run the `acurast deploy` command, which will check your balance, and displays the link to the Faucet page.
+
+```text
+tutorial % acurast deploy
+
+Deploying project "tutorial"
+
+Your balance is 0. Visit https://faucet.acurast.com?address=5GNimXAQhayQq8m8SxJt3xQmG2L3pGzeTkHopx9iPnrS6uHP to get some tokens.
+```
+
+That's it! You're now ready to deploy your app.
+
+## Deploying the Application
+
+To deploy your application, run `acurast deploy`:
+
+```text
+tutorial % acurast deploy
+
+Deploying project "tutorial"
+
+The CLI will use the following address: 5GNimXAQhayQq8m8SxJt3xQmG2L3pGzeTkHopx9iPnrS6uHP
+
+The deployment will be scheduled to start in 5 minutes 0 seconds.
+
+There will be 1 executions with a cost of 0.001 cACU each.
+
+❯ Deploying project (first execution scheduled in 246s)
+  ✔ Submitted to Acurast (ipfs://Qmdk1zGq2h9SiMLUQN845rB9ii6YbpQXdFTHz3j8zXQp8C)
+  ✔ Deployment registered (JobID: 3,461)
+  ⠇ Waiting for deployment to be matched with processors
+  ◼ Waiting for processor acknowledgements
+```
+
+Congratulations, your deployment is now being registered in the network and executed soon! Check the CLI for more information about the deployment process.
+
+## Verifying the Deployment
+
+If you followed this tutorial, then your script will fetch the BTC/USD price and post it to your webhook.site URL. To verify that everything worked, check your personal webhook.site URL and wait for the start time of the deployment. You should then see the request coming in!
+
+```json
+{
+  "price": 60620.43,
+  "timestamp": 1723199407257,
+  "acurast": {
+    "version": "1.9.2-canary",
+    "deploymentId": {
+      "origin": {
+        "kind": "Acurast",
+        "source": "beae6b29ea92051606e54502c68505c9453cecf882d778f5332fc2b77515dc56"
+      },
+      "id": "3461"
+    },
+    "deviceAddress": "5FVTdPfguMFmq6arhF6m9VxhqXs5bi2PWGJbxJvo4dgsXPPA"
+  }
+}
+```
+
+Success! You've successfully deployed your first application on Acurast!
+
+## Bonus: Setting Up a Live Code Environment
+
+The deployment process takes a little bit of time, and during development, you probably don't want to wait for a few minutes to test your changes. Because of this, we created a feature that we call "live-code". When you use this feature, your code will be run on a processor immediately and the result will be returned to you in the CLI.
+
+To set up a live code environment for real-time development, follow these steps:
+
+1. **Set up live deployment**
+
+```bash
+acurast live --setup
+```
+
+```text
+tutorial % acurast live --setup
+? Enter the duration (eg. 1h, 2d): 1h
+? On how many processors?: 2
+✔ Live code environment scheduled
+Please go to the follow link and copy the "Deployment Public Key" of the assigned processor, (it may take a few minutes until it's available)
+
+https://console.acurast.com/job-detail/acurast-5GNimXAQhayQq8m8SxJt3xQmG2L3pGzeTkHopx9iPnrS6uHP-3462
+
+? Deployment Public Key 0x020ed13052777b504de517c390ab9952c1bdeffbe04b09c26bf787773c2994219e
+To add more processors to the list, open ".acurast/live-code-processors.json" and add them manually.
+Live code environment set up! Run `acurast live` to run your code on that processor.
+```
+
+2. **Run live deployment**
+
+```bash
+acurast live
+```
+
+This will run the code on all processors that were added to the `live-code-processors.json` file.
+
+```text
+tutorial % acurast live
+⠸ Running code on 1 processor
+```
+
+You will see a loader while responses are awaited. If the code runs successfully, you will see a success message:
+
+```text
+tutorial % acurast live                         
+0x027...daf7c Success
+```
+
+And if we check the API again, we can see another report:
+
+```json
+{
+  "price": 60406.49,
+  "timestamp": 1723200094131,
+  "acurast": {
+    "version": "1.9.2-canary",
+    "deploymentId": {
+      "origin": {
+        "kind": "Acurast",
+        "source": "beae6b29ea92051606e54502c68505c9453cecf882d778f5332fc2b77515dc56"
+      },
+      "id": "3462"
+    },
+    "deviceAddress": "5CPo8adFp7SGaA4V6sje9Cc4QjFYGdk2MJZBLPks6DAq8DJo"
+  }
+}
+```
+
+That's it! Now you can change your code, run `npm run build && acurast live` and see the results in real-time. This is a great way to test your code and see the results immediately.
+
+## Conclusion
+
+Congratulations! You've successfully deployed your first application on Acurast! For more advanced features and detailed documentation, refer to [Acurast CLI Documentation](https://github.com/Acurast/acurast-cli/blob/main/README.md). Also make sure to join our Telegram or Discord to be part of our community!
