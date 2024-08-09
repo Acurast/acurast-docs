@@ -27,6 +27,17 @@ const sidebars = {
         "developers/job-creation",
         "developers/job-runtime-environment",
         "developers/on-demand-jobs",
+        {
+          type: "category",
+          label: "Tutorials",
+          items: [
+            {
+              type: "doc",
+              id: "developers/tutorials/deploy-first-app",
+              label: "Deploy First App",
+            },
+          ],
+        }
       ],
       collapsed: false,
     },
