@@ -78,6 +78,173 @@ _STD_.random.generateSecureRandomHex();
 _STD_.env;
 ```
 
+### **App Info**
+
+```javascript
+/**
+ * The processor app version as a string.
+ *
+ * Example: "1.9.2-canary"
+ */
+_STD_.app_info.version;
+```
+
+### **Job Info**
+
+```javascript
+/**
+ * @return {JobId} Object representing a job id. 
+ * 
+ * Example:
+ * {
+ *  origin: {
+ *    kind: "Acurast",
+ *    source: "2273f64ccf6e9dc13aedf111ca19da030909374f18c6a958b8e5c64927dc7b4f"
+ *  },
+ *  id: "3510"
+ * }
+ */
+_STD_.job.getId();
+
+type JobId = { origin: { kind: string, source: string }, id: string };
+
+/**
+ * @return {number} The slot number of this job.
+ */
+_STD_.job.getSlot();
+
+/**
+ * @return {PublicKeys} Object containing the job specific public keys.
+ *
+ * Example:
+ * {
+ *  p256: "03aa8fa2bfe5a5d6789637c3b82b322b617f8c19e29a4b7d3eede17a2583312891",
+ *  secp256k1: "02fcf1a928bab608989a0218831efd585d1e771669756e1033c60cff4bef6f28e5",
+ *  ed25519: "7ce9f9b96a0f898ad109a594ab2c30a1682e7e6425910427c9390fdf16b11dd6"
+ * }
+ */
+_STD_.job.getPublicKeys();
+
+type PublicKeys = { p256: string, secp256k1: string, ed25519: string };
+```
+
+### **Device Info**
+
+```javascript
+/**
+ * Get the main account public key.
+ *
+ * @since 1.9.2 (version code 58)
+ *
+ * @return {string} Hex string representing the main account public key.
+ */
+_STD_.device.getPublicKey();
+
+/**
+ * Get the main account address.
+ *
+ * @since 1.9.2 (version code 58)
+ *
+ * @return {string} String representing the main account address.
+ */
+_STD_.device.getAddress();
+
+```
+
+### **Signers**
+
+```javascript
+/**
+ * Signs the given payload with the secp256r1 key generated for the current job.
+ *
+ * @since 1.9.2 (version code 58)
+ *
+ * @param {string} payload Hex string representing the bytes to sign.
+ * @return {string} Hex string representing the signature.
+ */
+_STD_.signers.secp256r1.sign(payload);
+
+/**
+ * Encrypts the given payload with the secp256r1 key generated for the current job.
+ *
+ * @since 1.9.2 (version code 58)
+ *
+ * @param {string} payload Hex string representing the bytes to encrypt.
+ * @return {string} Hex string representing the encrypted payload.
+ */
+_STD_.signers.secp256r1.encrypt(payload);
+
+/**
+ * Decrypts the given payload with the secp256r1 key generated for the current job.
+ *
+ * @since 1.9.2 (version code 58)
+ *
+ * @param {string} payload Hex string representing the bytes to decrypt.
+ * @return {string} Hex string representing the decrypted payload.
+ */
+_STD_.signers.secp256r1.decrypt(payload);
+
+/**
+ * Signs the given payload with the secp256k1 key generated for the current job.
+ *
+ * @since 1.9.2 (version code 58)
+ *
+ * @param {string} payload Hex string representing the bytes to sign.
+ * @return {string} Hex string representing the signature.
+ */
+_STD_.signers.secp256k1.sign(payload);
+
+/**
+ * Encrypts the given payload with the secp256k1 key generated for the current job.
+ *
+ * @since 1.9.2 (version code 58)
+ *
+ * @param {string} payload Hex string representing the bytes to encrypt.
+ * @return {string} Hex string representing the encrypted payload.
+ */
+_STD_.signers.secp256k1.encrypt(payload);
+
+/**
+ * Decrypts the given payload with the secp256k1 key generated for the current job.
+ *
+ * @since 1.9.2 (version code 58)
+ *
+ * @param {string} payload Hex string representing the bytes to decrypt.
+ * @return {string} Hex string representing the decrypted payload.
+ */
+_STD_.signers.secp256k1.decrypt(payload);
+
+/**
+ * Signs the given payload with the ed25519 key generated for the current job.
+ *
+ * @since 1.9.2 (version code 58)
+ *
+ * @param {string} payload Hex string representing the bytes to sign.
+ * @return {string} Hex string representing the signature.
+ */
+_STD_.signers.ed25519.sign(payload);
+
+/**
+ * Encrypts the given payload with the ed25519 key generated for the current job.
+ *
+ * @since 1.9.2 (version code 58)
+ *
+ * @param {string} payload Hex string representing the bytes to encrypt.
+ * @return {string} Hex string representing the encrypted payload.
+ */
+_STD_.signers.ed25519.encrypt(payload);
+
+/**
+ * Decrypts the given payload with the ed25519 key generated for the current job.
+ *
+ * @since 1.9.2 (version code 58)
+ *
+ * @param {string} payload Hex string representing the bytes to decrypt.
+ * @return {string} Hex string representing the decrypted payload.
+ */
+_STD_.signers.ed25519.decrypt(payload);
+```
+
 ### **Websocket**
 
 ```javascript
@@ -159,6 +326,17 @@ type SubstrateError = (message) => void;
  * @param {'SECP256K1' | 'SECP256R1'} curveType
  */
 _STD_.chains.substrate.signer.setSigner(curveType);
+
+
+/**
+ * Signs a payload.
+ *
+ * @since 1.9.2 (version code 58)
+ *
+ * @param {string} payload Hex string to sign.
+ * @return {string} Hex string representing the signature.
+ */
+_STD_.chains.substrate.signer.sign(payload);
 ```
 
 ### **Substrate codec functions**
@@ -231,6 +409,26 @@ _STD_.chains.substrate.codec.encodeMultiAddress(value: string);
 _STD_.chains.substrate.contract.fulfill(
   nodes,
   callIndex,
+  destination,
+  data,
+  extra,
+  success,
+  error
+);
+
+/**
+ * Calls the `fulfill` extrinsic on a contract deployed on a chain integrating the substrate contract pallet (`pallet-contract`).
+ * @param {string | stirng[]} nodes the node URL or array of node URLs.
+ * @param {string} method a string representing the method name to call on the destination contract.
+ * @param {string} destination the contract address.
+ * @param {string} data the contract call arguments as an hex string.
+ * @param {object} extra objet containing additional arguments. It can provide a `blockNumber` as a string to sepcify at what lever to read from and `storageDepositLimit` as a string value.
+ * @param {SubstrateSuccess} success the success callback.
+ * @param {SubstrateError} error the error callback.
+ */
+_STD_.chains.substrate.contract.callView(
+  nodes,
+  method,
   destination,
   data,
   extra,
@@ -358,6 +556,11 @@ type EthereumSuccess = (operationHash) => void;
  * @param {string[]} message an error message.
  */
 type EthereumError = (message) => void;
+
+/**
+ * @return {string} The processor's ethereum address for the current job.
+ */
+_STD_.chains.ethereum.getAddress();
 ```
 
 ### **Ethereum message signing**
@@ -374,6 +577,37 @@ type EthereumError = (message) => void;
  * @return {string} Hex string representing the signature
  */
 _STD_.chains.ethereum.signer.sign(message);
+```
+
+### **Ethereum ABI functions**
+
+```javascript
+/**
+ * Encodes the given value.
+ *
+ * @param {any} value A string, number or an array/object containing strings and numbers.
+ * @return {string} Hex string representing the encoded value.
+ */
+_STD_.chains.ethereum.abi.encode(value);
+
+/**
+ * Encodes a numeric value.
+ *
+ * @param {number|string} value A number or a hex string representing a big integer.
+ * @param {number} bitLength A number specifying the bit length.
+ * @param {boolean} isNatural A boolean indicating if it is a natural number.
+ * @return {string} Hex string representing the encoded value.
+ */
+_STD_.chains.ethereum.abi.encodeNumeric(value, bitLength, isNatural);
+
+/**
+ * Encodes an objects as a structure.
+ *
+ * @param {any} value A string, number or an array/object containing strings and numbers.
+ * @param {boolean} isDynamic A boolean indicating if it is a dynamic strucure.
+ * @return {string} Hex string representing the encoded value.
+ */
+_STD_.chains.ethereum.abi.encodeStruct(value, isDynamic);
 ```
 
 ### **Bitcoin functions**
