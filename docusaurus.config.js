@@ -222,6 +222,26 @@ const config = {
             to: "/developers/deploy-first-app",
             from: "/developers/get-started",
           },
+          {
+            to: "/integrations",
+            from: "/integrations/evm",
+          },
+          {
+            to: "/integrations",
+            from: "/integrations/substrate-wasm",
+          },
+          {
+            to: "/integrations",
+            from: "/integrations/substrate",
+          },
+          {
+            to: "/integrations",
+            from: "/integrations/tezos",
+          },
+          {
+            to: "/integrations",
+            from: "/integrations/introduction",
+          },
         ],
       },
     ],
