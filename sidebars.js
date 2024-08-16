@@ -53,17 +53,7 @@ const sidebars = {
         "acurast-protocol/node-setup",
       ],
     },
-    {
-      type: "category",
-      label: "Ecosystems & Integrations",
-      items: [
-        "integrations/introduction",
-        "integrations/evm",
-        "integrations/substrate",
-        "integrations/substrate-wasm",
-        "integrations/tezos",
-      ],
-    },
+    "integrations",
     "networks",
     "wallets",
   ],
