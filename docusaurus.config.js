@@ -202,6 +202,26 @@ const config = {
             to: "/developers/get-started",
             from: "/acurast-protocol/modules/enterprise",
           },
+          {
+            to: "/developers/deployment-creation",
+            from: "/developers/job-creation",
+          },
+          {
+            to: "/developers/deployment-runtime-environment",
+            from: "/developers/job-runtime-environment",
+          },
+          {
+            to: "/developers/on-demand-deployments",
+            from: "/developers/on-demand-jobs",
+          },
+          {
+            to: "/developers/deploy-first-app",
+            from: "/developers/tutorials/deploy-first-app",
+          },
+          {
+            to: "/developers/deploy-first-app",
+            from: "/developers/get-started",
+          },
         ],
       },
     ],

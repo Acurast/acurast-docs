@@ -84,10 +84,10 @@ def main():
 
         @sp.onchain_view()
         def consume_entropy(self, max_age_in_seconds):
-            # Verify if the consumer has an active subscription
+            # Verify if the developer has an active subscription
             subscription = self.data.subscriptions.get(sp.sender, error = "NOT_SUBSCRIBED")
             assert subscription >= sp.now, "SUBSCRIPTION_EXPIRED"
-            # Consumers can specify the maximum entropy age they are willing to accept
+            # Developers can specify the maximum entropy age they are willing to accept
             assert (sp.now - self.data.last_update) <= max_age_in_seconds, "ENTROPY_TOO_OLD"
 
             return self.data.entropy
@@ -98,7 +98,7 @@ def test():
 
     # Test accounts
     governance = sp.test_account("governance")
-    consumer1 = sp.test_account("consumer1")
+    developer1 = sp.test_account("developer1")
     processor1 = sp.test_account("processor1")
 
     initial_storage = sp.record(
@@ -112,11 +112,11 @@ def test():
 
     scenario += contract
 
-    contract.subscribe(consumer1.address).run(amount = sp.mutez(1000000))
+    contract.subscribe(developer1.address).run(amount = sp.mutez(1000000))
     contract.submit_entropy(sp.pack(1)).run(
         valid     = False,
         exception = "NOT_PROCESSOR",
-        sender    = consumer1.address
+        sender    = developer1.address
     )
     contract.submit_entropy(sp.pack(1)).run(
         sender = processor1.address,
@@ -124,7 +124,7 @@ def test():
     )
 ```
 
-### Job specification
+### Deployment specification
 
 Now that the contract has been deployed, we can prepare the script that will get executed by the Processor to provision the entropy.
 
@@ -132,7 +132,7 @@ The script below computes some random bytes securely and calls the function `sub
 
 <RunnableCode>
 
-```javascript title="JobLogic.js"
+```javascript title="DeploymentLogic.js"
 const TEZOS_RPCS = [
   "https://rpc.ghostnet.teztnets.xyz",
   "https://tezos-ghostnet-node.prod.gke.papers.tech",
@@ -163,6 +163,6 @@ _STD_.chains.tezos.customCall(
 </RunnableCode>
 <div class="padding-vert--md"></div>
 
-## Job Registration
+## Deployment Registration
 
-Check out [How to get started with the Acurast Console](/developers/get-started) to register your Job.
+Check out [How to get started with the Acurast Console](/developers/get-started) to register your Deployment.

@@ -1,0 +1,130 @@
+---
+title: Deployment Creation
+slug: /developers/deployment-creation
+---
+
+import ThemedImage from "@theme/ThemedImage";
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
+Follow the steps in [first app deployment](/developers/deploy-first-app) if you want to deploy apps with the [Acurast CLI](https://github.com/Acurast/acurast-cli).
+
+Alternatively, use the [Acurast Console](https://console.acurast.com) create a deployment.
+
+### Protocol and Templates Selection
+
+<ThemedImage
+  width="640px"
+  sources={{
+    light: useBaseUrl("/img/protocol-template-select.png"),
+    dark: useBaseUrl("/img/protocol-template-select.png"),
+  }}
+/>
+
+Select the protocol / chain the deployment should fulfill on and select a deployment template as a starting point. Alternatively it is possible to just start with a blank template.
+
+### App Code
+
+<ThemedImage
+  width="640px"
+  sources={{
+    light: useBaseUrl("/img/deployment-script.png"),
+    dark: useBaseUrl("/img/deployment-script.png"),
+  }}
+/>
+
+Adapt the app code that it performs the task you need. The above images show the template for publishing a price on Ethereum.
+
+### Deployment Schedule
+
+<ThemedImage
+  width="640px"
+  sources={{
+    light: useBaseUrl("/img/deployment-schedule.png"),
+    dark: useBaseUrl("/img/deployment-schedule.png"),
+  }}
+/>
+
+Specify if the deployment should be matched to the available public processors or if it should run on a specific ones.
+
+Additionally, specify start and end times for the deployment, the execution interval and the duration.
+
+It is recommended to not have a start time sooner than 10 minutes from the present.
+
+## Deployment Environment Variables
+
+<ThemedImage
+  width="640px"
+  sources={{
+    light: useBaseUrl("/img/deployment-env-variables.png"),
+    dark: useBaseUrl("/img/deployment-env-variables.png"),
+  }}
+/>
+
+It is possible to specify environment variables that the script can access at runtime. This is useful when the script needs to use data that should be secret, for example an API key allowing permissioned access to the API.
+
+If an environment variable is specified like in pictured above, it will be accessible from the script with:
+
+```javascript
+const myApiKey = _STD_.env["MY_API_KEY"];
+```
+
+:::info
+
+The environment variables will be encrypted and only the Processor assigned to the deployment will be able to use them. Not even the owner of the device will be able to access this variable as it can only be encrypted within the Trusted Execution Environment of the devices.
+
+:::
+
+Using environment variables will require a processor with the `DataEncryption` module enabled which wille be activated automatically in your deployment when adding one or more environment variables.
+
+<ThemedImage
+  width="640px"
+  sources={{
+    light: useBaseUrl("/img/deployment-required-modules.png"),
+    dark: useBaseUrl("/img/deployment-required-modules.png"),
+  }}
+/>
+
+### Deployment Reward and Publish
+
+<ThemedImage
+  width="640px"
+  sources={{
+    light: useBaseUrl("/img/deployment-reward.png"),
+    dark: useBaseUrl("/img/deployment-reward.png"),
+  }}
+/>
+
+Specify the number of processors that should be assigned to run the deployment, the minimum reputation each processor needs to have and the reward per deployment execution, then publish the deployment.
+
+### Deployment Creation Progress
+
+<ThemedImage
+  width="640px"
+  sources={{
+    light: useBaseUrl("/img/deployment-creation.png"),
+    dark: useBaseUrl("/img/deployment-creation.png"),
+  }}
+/>
+
+After publishing the deployment, a deployment creation progress screen is displayed, showing the various initial stage of the deployment creation:
+
+- Deployment is registered on chain
+- Deployment is matched to one or more processors
+- Deployment is acknowledged by the matched processors
+  - At this point, if environment variables were specified, then the `Set` or `Set All` buttons should be pressed to encrypt and publish those variables on chain.
+
+`Go to Deployment` will open the deployment details page where all the deployment's details are displayed and the environment variables can be updated.
+
+<ThemedImage
+  width="640px"
+  sources={{
+    light: useBaseUrl("/img/deployment-details.png"),
+    dark: useBaseUrl("/img/deployment-details.png"),
+  }}
+/>
+
+In the `Assigned Processors` section, the list of assigned processors is displayed.
+
+Each processor will use a dedicated account for the user creating the deployment, thus here you can see the various addresses the processor will use when interacting with the various chains (selected from the drop down menus).
+
+If you see the `Transaction Fees Required` warning, it means that the chain has a [Level 1](/integrations/introduction#integration-levels) integration with Acurast and the user is responsible for those accounts to have enough balance to pay for the transaction fees.

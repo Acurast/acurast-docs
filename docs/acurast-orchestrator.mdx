@@ -6,21 +6,11 @@ slug: /acurast-orchestrator
 import ThemedImage from "@theme/ThemedImage";
 import useBaseUrl from "@docusaurus/useBaseUrl";
 
-The Acurast Orchestrator is a centerpiece of the consensus layer, combining the orchestration (i.e., the scheduling of jobs and enabling the liquid matching) of the Processor’s computational resources and Consumers. The orchestrator plays an essential role in the definition, agreement, and enforcement of value exchange between processors and consumers.
+The Acurast Orchestrator is a centerpiece of the consensus layer, combining the orchestration (i.e., the scheduling of deployments and enabling the liquid matching) of the Processor’s computational resources and Developers. The orchestrator plays an essential role in the definition, agreement, and enforcement of value exchange between processors and developers.
 
-The orchestrator is where the liquid matching engine pairs the advertised processor resources with the defined requirements of the consumers. The orchestrator natively supports various price-finding mechanisms (e.g., auctions and advertisements), making DevEx highly accessible and seamless.
+The orchestrator is where the liquid matching engine pairs the advertised processor resources with the defined requirements of the developers. The orchestrator natively supports various price-finding mechanisms (e.g., auctions and advertisements), making DevEx highly accessible and seamless.
 
-Every agreement between processor and consumer is specified in an entity called job. The job specifies (i) a set of instructions that are executed on the processor, (ii) its scheduling parameters, and (iii) settlement configuration (i.e., where the output is further processed or persisted), and (iv) finally, the rewards.
-
-<ThemedImage
-  alt="Docusaurus themed image"
-  sources={{
-    light: useBaseUrl("/img/acurast-orchestrator-flow.png"),
-    dark: useBaseUrl("/img/acurast-orchestrator-flow.png"),
-  }}
-/>
-
-<div class="padding-vert--md"></div>
+Every agreement between processor and developer is specified in an entity called deployment. The deployment specifies (i) a set of instructions that are executed on the processor, (ii) its scheduling parameters, and (iii) settlement configuration (i.e., where the output is further processed or persisted), and (iv) finally, the rewards.
 
 **The orchestrator reward is a core mechanism of the Acurast Protocol, formed by two flows**
 
@@ -37,8 +27,8 @@ Every agreement between processor and consumer is specified in an entity called 
 
 ## Compute/Data Flow
 
-For example, data can be the observation of a public data point (e.g., from a public API), an off-chain computation, the privacy-preserving querying of proprietary data (i.e., permissioned data), or even a combination of all these subcases. From the DevEx and consumer’s perspective, it can be compared to defining requirements with a public cloud provider like e.g., Amazon Web Services, Google Cloud or Microsoft Azure.
+For example, data can be the observation of a public data point (e.g., from a public API), an off-chain computation, the privacy-preserving querying of proprietary data (i.e., permissioned data), or even a combination of all these subcases. From the DevEx and developer’s perspective, it can be compared to defining requirements with a public cloud provider like e.g., Amazon Web Services, Google Cloud or Microsoft Azure.
 
 ## Reward Flow
 
-For the reward flow, the consumer defines the budget for the execution of the specified job. The budget can be defined in native ACU tokens, or for example, FIAT-pegged stablecoins. This mechanism allows for deterministic financial planning of executions for both the processor andthe consumer. The processor automatically receives the reward upon successful execution of jobs.
+For the reward flow, the developer defines the budget for the execution of the specified deployment. The budget can be defined in native ACU tokens, or for example, FIAT-pegged stablecoins. This mechanism allows for deterministic financial planning of executions for both the processor andthe developer. The processor automatically receives the reward upon successful execution of deployments.

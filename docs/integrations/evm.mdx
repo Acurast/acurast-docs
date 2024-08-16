@@ -9,7 +9,7 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
 
 # Ethereum Virtual Machine (EVM)
 
-Acurast can be used to get access to computational resources for various use cases and bring them to EVM chains. For that, the `Consumer` creates a Job that performs a given task on the [Acurast Console](https://console.acurast.com/).
+Acurast can be used to get access to computational resources for various use cases and bring them to EVM chains. For that, the `Developer` creates a Deployment that performs a given task on the [Acurast Console](https://console.acurast.com/).
 
 ## Integration Example
 
@@ -21,7 +21,7 @@ The first step is the implementation and deployment of the EVM contract.
 
 The example used is a simple entropy provider, which receives entropy from an Acurast Processor and exposes it to other contracts in the EVM environment.
 
-In this example, the contract expects the Acurast Processor to be known in advance, this can also be adapted at a later stage, depending on how you want to assign your Job to one or more Processors.
+In this example, the contract expects the Acurast Processor to be known in advance, this can also be adapted at a later stage, depending on how you want to assign your Deployment to one or more Processors.
 
 For simplicity purposes, this example uses the address **`0x176583fbcd4e378c138dea7a4630e7b2b759af96`** as a Processor.
 
@@ -41,7 +41,7 @@ contract EntropyProvider {
     }
 
     /**
-     * Receive entropy (random bytes) from an Acurast job.
+     * Receive entropy (random bytes) from an Acurast deployment.
      */
     function receive_entropy(bytes memory _entropy) public {
         // Ensures that only the processor can call this function
@@ -55,7 +55,7 @@ contract EntropyProvider {
      * A view that exposes the entropy to other contracts.
      */
     function consume_entropy(uint maxAge) public view returns (bytes memory) {
-        // Consumers can specify the maximum entropy age they are willing to accept
+        // Developers can specify the maximum entropy age they are willing to accept
         require(block.timestamp - last_update <= maxAge, "ENTROPY_TOO_OLD");
 
         return entropy;
@@ -65,15 +65,15 @@ contract EntropyProvider {
 
 Deployed contract example on Goerli chain: [0x2c503cfba7178eb0ac2dc5df45279527d437657a](https://goerli.etherscan.io/address/0x2c503cfba7178eb0ac2dc5df45279527d437657a)
 
-### Job specification
+### Deployment specification
 
 Now that the contract has been deployed, we can prepare the script that will get executed by the Processor to provision the entropy.
 
-The script below computes some random bytes securely and calls the function `receive_entropy` of the contract deployed above. The Consumer can also specify the gas limit and maximum costs per gas unit.
+The script below computes some random bytes securely and calls the function `receive_entropy` of the contract deployed above. The Developer can also specify the gas limit and maximum costs per gas unit.
 
 <RunnableCode>
 
-```javascript title="JobLogic.js"
+```javascript title="DeploymentLogic.js"
 // Destination contract address
 const destination = "<0x evm_contract_address>";
 // Generate entropy
@@ -104,9 +104,9 @@ _STD_.chains.ethereum.fulfill(
 </RunnableCode>
 <div class="padding-vert--md"></div>
 
-### Job Registration
+### Deployment Registration
 
-Check out [How to get started with the Acurast Console](/developers/get-started) to register your Job.
+Check out [How to get started with the Acurast Console](/developers/get-started) to register your Deployment.
 
 ## Chainlink-compatible Price Feeds
 
@@ -126,7 +126,7 @@ pragma solidity ^0.6.0;
 
 import "@chainlink/contracts/src/v0.6/interfaces/AggregatorInterface.sol";
 
-contract DataConsumer {
+contract DataDeveloper {
     AggregatorInterface internal dataFeed;
 
     /**

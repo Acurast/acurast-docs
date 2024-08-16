@@ -108,7 +108,7 @@ mod simple_oracle {
         /// Imports all the definitions from the outer scope so we can use them here.
         use super::*;
 
-        /// We test if the default constructor does its job.
+        /// We test if the default constructor does its deployment.
         #[ink::test]
         fn default_works() {
             let simple_oracle = SimpleOracle::default();
@@ -183,7 +183,7 @@ mod receiver {
   </TabItem>
 </Tabs>
 
-## Job Specification
+## Deployment Specification
 
 Now that the contract has been deployed, we can prepare the script that will get executed by the Processor to provision the price feed or entropy.
 
@@ -282,6 +282,6 @@ httpGET(
 </TabItem>
 </Tabs>
 
-## Job Registration
+## Deployment Registration
 
-Check out [How to get started with the Acurast Console](/developers/get-started) to register your Job.
+Check out [How to get started with the Acurast Console](/developers/get-started) to register your Deployment.

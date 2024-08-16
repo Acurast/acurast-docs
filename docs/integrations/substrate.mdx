@@ -11,13 +11,13 @@ The Acurast Receiver Pallet allows a Substrate based chain to integrate the Acur
 
 ### Introduction
 
-The Acurast Fulfillment Receiver Pallet, in combination with the [Acurast P256 crypto](https://github.com/Acurast/acurast-core/tree/main/p256-crypto) package, allows a Substrate (Polkadot SDK) enabled chain to accept direct fulfillments from Acurast Processors.
+The Acurast Fulfillment Receiver Pallet, in combination with the [Acurast P256 crypto](https://github.com/Acurast/acurast-core/tree/main/p256-crypto) package, allows a Substrate enabled chain to accept direct fulfillments from Acurast Processors.
 
 The Pallet exposes one extrinsic.
 
 #### fulfill
 
-Allows to post the [Fulfillment] of a job. The fulfillment structure consists of:
+Allows to post the [Fulfillment] of a deployment. The fulfillment structure consists of:
 
 - The ipfs url of the `script` executed.
 - The `payload` bytes representing the output of the `script`.
@@ -62,32 +62,35 @@ impl OnFulfillment<Runtime> for FulfillmentHandler {
 
 Provide an implementation of `OnFulfillment` to handle the received fulfillment. The implementation should check that the fulfillment is from a known Acurast Processor account id.
 
-For example, if the job calling the `fulfill` extrisic has the following script:
+For example, if the deployment calling the `fulfill` extrisic has the following script:
 
 ```javascript
 httpGET(
-    "https://api.binance.com/api/v3/ticker/price?symbol=AAVEBUSD",
-    {},
-    (response, _certificate) => {
-        const price = JSON.parse(response)["price"] * 10 ** 18;
-        const payload = _STD_.chains.substrate.codec.encodeUnsignedNumber(price, 128);
-        _STD_.chains.substrate.fulfill(
-            "<URL_TO_YOUR_SUBSTRATE_NODE>", // replace with your substrate node URL
-            payload,
-            {
-                callIndex: '0x4100', // replace with the call index for the 'fulfill' extrinsic of the pallet-acurast-fulfillment-receiver pallet.
-            },
-            (opHash) => {
-                print("Succeeded: " + opHash)
-            },
-            (err) => {
-                print("Failed fulfill: " + err)
-            },
-        )
-    },
-    (err) => {
-        print("Failed get price: " + err)
-    }
+  "https://api.binance.com/api/v3/ticker/price?symbol=AAVEBUSD",
+  {},
+  (response, _certificate) => {
+    const price = JSON.parse(response)["price"] * 10 ** 18;
+    const payload = _STD_.chains.substrate.codec.encodeUnsignedNumber(
+      price,
+      128
+    );
+    _STD_.chains.substrate.fulfill(
+      "<URL_TO_YOUR_SUBSTRATE_NODE>", // replace with your substrate node URL
+      payload,
+      {
+        callIndex: "0x4100", // replace with the call index for the 'fulfill' extrinsic of the pallet-acurast-fulfillment-receiver pallet.
+      },
+      (opHash) => {
+        print("Succeeded: " + opHash);
+      },
+      (err) => {
+        print("Failed fulfill: " + err);
+      }
+    );
+  },
+  (err) => {
+    print("Failed get price: " + err);
+  }
 );
 ```
 

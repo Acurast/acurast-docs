@@ -1,9 +1,9 @@
 ---
-title: Job Runtime Environment
-slug: /developers/job-runtime-environment
+title: Deployment Runtime Environment
+slug: /developers/deployment-runtime-environment
 ---
 
-The job's script running on Processors has access to the following a set of APIs.
+The deployment's script running on Processors has access to the following a set of APIs.
 
 ## **Top level functions**
 
@@ -72,7 +72,7 @@ _STD_.random.generateSecureRandomHex();
 
 ```javascript
 /**
- * Environment object populated with the environment variables defined during job creation.
+ * Environment object populated with the environment variables defined during deployment creation.
  * For example, to access a variable defined with the "MY_KEY" key do: _STD_.env["MY_KEY"].
  */
 _STD_.env;
@@ -89,12 +89,12 @@ _STD_.env;
 _STD_.app_info.version;
 ```
 
-### **Job Info**
+### **Deployment Info**
 
 ```javascript
 /**
- * @return {JobId} Object representing a job id. 
- * 
+ * @return {DeploymentId} Object representing a deployment id.
+ *
  * Example:
  * {
  *  origin: {
@@ -104,17 +104,17 @@ _STD_.app_info.version;
  *  id: "3510"
  * }
  */
-_STD_.job.getId();
+_STD_.deployment.getId();
 
-type JobId = { origin: { kind: string, source: string }, id: string };
+type DeploymentId = { origin: { kind: string, source: string }, id: string };
 
 /**
- * @return {number} The slot number of this job.
+ * @return {number} The slot number of this deployment.
  */
-_STD_.job.getSlot();
+_STD_.deployment.getSlot();
 
 /**
- * @return {PublicKeys} Object containing the job specific public keys.
+ * @return {PublicKeys} Object containing the deployment specific public keys.
  *
  * Example:
  * {
@@ -123,7 +123,7 @@ _STD_.job.getSlot();
  *  ed25519: "7ce9f9b96a0f898ad109a594ab2c30a1682e7e6425910427c9390fdf16b11dd6"
  * }
  */
-_STD_.job.getPublicKeys();
+_STD_.deployment.getPublicKeys();
 
 type PublicKeys = { p256: string, secp256k1: string, ed25519: string };
 ```
@@ -148,14 +148,13 @@ _STD_.device.getPublicKey();
  * @return {string} String representing the main account address.
  */
 _STD_.device.getAddress();
-
 ```
 
 ### **Signers**
 
 ```javascript
 /**
- * Signs the given payload with the secp256r1 key generated for the current job.
+ * Signs the given payload with the secp256r1 key generated for the current deployment.
  *
  * @since 1.9.2 (version code 58)
  *
@@ -165,7 +164,7 @@ _STD_.device.getAddress();
 _STD_.signers.secp256r1.sign(payload);
 
 /**
- * Encrypts the given payload with the secp256r1 key generated for the current job.
+ * Encrypts the given payload with the secp256r1 key generated for the current deployment.
  *
  * @since 1.9.2 (version code 58)
  *
@@ -175,7 +174,7 @@ _STD_.signers.secp256r1.sign(payload);
 _STD_.signers.secp256r1.encrypt(payload);
 
 /**
- * Decrypts the given payload with the secp256r1 key generated for the current job.
+ * Decrypts the given payload with the secp256r1 key generated for the current deployment.
  *
  * @since 1.9.2 (version code 58)
  *
@@ -185,7 +184,7 @@ _STD_.signers.secp256r1.encrypt(payload);
 _STD_.signers.secp256r1.decrypt(payload);
 
 /**
- * Signs the given payload with the secp256k1 key generated for the current job.
+ * Signs the given payload with the secp256k1 key generated for the current deployment.
  *
  * @since 1.9.2 (version code 58)
  *
@@ -195,7 +194,7 @@ _STD_.signers.secp256r1.decrypt(payload);
 _STD_.signers.secp256k1.sign(payload);
 
 /**
- * Encrypts the given payload with the secp256k1 key generated for the current job.
+ * Encrypts the given payload with the secp256k1 key generated for the current deployment.
  *
  * @since 1.9.2 (version code 58)
  *
@@ -205,7 +204,7 @@ _STD_.signers.secp256k1.sign(payload);
 _STD_.signers.secp256k1.encrypt(payload);
 
 /**
- * Decrypts the given payload with the secp256k1 key generated for the current job.
+ * Decrypts the given payload with the secp256k1 key generated for the current deployment.
  *
  * @since 1.9.2 (version code 58)
  *
@@ -215,7 +214,7 @@ _STD_.signers.secp256k1.encrypt(payload);
 _STD_.signers.secp256k1.decrypt(payload);
 
 /**
- * Signs the given payload with the ed25519 key generated for the current job.
+ * Signs the given payload with the ed25519 key generated for the current deployment.
  *
  * @since 1.9.2 (version code 58)
  *
@@ -225,7 +224,7 @@ _STD_.signers.secp256k1.decrypt(payload);
 _STD_.signers.ed25519.sign(payload);
 
 /**
- * Encrypts the given payload with the ed25519 key generated for the current job.
+ * Encrypts the given payload with the ed25519 key generated for the current deployment.
  *
  * @since 1.9.2 (version code 58)
  *
@@ -235,7 +234,7 @@ _STD_.signers.ed25519.sign(payload);
 _STD_.signers.ed25519.encrypt(payload);
 
 /**
- * Decrypts the given payload with the ed25519 key generated for the current job.
+ * Decrypts the given payload with the ed25519 key generated for the current deployment.
  *
  * @since 1.9.2 (version code 58)
  *
@@ -326,7 +325,6 @@ type SubstrateError = (message) => void;
  * @param {'SECP256K1' | 'SECP256R1'} curveType
  */
 _STD_.chains.substrate.signer.setSigner(curveType);
-
 
 /**
  * Signs a payload.
@@ -450,8 +448,15 @@ _STD_.chains.substrate.contract.callView(
  * @param {SubstrateSuccess} success the success callback.
  * @param {SubstrateError} error the error callback.
  */
-_STD_.chains.substrate.gear.sendMessage(nodes, callIndex, destination, data, extra, success, error);
-
+_STD_.chains.substrate.gear.sendMessage(
+  nodes,
+  callIndex,
+  destination,
+  data,
+  extra,
+  success,
+  error
+);
 ```
 
 ### **Tezos functions**
@@ -513,11 +518,11 @@ _STD_.chains.tezos.encoding.encodeExpr(value);
 ```javascript
 /**
  * Signs the given message and returns the signature.
- * 
- * Before signing, the message is prepended with the utf8 bytes of the 
+ *
+ * Before signing, the message is prepended with the utf8 bytes of the
  * string 'acusig' and the script's ipfs hash ('acusig' + SCRIPT_HASH + message),
  * then the resulting bytes are hashed with blake2b256.
- * 
+ *
  * @param {string} message an hex string representing the bytes to sign
  * @return {string} Hex string representing the signature
  */
@@ -558,7 +563,7 @@ type EthereumSuccess = (operationHash) => void;
 type EthereumError = (message) => void;
 
 /**
- * @return {string} The processor's ethereum address for the current job.
+ * @return {string} The processor's ethereum address for the current deployment.
  */
 _STD_.chains.ethereum.getAddress();
 ```
@@ -568,11 +573,11 @@ _STD_.chains.ethereum.getAddress();
 ```javascript
 /**
  * Signs the given message and returns the signature.
- * 
- * Before signing, the message is prepended with the utf8 bytes of the 
+ *
+ * Before signing, the message is prepended with the utf8 bytes of the
  * string 'acusig' and the script's ipfs hash ('acusig' + SCRIPT_HASH + message),
  * then the resulting bytes are hashed with Keccak256.
- * 
+ *
  * @param {string} message an hex string representing the bytes to sign
  * @return {string} Hex string representing the signature
  */
@@ -615,9 +620,9 @@ _STD_.chains.ethereum.abi.encodeStruct(value, isDynamic);
 ```javascript
 /**
  * Returns the public key for the bitcoin chain.
- * 
+ *
  * @since 1.5.0 (version code 28)
- * 
+ *
  * @return {string} Hex string representing the public key
  */
 _STD_.chains.bitcoin.getPublicKey();
@@ -639,12 +644,12 @@ _STD_.chains.bitcoin.getExtendedPublicKey(version, derivationPath);
 ```javascript
 /**
  * Signs the given message and returns the signature.
- * 
- * Before signing, the message is prepended with the utf8 bytes of the 
+ *
+ * Before signing, the message is prepended with the utf8 bytes of the
  * string 'acusig' and the script's ipfs hash ('acusig' + SCRIPT_HASH + message).
- * 
+ *
  * @since 1.4.0 (version code 26)
- * 
+ *
  * @param {string} message an hex string representing the bytes to sign
  * @return {string} Hex string representing the signature
  */
@@ -652,7 +657,7 @@ _STD_.chains.bitcoin.signer.sign(message);
 
 /**
  * Signs the given message and returns the signature.
- * 
+ *
  * @since 1.4.0 (version code 26)
  *
  * @param {string} message an hex string representing the bytes to sign
@@ -662,7 +667,7 @@ _STD_.chains.bitcoin.signer.rawSign(message);
 
 /**
  * Hashes the given value using SHA256.
- * 
+ *
  * @since 1.4.0 (version code 26)
  *
  * @param {string} value an hex string representing the bytes to hash
@@ -672,28 +677,28 @@ _STD_.chains.bitcoin.signer.sha256(value);
 
 /**
  * Signs the given message with a key derived with the given derivation path and returns the signature.
- * 
- * Before signing, the message is prepended with the utf8 bytes of the 
+ *
+ * Before signing, the message is prepended with the utf8 bytes of the
  * string 'acusig' and the script's ipfs hash ('acusig' + SCRIPT_HASH + message).
- * 
- * @since 1.7.0 (version code 38)
- * 
- * @param {string} message an hex string representing the bytes to sign
- * @param {string} derivationPath the derivation path to use. Currently, the only valid value is "m/0/1"
- * @return {string} Hex string representing the signature
- */
-_STD_.chains.bitcoin.signer.signHD(message, derivationPath)
-
-/**
- * Signs the given message with a key derived with the given derivation path and returns the signature.
- * 
+ *
  * @since 1.7.0 (version code 38)
  *
  * @param {string} message an hex string representing the bytes to sign
  * @param {string} derivationPath the derivation path to use. Currently, the only valid value is "m/0/1"
  * @return {string} Hex string representing the signature
  */
-_STD_.chains.bitcoin.signer.rawSignHD(message, derivationPath)
+_STD_.chains.bitcoin.signer.signHD(message, derivationPath);
+
+/**
+ * Signs the given message with a key derived with the given derivation path and returns the signature.
+ *
+ * @since 1.7.0 (version code 38)
+ *
+ * @param {string} message an hex string representing the bytes to sign
+ * @param {string} derivationPath the derivation path to use. Currently, the only valid value is "m/0/1"
+ * @return {string} Hex string representing the signature
+ */
+_STD_.chains.bitcoin.signer.rawSignHD(message, derivationPath);
 ```
 
 ### **Bitcoin utils functions**
@@ -708,7 +713,7 @@ _STD_.chains.bitcoin.signer.rawSignHD(message, derivationPath)
  * @param {string} derivationPath the derivation path to use
  * @return {string} Hex string representing the derivced public key
  */
-_STD_.chains.bitcoin.utils.derivePublicKey(xpub, derivationPath)
+_STD_.chains.bitcoin.utils.derivePublicKey(xpub, derivationPath);
 
 /**
  * Encodes the given bytes using base58check.
@@ -718,7 +723,7 @@ _STD_.chains.bitcoin.utils.derivePublicKey(xpub, derivationPath)
  * @param {string} value an hex string representing the bytes to encode
  * @return {string} The base58check encoded value
  */
-_STD_.chains.bitcoin.utils.base58CheckEncode(value)
+_STD_.chains.bitcoin.utils.base58CheckEncode(value);
 
 /**
  * Encodes the given bytes using base58.
@@ -728,7 +733,7 @@ _STD_.chains.bitcoin.utils.base58CheckEncode(value)
  * @param {string} value an hex string representing the bytes to encode
  * @return {string} The base58 encoded value
  */
-_STD_.chains.bitcoin.utils.base58Encode(value)
+_STD_.chains.bitcoin.utils.base58Encode(value);
 
 /**
  * Decodes the given base58check value.
@@ -738,7 +743,7 @@ _STD_.chains.bitcoin.utils.base58Encode(value)
  * @param {string} value a string representing the base58check value to decode
  * @return {string} Hex string representing the decoded value
  */
-_STD_.chains.bitcoin.utils.base58CheckDecode(value)
+_STD_.chains.bitcoin.utils.base58CheckDecode(value);
 
 /**
  * Decodes the given base58 value.
@@ -748,7 +753,7 @@ _STD_.chains.bitcoin.utils.base58CheckDecode(value)
  * @param {string} value a string representing the base58 value to decode
  * @return {string} Hex string representing the decoded value
  */
-_STD_.chains.bitcoin.utils.base58Decode(value)
+_STD_.chains.bitcoin.utils.base58Decode(value);
 ```
 
 ### **Aeternity functions**
@@ -756,14 +761,14 @@ _STD_.chains.bitcoin.utils.base58Decode(value)
 ```javascript
 /**
  * Calls `fulfill` on an aeternity contract.
- * 
+ *
  * The `extra` argument is an object that can provide the following:
  * - `functionName`: an optional string representing the method name, if not provided `fulfill` is used.
  * - `gasLimit`: a string representing the transaction's gas limit, if not provided '25000' is used.
  * - `gasPrice`: a string representing the transaction's gas price, if not provided '1000000000' is used.
- * 
+ *
  * @since 1.3.32
- * 
+ *
  * @param {string} url the node URL.
  * @param {string} destination the contract's address.
  * @param {[object]} payload an array of encoded values. The objects inside this array need to be constructed using the functions found under `_STD_.chains.aeternity.data`.
@@ -771,13 +776,20 @@ _STD_.chains.bitcoin.utils.base58Decode(value)
  * @param {AeternitySuccess} success the success callback.
  * @param {AeternityError} error the success callback.
  */
-_STD_.chains.aeternity.fulfill(url, destination, payload, extra, success, error);
+_STD_.chains.aeternity.fulfill(
+  url,
+  destination,
+  payload,
+  extra,
+  success,
+  error
+);
 
 /**
  * Returns the Aeternity address.
- * 
+ *
  * @since 1.3.34 (version code 19)
- * 
+ *
  * @return {string} The Aeternity address
  */
 _STD_.chains.aeternity.getAddress();
@@ -800,9 +812,9 @@ type AeternityError = (message) => void;
 ```javascript
 /**
  * Returns an object representing an integer that can be used as payload in the `fulfill` call.
- * 
+ *
  * @since 1.3.32
- * 
+ *
  * @param {number | string} value a value representing an integer.
  * @return {object} an object representing an integer that can be used as payload in the `fulfill` call.
  */
@@ -810,9 +822,9 @@ _STD_.chains.aeternity.data.int(value);
 
 /**
  * Returns an object representing a string that can be used as payload in the `fulfill` call.
- * 
+ *
  * @since 1.3.32
- * 
+ *
  * @param {string} value a string value.
  * @return {object} an object representing a string that can be used as payload in the `fulfill` call.
  */
@@ -820,9 +832,9 @@ _STD_.chains.aeternity.data.string(value);
 
 /**
  * Returns an object representing bytes that can be used as payload in the `fulfill` call.
- * 
+ *
  * @since 1.3.32
- * 
+ *
  * @param {string} value an hex string representing the bytes.
  * @return {object} an object representing bytes that can be used as payload in the `fulfill` call.
  */
@@ -830,9 +842,9 @@ _STD_.chains.aeternity.data.bytes(value);
 
 /**
  * Returns an object representing a list of objects that can be used as payload in the `fulfill` call.
- * 
+ *
  * @since 1.3.32
- * 
+ *
  * @param {object[]} values an array of objects that were created using the functions found under `_STD_.chains.aeternity.data`.
  * @return {object} an object representing a list of objects that can be used as payload in the `fulfill` call
  */
@@ -840,9 +852,9 @@ _STD_.chains.aeternity.data.list(values);
 
 /**
  * Returns an object representing a tuple can be used as payload in the `fulfill` call.
- * 
+ *
  * @since 1.3.32
- * 
+ *
  * @param {object[]} values an array of objects that were created using the functions found under `_STD_.chains.aeternity.data`.
  * @return {object} an object representing a tuple can be used as payload in the `fulfill` call.
  */
@@ -850,17 +862,17 @@ _STD_.chains.aeternity.data.tuple(values);
 
 /**
  * Returns an object representing a map can be used as payload in the `fulfill` call.
- * 
- * The input value is an array of arrays of objects. The items need to be an array of size 2, 
+ *
+ * The input value is an array of arrays of objects. The items need to be an array of size 2,
  * where the first element represents a map key and the second element represents its value:
- * 
+ *
  * _STD_.chains.aeternity.data.map([
- *  [_STD_.chains.aeternity.data.string("key1"), _STD_.chains.aeternity.data.string("value1")], 
- *  [_STD_.chains.aeternity.data.string("key2"), _STD_.chains.aeternity.data.string("value2")] 
+ *  [_STD_.chains.aeternity.data.string("key1"), _STD_.chains.aeternity.data.string("value1")],
+ *  [_STD_.chains.aeternity.data.string("key2"), _STD_.chains.aeternity.data.string("value2")]
  * ]);
- * 
+ *
  * @since 1.3.32
- * 
+ *
  * @param {object[][]} values an array of arrays of objects that were created using the functions found under `_STD_.chains.aeternity.data`.
  * @return {object} an object representing a map can be used as payload in the `fulfill` call.
  */
@@ -868,9 +880,9 @@ _STD_.chains.aeternity.data.map(values);
 
 /**
  * Returns an object representing an account pubkey can be used as payload in the `fulfill` call.
- * 
+ *
  * @since 1.3.32
- * 
+ *
  * @param {string} value a string representing an account pubkey .
  * @return {object} an object representing an account pubkey can be used as payload in the `fulfill` call.
  */

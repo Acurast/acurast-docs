@@ -21,32 +21,22 @@ const sidebars = {
     "introduction",
     {
       type: "category",
-      label: "Consumers",
+      label: "Developers",
       items: [
-        "developers/get-started",
-        "developers/job-creation",
-        "developers/job-runtime-environment",
-        "developers/on-demand-jobs",
-        {
-          type: "category",
-          label: "Tutorials",
-          items: [
-            {
-              type: "doc",
-              id: "developers/tutorials/deploy-first-app",
-              label: "Deploy First App",
-            },
-          ],
-        }
+        "developers/deploy-first-app",
+        "developers/deployment-creation",
+        "developers/deployment-runtime-environment",
+        "developers/on-demand-deployments",
       ],
       collapsed: false,
     },
     "acurast-processors",
-    "acurast-orchestrator",
     {
       type: "category",
       label: "Acurast Protocol",
       items: [
+        "acurast-orchestrator",
+
         {
           type: "category",
           label: "Architecture",
@@ -62,7 +52,6 @@ const sidebars = {
         },
         "acurast-protocol/node-setup",
       ],
-      collapsed: false,
     },
     {
       type: "category",
@@ -74,7 +63,6 @@ const sidebars = {
         "integrations/substrate-wasm",
         "integrations/tezos",
       ],
-      collapsed: false,
     },
     "networks",
     "wallets",

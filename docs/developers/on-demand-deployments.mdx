@@ -1,0 +1,50 @@
+---
+title: Deployments On Demand
+slug: /developers/on-demand-deployments
+---
+
+import ThemedImage from "@theme/ThemedImage";
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
+On demand deployments are special kind of deployments that can be used to access a processor on demand from a dapp. This is achieved by having the deployment open a websocket connection to the acurast websocket service and setup handlers to process incoming messages.
+
+### On Demand deployment script
+
+The snippet below shows a very simple on demand deployment script that setups a websocket connection to the acurast websocket service and registers a payload handler that just sends back the message it receives.
+
+```javascript
+_STD_.ws.open(
+  // open a websocket connection to the provided server
+  ["wss://ws-1.ws-server-1.acurast.com", "wss://ws-1.ws-server-2.acurast.com "],
+  () => {
+    print("open: success");
+    _STD_.ws.registerPayloadHandler((payload) => {
+      // register a handler for incoming messages
+      _STD_.ws.send(payload.sender, payload.payload); // just send back the received message
+    });
+  },
+  (err) => {
+    print("open: error " + err);
+  }
+);
+```
+
+An on demand deployment should be scheduled with a long duration since the deployment needs to continuously run in order to be able to process incoming messages.
+
+### dApp integration
+
+A dApp can start interacting with a running on demand deployment by integrating the [Acurast Typescript SDK](https://github.com/Acurast/acurast-typescript-sdk). See the example dapp for on how a simple integration works.
+
+### Acurast websocket service
+
+The Acurast websocket service is a P2P service that allows to simply send messages to clients connected to it. Clients are authenticated during the initial connection setup by signing a challenge with their private key (in case of a processor, that would be the private key specifically generated for the deployment creator).
+
+The initial connection setup and authentication flow is as follows:
+
+- Client sends an `init` message to the websocket service.
+- Websocket service responds with a `challenge` message, providing the bytes to be signed.
+- Client creates the payload to sign by concatenating the `challenge` bytes, the client public key and a 16 bytes nonce.
+- Client signs the payload and responds to the challenge by sending beck the signature alongside the originally received challenge bytes, client public key and nonce.
+- Websocket service verifies the signature and if it is valid accepts the connection.
+
+After a client is authenticated, it can be addressed by specifying its public key as the recipient.

@@ -6,9 +6,9 @@ slug: /acurast-protocol/architecture/execution-layer
 import ThemedImage from "@theme/ThemedImage";
 import useBaseUrl from "@docusaurus/useBaseUrl";
 
-Acurast's execution layer is modular, allowing the flexible selection of runtimes according to the requirements of the use-case and the `job`, respectively. Decoupling the execution layer from the consensus and application layer allows the long-term evolution of runtimes, avoiding dependency lock-ins. Additionally, it ensures the highest level of service and confidentiality because security models can iteratively evolve with upgrades as novel threats emerge or new requirements arise.
+Acurast's execution layer is modular, allowing the flexible selection of runtimes according to the requirements of the use-case and the `deployment`, respectively. Decoupling the execution layer from the consensus and application layer allows the long-term evolution of runtimes, avoiding dependency lock-ins. Additionally, it ensures the highest level of service and confidentiality because security models can iteratively evolve with upgrades as novel threats emerge or new requirements arise.
 
-Acurast offers native and straightforward bootstrapping of permissioned consortia. Depending on the requirements, either _(a)_ consumers can directly leverage the Acurast orchestrator to select from a public pool of processors, or _(b)_ or use dedicated processors (_e.g.,_ from trusted entities, or use consumer-supported self-service processors). Such composability allows consumers to customize access control and define individual trust models depending on the `jobs` that are executed.
+Acurast offers native and straightforward bootstrapping of permissioned consortia. Depending on the requirements, either _(a)_ developers can directly leverage the Acurast orchestrator to select from a public pool of processors, or _(b)_ or use dedicated processors (_e.g.,_ from trusted entities, or use developer-supported self-service processors). Such composability allows developers to customize access control and define individual trust models depending on the `deployments` that are executed.
 
 The Acurast execution layer natively offers two runtimes, the _(1)_ Acurast Secure Hardware Runtime (ASHR) and _(2)_ Acurast Zero-Knowledge Runtime (AZKR).
 
