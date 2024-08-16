@@ -6,7 +6,7 @@ on:
   push:
     branches: [main]
 
-deployments:
+jobs:
   checks:
     if: github.event_name != 'push'
     runs-on: ubuntu-latest
