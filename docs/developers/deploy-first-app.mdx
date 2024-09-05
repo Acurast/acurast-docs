@@ -378,6 +378,62 @@ And if we check the API again, we can see another report:
 
 That's it! Now you can change your code, run `npm run build && acurast live` and see the results in real-time. This is a great way to test your code and see the results immediately.
 
+## Bonus: Working with Secret Environment Variables
+
+You can use secret environment variables in Acurast depoyments. The environment variables that are encrypted during deployment and only decrypted when the code is run on the processor. This is useful for storing sensitive information like API keys.
+
+To use environment variables in your project, you first need to add them to the `.env` file. For example, let's say you have an API key that you want to keep secret. You can add it to the `.env` file like this: 
+
+```text
+# .env
+
+API_KEY=your-api-key
+```
+
+To configure which of our deployments make use of the environment variables, we need to edit the `acurast.json` file and add all the environment variables we want to include in the deployment to the `includeEnvironmentVariables` array.
+
+```json
+{
+  "projects": {
+    "tutorial": {
+      "projectName": "tutorial",
+      "fileUrl": "dist/bundle.js",
+      "network": "canary",
+      "onlyAttestedDevices": true,
+      "assignmentStrategy": {
+        "type": "Single"
+      },
+      "execution": {
+        "type": "onetime",
+        "maxExecutionTimeInMs": 60000
+      },
+      "maxAllowedStartDelayInMs": 10000,
+      "usageLimit": {
+        "maxMemory": 0,
+        "maxNetworkRequests": 0,
+        "maxStorage": 0
+      },
+      "numberOfReplicas": 1,
+      "requiredModules": [],
+      "minProcessorReputation": 0,
+      "maxCostPerExecution": 1000000000,
+      "includeEnvironmentVariables": ["API_KEY"],
+      "processorWhitelist": []
+    }
+  }
+}
+```
+
+Then, in your code, you can access the environment variables like this: 
+
+```typescript
+const API_KEY = _STD_.env[API_KEY];
+```
+
+When you run `acurast deploy`, the environment variables will now automatically be added to your deployment.
+
+If you run an interval based deployment with multiple executions, then you can even update the environment variables between executions. This is useful if you want to rotate your API keys regularly. To do that, simply update the `.env` file and run `acurast deployments <id> -e`. This will update the environment variables for the deployment with the given ID.
+
 ## Conclusion
 
 Congratulations! You've successfully deployed your first application on Acurast! For more advanced features and detailed documentation, refer to [Acurast CLI Documentation](https://github.com/Acurast/acurast-cli/blob/main/README.md). Also make sure to join our Telegram or Discord to be part of our community!
