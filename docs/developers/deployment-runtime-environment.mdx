@@ -104,14 +104,14 @@ _STD_.app_info.version;
  *  id: "3510"
  * }
  */
-_STD_.deployment.getId();
+_STD_.job.getId();
 
 type DeploymentId = { origin: { kind: string, source: string }, id: string };
 
 /**
  * @return {number} The slot number of this deployment.
  */
-_STD_.deployment.getSlot();
+_STD_.job.getSlot();
 
 /**
  * @return {PublicKeys} Object containing the deployment specific public keys.
@@ -123,7 +123,7 @@ _STD_.deployment.getSlot();
  *  ed25519: "7ce9f9b96a0f898ad109a594ab2c30a1682e7e6425910427c9390fdf16b11dd6"
  * }
  */
-_STD_.deployment.getPublicKeys();
+_STD_.job.getPublicKeys();
 
 type PublicKeys = { p256: string, secp256k1: string, ed25519: string };
 ```
