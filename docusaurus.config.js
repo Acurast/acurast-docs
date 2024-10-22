@@ -159,27 +159,27 @@ const config = {
             from: "/acurast-transmitters",
           },
           {
-            to: "/developers/get-started",
+            to: "/developers/deploy-first-app",
             from: "/acurast-protocol/interoperability/enterprise",
           },
           {
-            to: "/developers/get-started",
+            to: "/developers/deploy-first-app",
             from: "/acurast-protocol/interoperability/hyperdrive",
           },
           {
-            to: "/developers/get-started",
+            to: "/developers/deploy-first-app",
             from: "/acurast-protocol/modules/mesh",
           },
           {
-            to: "/developers/get-started",
+            to: "/developers/deploy-first-app",
             from: "/acurast-protocol/interoperability/mesh",
           },
           {
-            to: "/developers/get-started",
+            to: "/developers/deploy-first-app",
             from: "/acurast-protocol/interoperability/singularity",
           },
           {
-            to: "/developers/get-started",
+            to: "/developers/deploy-first-app",
             from: "/acurast-protocol/modules/singularity",
           },
           {
@@ -191,15 +191,15 @@ const config = {
             from: "/developers/create-address",
           },
           {
-            to: "/developers/get-started",
+            to: "/developers/deploy-first-app",
             from: "/acurast-protocol/modules/singularity-mesh",
           },
           {
-            to: "/developers/get-started",
+            to: "/developers/deploy-first-app",
             from: "/acurast-protocol/modules/hyperdrive",
           },
           {
-            to: "/developers/get-started",
+            to: "/developers/deploy-first-app",
             from: "/acurast-protocol/modules/enterprise",
           },
           {
@@ -241,10 +241,6 @@ const config = {
           {
             to: "/integrations",
             from: "/integrations/introduction",
-          },
-          {
-            to: "/developers/deploy-first-app",
-            from: "/developers/get-started",
           },
         ],
       },
