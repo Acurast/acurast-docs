@@ -242,6 +242,10 @@ const config = {
             to: "/integrations",
             from: "/integrations/introduction",
           },
+          {
+            to: "/developers/deploy-first-app",
+            from: "/developers/get-started",
+          },
         ],
       },
     ],
