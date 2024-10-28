@@ -11,111 +11,113 @@ import TOCInline from "@theme/TOCInline";
 
 This tutorial will guide you through deploying a simple application on Acurast. By the end of this guide, you'll have your first project ready and deployment up and running.
 
+:::tip
+
+If you prefer to jump right in, you can take a look at one of our example projects: [Express Server on Acurast](https://github.com/Acurast/acurast-example-apps/tree/13322f2eb9e083a2e6d69699026ac76f2fa40ab6/apps/app-webserver) or [Fetch data from an API](https://github.com/Acurast/acurast-example-apps/tree/13322f2eb9e083a2e6d69699026ac76f2fa40ab6/apps/app-fetch).
+
+You can either clone those repositories, or set up a blank Acurast starter project by running `npx @acurast/cli new <project-name>`.
+
+:::
+
 ## Prerequisites
 
 - Basic knowledge of Node.js and the Command Line
 
 ## Setting up the Project
 
+### Project Structure
+
+The structure of a project looks exactly like a normal Node.js project:
+
+```
+├── dist
+│   └── bundle.js
+├── LICENSE
+├── README.md
+├── acurast.json
+├── package-lock.json
+├── package.json
+├── src
+│   └── index.ts
+├── .env
+├── tsconfig.json
+└── webpack.config.js
+```
+
+There is only one file that is specific to Acurast, which is `acurast.json`. This file is used to configure the deployment, and we will come back to it later in the tutorial.
+
 ### Writing the code
 
-First, let's start by creating a simple node.js project. You can find the code of the example, including all the build steps and configurations, on [GitHub](https://github.com/Acurast/acurast-example-apps/blob/509f8245ca72e41a3a961959fba185a2a3a37474/apps/app-fetch/src/index.ts)
+First, let's start by creating a simple node.js project. You can find the code of the example, including all the build steps and configurations, on [GitHub](https://github.com/Acurast/acurast-example-apps/blob/13322f2eb9e083a2e6d69699026ac76f2fa40ab6/apps/app-webserver/)
 
 If you're interested only in the Acurast part of the tutorial, feel free to skip to the "Installing the Acurast CLI" step.
 
-The app we will build is pretty straight forward. First, we make a request to an API to fetch the BTC/USD price. Then we make another request to send the price, along with some other data, to an API.
+The app we will build is a simple Express server that will return a "Hello, World!" message. This is the code of the app:
 
 ```typescript
-const WEBHOOK_URL = "REPLACE_ME"; // TODO: Replace with your https://webhook.site/ URL
+import express from "express";
+import localtunnel from "localtunnel";
 
-const BASE_URL = "https://min-api.cryptocompare.com";
-const SYMBOL = "BTC";
-const TARGET_CURRENCY = "USD";
+/**
+ * WARNING: This subdomain is NOT secure and should not be used in production.
+ * Anyone can simply overwrite it with their own project and hijack requests
+ * This is simply for testing purposes. If you need a secure way to host your
+ * project, please reach out to us.
+ */
+const LOCALTUNNEL_SUBDOMAIN = ""; // This is the subdomain where your webserver will be available. Eg. https://example.processor-proxy.sook.ch
+const LOCALTUNNEL_HOST = "https://processor-proxy.sook.ch/";
+const LOCAL_PORT = 3000;
 
-declare const _STD_: any;
-
-if (typeof _STD_ === "undefined") {
-  // If _STD_ is not defined, we know it's not running in the Acurast Cloud.
-  // Define _STD_ here for local testing.
-  console.log("Running in local environment");
-  (global as any)._STD_ = {
-    app_info: { version: "local" },
-    deployment: { getId: () => "local" },
-    device: { getAddress: () => "local" },
-  };
+if (!LOCALTUNNEL_SUBDOMAIN) {
+  console.log("LOCALTUNNEL_SUBDOMAIN must be set");
+  process.exit(1);
 }
 
-fetch(`${BASE_URL}/data/price?fsym=${SYMBOL}&tsyms=${TARGET_CURRENCY}`)
-  .then((response) => response.json())
-  .then((data) => {
-    const price = data[TARGET_CURRENCY];
-    return fetch(WEBHOOK_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        price,
-        timestamp: Date.now(),
-        acurast: {
-          version: _STD_.app_info.version,
-          deploymentId: _STD_.deployment.getId(),
-          deviceAddress: _STD_.device.getAddress(),
-        },
-      }),
-    })
-      .then((postResponse) => console.log("Success:", postResponse.status))
-      .catch((error) => console.error("Error posting data:", error));
-  })
-  .catch((error) => console.error("Error getting data:", error));
+const app = express();
+app.use(express.json());
+
+app.get("/", (req, res) => {
+  res.send(`<h1>Hello from Acurast!</h1>`);
+});
+
+app.listen(LOCAL_PORT, () =>
+  console.log(`Server listening on port ${LOCAL_PORT}!`)
+);
+
+const startTunnel = async () => {
+  const tunnel = await localtunnel({
+    subdomain: LOCALTUNNEL_SUBDOMAIN,
+    host: LOCALTUNNEL_HOST,
+    port: LOCAL_PORT,
+  });
+
+  console.log("Tunnel started at", tunnel.url);
+};
+
+startTunnel();
 ```
 
-Make sure to replace "REPLACE_ME" with your own link. To get your own link, simply open https://webhook.site/ and copy the URL that is located under "Your unique URL". It will look something like this `https://webhook.site/04450188-d4ab-4d8b-b060-d334bff641e1`. If you stay on that page, you will see all incoming GET and POST requests.
+In this code, we start a webserver using express on port 3000. We then start a localtunnel tunnel to make the server publicly available.
 
-If you take a closer look at the app, you will see that we access an object called `_STD_`. This is the "standard object" available in the [Acurast Runtime Environment](https://docs.acurast.com/developers/deployment-runtime-environment/). It exposes some functionality like allowing you to sign data with a secure key, or get the identifier of the processor the app is running on.
+We need to set the `LOCALTUNNEL_SUBDOMAIN` variable to specifiy where our server will be available. If we set it to `example`, then the URL will be `https://example.processor-proxy.sook.ch`.
 
-In our example, we access the App Version, Deployment ID (previously Deployment ID) and Device Address. We also add a fallback for those values in case the app is ran locally for testing. You should remove any "testing" code before deploying your app in production.
+:::warning
+
+This localtunnel server is not secure and should not be used in production. We are working on making this secure by default, but if you need a secure way to host your project now, please reach out to us.
+
+:::
+
+{/* If you take a closer look at the app, you will see that we access an object called `_STD_`. This is the "standard object" available in the [Acurast Runtime Environment](https://docs.acurast.com/developers/deployment-runtime-environment/). It exposes some functionality like allowing you to sign data with a secure key, or get the identifier of the processor the app is running on.
+
+In our example, we access the App Version, Deployment ID (previously Deployment ID) and Device Address. We also add a fallback for those values in case the app is ran locally for testing. You should remove any "testing" code before deploying your app in production. */}
 
 ### Building the project
 
-To deploy a project on the Acurast cloud, it needs to be bundled into a single js file. In our example, we use webpack. You can find the configuration in the example project on [GitHub](https://github.com/Acurast/acurast-example-apps/blob/509f8245ca72e41a3a961959fba185a2a3a37474/apps/app-fetch/)
+To deploy a project on the Acurast Cloud, it needs to be bundled into a single js file. In our example, we use webpack. You can find the configuration in the example project on [GitHub](https://github.com/Acurast/acurast-example-apps/blob/13322f2eb9e083a2e6d69699026ac76f2fa40ab6/apps/app-webserver/)
 
 Running `npm run bundle` will then output a single js file which includes all necessary dependencies.
 
-The is located in `dist/bundle.js` and looks something like this:
-
-```javascript
-// bundle.js
-(() => {
-  "use strict";
-  "undefined" == typeof _STD_ &&
-    (console.log("Running in local environment"),
-    (global._STD_ = {
-      app_info: { version: "local" },
-      deployment: { getId: () => "local" },
-      device: { getAddress: () => "local" },
-    })),
-    fetch("https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=USD")
-      .then((e) => e.json())
-      .then((e) => {
-        const o = e.USD;
-        return fetch("REPLACE_ME", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            price: o,
-            timestamp: Date.now(),
-            acurast: {
-              version: _STD_.app_info.version,
-              deploymentId: _STD_.deployment.getId(),
-              deviceAddress: _STD_.device.getAddress(),
-            },
-          }),
-        })
-          .then((e) => console.log("Success:", e.status))
-          .catch((e) => console.error("Error posting data:", e));
-      })
-      .catch((e) => console.error("Error getting data:", e));
-})();
-```
+The is located in `dist/bundle.js`. It includes your code, as well as all the dependencies in a single file.
 
 This is the file that will be deployed to the Acurast Cloud. You can run it locally with `node dist/bundle.js` to test it.
 
@@ -234,23 +236,14 @@ ACURAST_MNEMONIC=bounce crack ostrich put entry comic wage all tilt nature rebel
 # ACURAST_IPFS_API_KEY=
 ```
 
-### Edit .env file
+### Getting ready for Deployment
 
-To deploy our application, we still need to do two things.
-
-1. Create a Pinata account and add API keys
-2. Get some funds from the faucet
+To deploy our application, we still need to do one thing. Getting some tokens from the faucet.
 
 > [!TIP]
 > You can import the mnemonic that was generated and stored in the .env file and import it in Talisman (Browser Extension) to access the same account in the [Web Console](https://console.acurast.com/).
 
-First, let's head to [Pinata](https://www.pinata.cloud/), create an account and get our API keys.
-
-You can set `ACURAST_IPFS_URL=https://api.pinata.cloud`, and `ACURAST_IPFS_API_KEY` should equal something like `eyJhb...eyJ1c.UtRF...__...AhjE`
-
-Save everything in the .env file.
-
-Now, let's put some funds on your new account. You can run the `acurast deploy` command, which will check your balance, and displays the link to the Faucet page.
+Let's get some tokens on your new account. You can run the `acurast deploy` command, which will check your balance, and displays the link to the Faucet page.
 
 ```text
 tutorial % acurast deploy
@@ -259,6 +252,8 @@ Deploying project "tutorial"
 
 Your balance is 0. Visit https://faucet.acurast.com?address=5GNimXAQhayQq8m8SxJt3xQmG2L3pGzeTkHopx9iPnrS6uHP to get some tokens.
 ```
+
+Visit the link displayed in the CLI and follow the instructions to get some tokens. They should be available in a few seconds.
 
 That's it! You're now ready to deploy your app.
 
@@ -288,29 +283,11 @@ Congratulations, your deployment is now being registered in the network and exec
 
 ## Verifying the Deployment
 
-If you followed this tutorial, then your app will fetch the BTC/USD price and post it to your webhook.site URL. To verify that everything worked, check your personal webhook.site URL and wait for the start time of the deployment. You should then see the request coming in!
-
-```json
-{
-  "price": 60620.43,
-  "timestamp": 1723199407257,
-  "acurast": {
-    "version": "1.9.2-canary",
-    "deploymentId": {
-      "origin": {
-        "kind": "Acurast",
-        "source": "beae6b29ea92051606e54502c68505c9453cecf882d778f5332fc2b77515dc56"
-      },
-      "id": "3461"
-    },
-    "deviceAddress": "5FVTdPfguMFmq6arhF6m9VxhqXs5bi2PWGJbxJvo4dgsXPPA"
-  }
-}
-```
+If you followed this tutorial, then your app will be available at `https://<your-subdomain>.processor-proxy.sook.ch`. ("\<your-subdomain\>" is the value you set for `LOCALTUNNEL_SUBDOMAIN` in the code).
 
 Success! You've successfully deployed your first application on Acurast!
 
-## Bonus: Setting Up a Live Code Environment
+{/* ## Bonus: Setting Up a Live Code Environment
 
 The deployment process takes a little bit of time, and during development, you probably don't want to wait for a few minutes to test your changes. Because of this, we created a feature that we call "live-code". When you use this feature, your code will be run on a processor immediately and the result will be returned to you in the CLI.
 
@@ -376,7 +353,7 @@ And if we check the API again, we can see another report:
 }
 ```
 
-That's it! Now you can change your code, run `npm run build && acurast live` and see the results in real-time. This is a great way to test your code and see the results immediately.
+That's it! Now you can change your code, run `npm run build && acurast live` and see the results in real-time. This is a great way to test your code and see the results immediately. */}
 
 ## Bonus: Working with Secret Environment Variables
 
