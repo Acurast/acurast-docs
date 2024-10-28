@@ -13,7 +13,7 @@ This tutorial will guide you through deploying a simple application on Acurast. 
 
 :::tip
 
-If you prefer to jump right in, you can take a look at one of our example projects: [Express Server on Acurast](https://github.com/Acurast/acurast-example-apps/tree/13322f2eb9e083a2e6d69699026ac76f2fa40ab6/apps/app-webserver) or [Fetch data from an API](https://github.com/Acurast/acurast-example-apps/tree/13322f2eb9e083a2e6d69699026ac76f2fa40ab6/apps/app-fetch).
+If you prefer to jump right in, you can take a look at one of our example projects: [Express Server on Acurast](https://github.com/Acurast/acurast-example-apps/tree/26ebfb27b1f0bdf4a146acafa792d47c155a34d5/apps/app-webserver) or [Fetch data from an API](https://github.com/Acurast/acurast-example-apps/tree/26ebfb27b1f0bdf4a146acafa792d47c155a34d5/apps/app-fetch).
 
 You can either clone those repositories, or set up a blank Acurast starter project by running `npx @acurast/cli new <project-name>`.
 
@@ -48,7 +48,7 @@ There is only one file that is specific to Acurast, which is `acurast.json`. Thi
 
 ### Writing the code
 
-First, let's start by creating a simple node.js project. You can find the code of the example, including all the build steps and configurations, on [GitHub](https://github.com/Acurast/acurast-example-apps/blob/13322f2eb9e083a2e6d69699026ac76f2fa40ab6/apps/app-webserver/)
+First, let's start by creating a simple node.js project. You can find the code of the example, including all the build steps and configurations, on [GitHub](https://github.com/Acurast/acurast-example-apps/blob/26ebfb27b1f0bdf4a146acafa792d47c155a34d5/apps/app-webserver/)
 
 If you're interested only in the Acurast part of the tutorial, feel free to skip to the "Installing the Acurast CLI" step.
 
@@ -113,7 +113,7 @@ In our example, we access the App Version, Deployment ID (previously Deployment 
 
 ### Building the project
 
-To deploy a project on the Acurast Cloud, it needs to be bundled into a single js file. In our example, we use webpack. You can find the configuration in the example project on [GitHub](https://github.com/Acurast/acurast-example-apps/blob/13322f2eb9e083a2e6d69699026ac76f2fa40ab6/apps/app-webserver/)
+To deploy a project on the Acurast Cloud, it needs to be bundled into a single js file. In our example, we use webpack. You can find the configuration in the example project on [GitHub](https://github.com/Acurast/acurast-example-apps/blob/26ebfb27b1f0bdf4a146acafa792d47c155a34d5/apps/app-webserver/)
 
 Running `npm run bundle` will then output a single js file which includes all necessary dependencies.
 
@@ -209,7 +209,7 @@ acurast.json:
       },
       "execution": {
         "type": "onetime",
-        "maxExecutionTimeInMs": 60000
+        "maxExecutionTimeInMs": 3600000
       },
       "maxAllowedStartDelayInMs": 10000,
       "usageLimit": {
