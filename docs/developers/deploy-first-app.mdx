@@ -107,10 +107,6 @@ This localtunnel server is not secure and should not be used in production. We a
 
 :::
 
-{/* If you take a closer look at the app, you will see that we access an object called `_STD_`. This is the "standard object" available in the [Acurast Runtime Environment](https://docs.acurast.com/developers/deployment-runtime-environment/). It exposes some functionality like allowing you to sign data with a secure key, or get the identifier of the processor the app is running on.
-
-In our example, we access the App Version, Deployment ID (previously Deployment ID) and Device Address. We also add a fallback for those values in case the app is ran locally for testing. You should remove any "testing" code before deploying your app in production. */}
-
 ### Building the project
 
 To deploy a project on the Acurast Cloud, it needs to be bundled into a single js file. In our example, we use webpack. You can find the configuration in the example project on [GitHub](https://github.com/Acurast/acurast-example-apps/blob/26ebfb27b1f0bdf4a146acafa792d47c155a34d5/apps/app-webserver/)
@@ -286,74 +282,6 @@ Congratulations, your deployment is now being registered in the network and exec
 If you followed this tutorial, then your app will be available at `https://<your-subdomain>.processor-proxy.sook.ch`. ("\<your-subdomain\>" is the value you set for `LOCALTUNNEL_SUBDOMAIN` in the code).
 
 Success! You've successfully deployed your first application on Acurast!
-
-{/* ## Bonus: Setting Up a Live Code Environment
-
-The deployment process takes a little bit of time, and during development, you probably don't want to wait for a few minutes to test your changes. Because of this, we created a feature that we call "live-code". When you use this feature, your code will be run on a processor immediately and the result will be returned to you in the CLI.
-
-To set up a live code environment for real-time development, follow these steps:
-
-1. **Set up live deployment**
-
-```bash
-acurast live --setup
-```
-
-```text
-tutorial % acurast live --setup
-? Enter the duration (eg. 1h, 2d): 1h
-? On how many processors?: 2
-✔ Live code environment scheduled
-Please go to the follow link and copy the "Deployment Public Key" of the assigned processor, (it may take a few minutes until it's available)
-
-https://console.acurast.com/deployment-detail/acurast-5GNimXAQhayQq8m8SxJt3xQmG2L3pGzeTkHopx9iPnrS6uHP-3462
-
-? Deployment Public Key 0x020ed13052777b504de517c390ab9952c1bdeffbe04b09c26bf787773c2994219e
-To add more processors to the list, open ".acurast/live-code-processors.json" and add them manually.
-Live code environment set up! Run `acurast live` to run your code on that processor.
-```
-
-2. **Run live deployment**
-
-```bash
-acurast live
-```
-
-This will run the code on all processors that were added to the `live-code-processors.json` file.
-
-```text
-tutorial % acurast live
-⠸ Running code on 1 processor
-```
-
-You will see a loader while responses are awaited. If the code runs successfully, you will see a success message:
-
-```text
-tutorial % acurast live
-0x027...daf7c Success
-```
-
-And if we check the API again, we can see another report:
-
-```json
-{
-  "price": 60406.49,
-  "timestamp": 1723200094131,
-  "acurast": {
-    "version": "1.9.2-canary",
-    "deploymentId": {
-      "origin": {
-        "kind": "Acurast",
-        "source": "beae6b29ea92051606e54502c68505c9453cecf882d778f5332fc2b77515dc56"
-      },
-      "id": "3462"
-    },
-    "deviceAddress": "5CPo8adFp7SGaA4V6sje9Cc4QjFYGdk2MJZBLPks6DAq8DJo"
-  }
-}
-```
-
-That's it! Now you can change your code, run `npm run build && acurast live` and see the results in real-time. This is a great way to test your code and see the results immediately. */}
 
 ## Bonus: Working with Secret Environment Variables
 
