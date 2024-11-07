@@ -268,8 +268,10 @@ _STD_.ws.registerPayloadHandler(handler);
 /**
  * @param {string} recipient the public key in hex format of the recipient.
  * @param {string} payload the payload to send as a hex string.
+ * @param {WsSuccess} success the success callback.
+ * @param {WsError} error the error callback.
  */
-_STD_.ws.send(recipient, payload);
+_STD_.ws.send(recipient, payload, success, error);
 
 /**
  * @callback WsSuccess
