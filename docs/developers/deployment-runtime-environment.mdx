@@ -168,20 +168,24 @@ _STD_.signers.secp256r1.sign(payload);
  *
  * @since 1.9.2 (version code 58)
  *
+ * @param {string} publicKey Hex string representing the receiver's public key.
+ * @param {string} salt Hex string representing the salt used for encryption.
  * @param {string} payload Hex string representing the bytes to encrypt.
  * @return {string} Hex string representing the encrypted payload.
  */
-_STD_.signers.secp256r1.encrypt(payload);
+_STD_.signers.secp256r1.encrypt(publicKey, salt, payload);
 
 /**
  * Decrypts the given payload with the secp256r1 key generated for the current deployment.
  *
  * @since 1.9.2 (version code 58)
  *
+ * @param {string} publicKey Hex string representing the sender's public key.
+ * @param {string} salt Hex string representing the salt used for encryption.
  * @param {string} payload Hex string representing the bytes to decrypt.
  * @return {string} Hex string representing the decrypted payload.
  */
-_STD_.signers.secp256r1.decrypt(payload);
+_STD_.signers.secp256r1.decrypt(publicKey, salt, payload);
 
 /**
  * Signs the given payload with the secp256k1 key generated for the current deployment.
@@ -198,20 +202,24 @@ _STD_.signers.secp256k1.sign(payload);
  *
  * @since 1.9.2 (version code 58)
  *
+ * @param {string} publicKey Hex string representing the receiver's public key.
+ * @param {string} salt Hex string representing the salt used for encryption.
  * @param {string} payload Hex string representing the bytes to encrypt.
  * @return {string} Hex string representing the encrypted payload.
  */
-_STD_.signers.secp256k1.encrypt(payload);
+_STD_.signers.secp256k1.encrypt(publicKey, salt, payload);
 
 /**
  * Decrypts the given payload with the secp256k1 key generated for the current deployment.
  *
  * @since 1.9.2 (version code 58)
- *
+ * 
+ * @param {string} publicKey Hex string representing the sender's public key.
+ * @param {string} salt Hex string representing the salt used for encryption.
  * @param {string} payload Hex string representing the bytes to decrypt.
  * @return {string} Hex string representing the decrypted payload.
  */
-_STD_.signers.secp256k1.decrypt(payload);
+_STD_.signers.secp256k1.decrypt(publicKey, salt, payload);
 
 /**
  * Signs the given payload with the ed25519 key generated for the current deployment.
@@ -222,26 +230,6 @@ _STD_.signers.secp256k1.decrypt(payload);
  * @return {string} Hex string representing the signature.
  */
 _STD_.signers.ed25519.sign(payload);
-
-/**
- * Encrypts the given payload with the ed25519 key generated for the current deployment.
- *
- * @since 1.9.2 (version code 58)
- *
- * @param {string} payload Hex string representing the bytes to encrypt.
- * @return {string} Hex string representing the encrypted payload.
- */
-_STD_.signers.ed25519.encrypt(payload);
-
-/**
- * Decrypts the given payload with the ed25519 key generated for the current deployment.
- *
- * @since 1.9.2 (version code 58)
- *
- * @param {string} payload Hex string representing the bytes to decrypt.
- * @return {string} Hex string representing the decrypted payload.
- */
-_STD_.signers.ed25519.decrypt(payload);
 ```
 
 ### **Websocket**
@@ -268,8 +256,10 @@ _STD_.ws.registerPayloadHandler(handler);
 /**
  * @param {string} recipient the public key in hex format of the recipient.
  * @param {string} payload the payload to send as a hex string.
+ * @param {WsSuccess} success the success callback.
+ * @param {WsError} error the error callback.
  */
-_STD_.ws.send(recipient, payload);
+_STD_.ws.send(recipient, payload, success, error);
 
 /**
  * @callback WsSuccess
