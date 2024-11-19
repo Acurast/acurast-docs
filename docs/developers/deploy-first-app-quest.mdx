@@ -1,0 +1,45 @@
+---
+title: First App Deployment (Console)
+slug: /developers/deploy-first-app-console
+---
+
+import ThemedImage from "@theme/ThemedImage";
+import useBaseUrl from "@docusaurus/useBaseUrl";
+import TOCInline from "@theme/TOCInline";
+
+## Introduction
+
+This tutorial will guide you through deploying a simple application on Acurast. 
+
+After deploying any app, you are eligible to get the reward for the "Deploy for the Rebellion" quest on the [Acurast Cloud Rebellion](https://rebellion.acurast.com/).
+
+:::tip
+
+For developers, we recommend reading the [First App Deployment](/developers/deploy-first-app) tutorial.
+
+:::
+
+### Writing the code
+
+We have already prepared code that you can deploy. It is a simple webserver that will return a "Hello, World!" message.
+
+The code is located here: ipfs://Qmb7sw1mH349wNJsoGWRs1HedAwVXtHPsW4YoXok15DeZL
+
+## Deploying the Application
+
+1. Open up the [Acurast Console](https://console.acurast.com/) and click on "Create Deployments". 
+
+2. You can leave the default settings and scroll down to "Deployment Code". There you click on "IPFS URL" and paste the link from above.
+
+3. Now scroll down. You can optionally select on which processor your app will be deployed to, for example one of your own. But you can also leave it with the default option.
+
+4. In the Execution Schedule settings, you select "One-time" and set the End time to a time in the future.
+
+5. Scroll down and click on "Suggest Reward", then click on "Publish Deployment".
+
+Success! You've successfully deployed your first application on Acurast!
+
+
+## Verify the Deployment
+
+Once the start time is reached, your app will be available at `https://<processor-address>.processor-proxy.sook.ch`. (Note: processor addresses are all lowercase.). You can find the address of the processor that runs your app in the deployment details in the Acurast Console. Open the "Deployments" view, then click on the deployment and look at the "Assigned Processors" section. Copy the "Main Acurast Account", this is the processor address that runs your app.

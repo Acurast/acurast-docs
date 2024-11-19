@@ -112,11 +112,11 @@ This localtunnel server is not secure and should not be used in production. We a
 
 ### Building the project
 
-To deploy a project on the Acurast Cloud, it needs to be bundled into a single js file. In our example, we use webpack. You can find the configuration in the example project on [GitHub](https://github.com/Acurast/acurast-example-apps/blob/26ebfb27b1f0bdf4a146acafa792d47c155a34d5/apps/app-webserver/)
+To deploy a project to the Acurast Cloud, it needs to be bundled into a single js file. In our example, we use webpack. You can find the configuration in the example project on [GitHub](https://github.com/Acurast/acurast-example-apps/blob/26ebfb27b1f0bdf4a146acafa792d47c155a34d5/apps/app-webserver/)
 
 Running `npm run bundle` will then output a single js file which includes all necessary dependencies.
 
-The is located in `dist/bundle.js`. It includes your code, as well as all the dependencies in a single file.
+The file is located in `dist/bundle.js`. It includes your code, as well as all the dependencies in a single file.
 
 This is the file that will be deployed to the Acurast Cloud. You can run it locally with `node dist/bundle.js` to test it.
 
@@ -350,8 +350,11 @@ Congratulations! You've successfully deployed your first application on Acurast!
 
 For more inspiration, check out the [Acurast Examples](https://github.com/Acurast/acurast-example-apps) with examples showing various features:
 
-- external-dependencies
-- fetch from API
-- puppeteer
-- telegram-bot
-- wasm
+- [app-env-vars](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-env-vars)
+- [external-dependencies](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-external-dependencies)
+- [fetch from API](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-fetch)
+- [heic to png](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-heic-to-png)
+- [puppeteer](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-puppeteer)
+- [telegram-bot](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-telegram-bot)
+- [wasm](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-wasm)
+- [webserver](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-webserver)
