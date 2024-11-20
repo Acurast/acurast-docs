@@ -27,6 +27,7 @@ const sidebars = {
         "developers/deployment-creation",
         "developers/deployment-runtime-environment",
         "developers/on-demand-deployments",
+        "developers/llm-on-acurast",
       ],
       collapsed: false,
     },

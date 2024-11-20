@@ -1,0 +1,261 @@
+---
+title: How to run an LLM on Acurast
+slug: /developers/llm-on-acurast
+---
+
+import ThemedImage from "@theme/ThemedImage";
+import useBaseUrl from "@docusaurus/useBaseUrl";
+import TOCInline from "@theme/TOCInline";
+
+## Introduction
+
+In this tutorial, we will guide you through the process of deploying and running an LLM on Acurast.
+
+Acurast includes a module for running LLMs. Most models from [Hugging Face](https://huggingface.co/) in the `GGUF` format are supported.
+
+:::tip
+
+If you prefer to jump right in, you can take a look at our example project:     
+
+- [LLMs on Acurast](https://github.com/Acurast/acurast-example-apps/tree/d835aa6c101e50ab0fd85118d29c4c464fbc003e/apps/app-llm)     
+
+You can either clone the repository, or set up a blank Acurast starter project by running `npx @acurast/cli new <project-name>`.
+
+:::
+
+## Prerequisites
+
+- Basic knowledge of Node.js and the Command Line
+
+## Setting up the Project
+
+### Project Structure
+
+The structure of a project looks exactly like a normal Node.js project:
+
+```
+├── dist
+│   └── bundle.js
+├── LICENSE
+├── README.md
+├── acurast.json
+├── package-lock.json
+├── package.json
+├── src
+│   └── index.ts
+├── .env
+├── tsconfig.json
+└── webpack.config.js
+```
+
+There is only one file that is specific to Acurast, which is `acurast.json`. This file is used to configure the deployment, and we will come back to it later in the tutorial.
+
+### Writing the code
+
+First, let's start by creating a simple node.js project. You can find the code of the example, including all the build steps and configurations, on [GitHub](https://github.com/Acurast/acurast-example-apps/tree/d835aa6c101e50ab0fd85118d29c4c464fbc003e/apps/app-llm)
+
+The app will host a local LLM server and make it available over HTTP.
+
+```typescript
+import path from "path";
+import {
+  MODEL_URL,
+  MODEL_NAME,
+  STORAGE_DIR,
+  LOCALTUNNEL_HOST,
+} from "./constants";
+import { createWriteStream, existsSync } from "fs";
+import { Readable } from "stream";
+import { finished } from "stream/promises";
+import localtunnel from "localtunnel";
+
+declare let _STD_: any;
+
+const MODEL_FILE = path.resolve(STORAGE_DIR, MODEL_NAME);
+async function downloadModel(url: string, dst: string) {
+  console.log("Downloading model", MODEL_NAME);
+  const res = await fetch(url);
+
+  if (!res.body) {
+    throw new Error("No response body");
+  }
+
+  console.log("Writing model to file:", dst);
+  const writer = createWriteStream(dst);
+  await finished(Readable.fromWeb(res.body as any).pipe(writer));
+}
+async function main() {
+  if (!existsSync(MODEL_FILE)) {
+    await downloadModel(MODEL_URL, MODEL_FILE);
+  } else {
+    console.log("Using already downloaded model:", MODEL_FILE);
+  }
+  console.log("model downloaded");
+
+  _STD_.llama.server.start(
+    ["--model", MODEL_FILE, "--ctx-size", "2048", "--threads", "8"],
+    () => {
+      // onCompletion
+      console.log("Llama server closed.");
+    },
+    (error: any) => {
+      // onError
+      console.log("Llama server error:", error);
+      throw error;
+    }
+  );
+  const tunnel = await localtunnel({
+    port: 8080,
+    host: LOCALTUNNEL_HOST,
+    subdomain: _STD_.device.getAddress().toLowerCase(),
+  });
+
+  console.log(tunnel.url);
+}
+
+main();
+```
+
+In this code, we first download a model from Hugging Face, then start the integrated LLM server and load it. Finally, we use localtunnel to make the server publicly available.
+
+:::tip
+
+The API is compatible with the [OpenAI-like API endpoints](https://lmstudio.ai/docs/basics/server#openai-like-api-endpoints)
+
+:::
+
+We need to set the `LOCALTUNNEL_SUBDOMAIN` variable to specifiy where our server will be available. If we set it to `llm`, then the URL will be `https://llm.processor-proxy.sook.ch`.
+
+:::warning
+
+This localtunnel server is not secure and should not be used in production. We are working on making this secure by default, but if you need a secure way to host your project now, please reach out to us.
+
+:::
+
+### Building the project
+
+To deploy a project to the Acurast Cloud, it needs to be bundled into a single js file. In our example, we use webpack. You can find the configuration in the example project on [GitHub](https://github.com/Acurast/acurast-example-apps/blob/d835aa6c101e50ab0fd85118d29c4c464fbc003e/apps/app-llm/)
+
+Running `npm run bundle` will then output a single js file which includes all necessary dependencies.
+
+The file is located in `dist/bundle.js`. It includes your code, as well as all the dependencies in a single file.
+
+This is the file that will be deployed to the Acurast Cloud.
+
+## Setting up the Acurast CLI
+
+Now that our app is ready, we need to set up the Acurast CLI. The CLI is a tool that allows you to deploy and manage your applications on the Acurast Cloud.
+
+### Installation
+
+Let's install the Acurast CLI globally using npm:
+
+```bash
+npm install -g @acurast/cli
+```
+
+To verify that the installation worked, you can run `acurast` in the terminal and it will show you the help page:
+
+```text
+tutorial % acurast
+     _                            _      ____ _     ___
+    / \   ___ _   _ _ __ __ _ ___| |_   / ___| |   |_ _|
+   / _ \ / __| | | | '__/ _` / __| __| | |   | |    | |
+  / ___ \ (__| |_| | | | (_| \__ \ |_  | |___| |___ | |
+ /_/   \_\___|\__,_|_|  \__,_|___/\__|  \____|_____|___|
+
+Usage: acurast [options] [command]
+
+A cli to interact with the Acurast Network.
+
+Options:
+  -v, --version               output the version number
+  -h, --help                  display help for command
+
+Commands:
+  deploy [options] [project]  Deploy the current project to the Acurast platform.
+  init                        Create an acurast.json and .env file
+  live [options] [project]    Run the code in a live code environment on a remote processor
+  open                        Open Acurast websites in your browser
+  help [command]              display help for command
+```
+
+### Adding Acurast Config to the Project
+
+The next step is to add the Acurast Config to our project. To do that, run the following command:
+
+```bash
+acurast init
+```
+
+This will start an interactive guide, which will create an `.env` file.
+
+If you checked out the sample project, the `acurast.json` already exists, so this step will be skipped. You can open the `acurast.json` file and change the configuration there. In the [CLI Docs](https://github.com/Acurast/acurast-cli?tab=readme-ov-file#configuration-details) you will find more information about the possible configurations.
+
+### Getting ready for Deployment
+
+To deploy our application, we still need to do one thing. Getting some tokens from the faucet.
+
+> [!TIP]
+> You can import the mnemonic that was generated and stored in the .env file and import it in Talisman (Browser Extension) to access the same account in the [Web Console](https://console.acurast.com/).
+
+Let's get some tokens on your new account. You can run the `acurast deploy` command, which will check your balance, and displays the link to the Faucet page.
+
+```text
+tutorial % acurast deploy --dry-run
+
+Deploying project "app-llm"
+
+Your balance is 0. Visit https://faucet.acurast.com?address=5GNimXAQhayQq8m8SxJt3xQmG2L3pGzeTkHopx9iPnrS6uHP to get some tokens.
+```
+
+Visit the link displayed in the CLI and follow the instructions to get some tokens. They should be available in a few seconds.
+
+That's it! You're now ready to deploy your app.
+
+## Deploying the Application
+
+To deploy your application, run `acurast deploy`:
+
+```text
+tutorial % acurast deploy
+
+Deploying project "tutorial"
+
+The CLI will use the following address: 5GNimXAQhayQq8m8SxJt3xQmG2L3pGzeTkHopx9iPnrS6uHP
+
+The deployment will be scheduled to start in 5 minutes 0 seconds.
+
+There will be 1 executions with a cost of 0.001 cACU each.
+
+❯ Deploying project (first execution scheduled in 246s)
+  ✔ Submitted to Acurast (ipfs://...)
+  ✔ Deployment registered (DeploymentID: ...)
+  ⠇ Waiting for deployment to be matched with processors
+  ◼ Waiting for processor acknowledgements
+```
+
+Congratulations, your deployment is now being registered in the network and executed soon! Check the CLI for more information about the deployment process.
+
+## Verifying the Deployment
+
+If you followed this tutorial, then your app will be available at `https://<your-subdomain>.processor-proxy.sook.ch`. ("\<your-subdomain\>" is the value you set for `LOCALTUNNEL_SUBDOMAIN` in the code).
+
+Success! You've successfully deployed your first application on Acurast!
+
+## Conclusion
+
+Congratulations! You've successfully deployed your first application on Acurast! For more advanced features and detailed documentation, refer to [Acurast CLI Documentation](https://github.com/Acurast/acurast-cli/blob/main/README.md). Also make sure to join our Telegram or Discord to be part of our community!
+
+## More Examples
+
+For more inspiration, check out the [Acurast Examples](https://github.com/Acurast/acurast-example-apps) with examples showing various features:
+
+- [app-env-vars](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-env-vars)
+- [external-dependencies](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-external-dependencies)
+- [fetch from API](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-fetch)
+- [heic to png](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-heic-to-png)
+- [puppeteer](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-puppeteer)
+- [telegram-bot](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-telegram-bot)
+- [wasm](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-wasm)
+- [webserver](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-webserver)
