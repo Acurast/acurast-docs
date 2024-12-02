@@ -11,11 +11,24 @@ import TOCInline from "@theme/TOCInline";
 
 This tutorial will guide you through deploying a simple application on Acurast. By the end of this guide, you'll have your first project ready and deployment up and running.
 
+<iframe
+  width="100%"
+  height="auto"
+  src="https://www.youtube.com/embed/KSq-A-CJDyc"
+  title="Create your first Acurast Deployment"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  referrerpolicy="strict-origin-when-cross-origin"
+  allowfullscreen
+></iframe>
+
+<div class="padding-vert--md"></div>
+
 :::tip
 
-If you prefer to jump right in, you can take a look at one of our example projects:     
+If you prefer to jump right in, you can take a look at one of our example projects:
 
-- [Express Server on Acurast](https://github.com/Acurast/acurast-example-apps/tree/26ebfb27b1f0bdf4a146acafa792d47c155a34d5/apps/app-webserver)     
+- [Express Server on Acurast](https://github.com/Acurast/acurast-example-apps/tree/26ebfb27b1f0bdf4a146acafa792d47c155a34d5/apps/app-webserver)
 - [Fetch data from an API](https://github.com/Acurast/acurast-example-apps/tree/26ebfb27b1f0bdf4a146acafa792d47c155a34d5/apps/app-fetch).
 
 You can either clone those repositories, or set up a blank Acurast starter project by running `npx @acurast/cli new <project-name>`.
@@ -290,7 +303,7 @@ Success! You've successfully deployed your first application on Acurast!
 
 You can use secret environment variables in Acurast depoyments. The environment variables that are encrypted during deployment and only decrypted when the code is run on the processor. This is useful for storing sensitive information like API keys.
 
-To use environment variables in your project, you first need to add them to the `.env` file. For example, let's say you have an API key that you want to keep secret. You can add it to the `.env` file like this: 
+To use environment variables in your project, you first need to add them to the `.env` file. For example, let's say you have an API key that you want to keep secret. You can add it to the `.env` file like this:
 
 ```text
 # .env
@@ -332,7 +345,7 @@ To configure which of your deployments make use of the environment variables, we
 }
 ```
 
-Then, in your code, you can access the environment variables like this: 
+Then, in your code, you can access the environment variables like this:
 
 ```typescript
 const API_KEY = _STD_.env[API_KEY];
