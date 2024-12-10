@@ -281,6 +281,93 @@ type WsHandler = (payload) => void;
 type WsPayload = { sender: string, recipient: string, payload: string };
 ```
 
+### **P2P**
+
+```javascript
+/**
+ * @param {P2PConfig} config the node configuration.
+ * @param {P2PSuccess} success the success callback.
+ * @param {P2PError} error the error callback.
+ */
+_STD_.p2p.start(config, success, error);
+
+/**
+ * @param {P2PSuccess} success the success callback.
+ * @param {P2PError} error the error callback.
+ */
+_STD_.p2p.close(success, error);
+
+/**
+ * @param {P2PListener} listener the listener called on every incoming message.
+ */
+_STD_.p2p.onMessage(listener);
+
+/**
+ * @param {P2PPeer} receiver the peer who should receive the message.
+ * @param {string} protocol the ID of the message protocol that should be used to transmit the message.
+ * @param {string} bytes the payload to send as a hex string.
+ * @param {P2PSuccess} success the success callback.
+ * @param {P2PError} error the error callback.
+ */
+_STD_.ws.request(receiver, protocol, bytes, success, error);
+
+/**
+ * @param {P2PMessage} request the request to which this message responds.
+ * @param {string} bytes the payload to send as a hex string.
+ * @param {P2PSuccess} success the success callback.
+ * @param {P2PError} error the error callback.
+ */
+_STD_.ws.respond(recipient, payload, success, error);
+
+/**
+ * @property {string[]} messageProtcols message protocols the node will support and use to send and receive messages.
+ * @property {string[]} relays a list of public nodes that will serve as a proxy helping establish connections with nodes behind NATs and firewalls.
+ * @property {number?} idleConnectionTimeout time in milliseconds after which idle connections will be closed, defaults to 15s if not provided.
+ */
+type P2PConfig = {
+  messageProtocols: string[]
+  relays: string[]
+  idleConnectionTimeout?: number
+}
+
+/**
+ * @callback P2PSuccess
+ */
+type P2PSuccess = () => void;
+
+/**
+ * @callback P2PError
+ * @param {string} message an error message.
+ */
+type P2PError = (message) => void;
+
+/**
+ * @callback P2PListener
+ * @param {P2PMessage} message
+ */
+type P2PListener = (payload) => void;
+
+/**
+ * @property {P2PMessageType} type the type of the message.
+ * @property {string} id internal id,
+ * @property {P2Peer} sender the sender of the message.
+ * @property {string} protocol the message protocol that was used to transmit this message.
+ * @property {string} bytes the payload represented as a hex string.  
+ */
+type P2PMessage = { 
+  type: P2PMessageType
+  id: string
+  sender: P2PPeer
+  protocol: string
+  bytes: string 
+};
+
+type P2PMessageType = 'request' | 'response'
+
+type P2PPeer = { type: P2PPeerType, value: string }
+type P2PPeerType = 'address' | 'peerId'
+```
+
 ### **Substrate functions**
 
 ```javascript
