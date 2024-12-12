@@ -309,7 +309,7 @@ _STD_.p2p.onMessage(listener);
  * @param {P2PSuccess} success the success callback.
  * @param {P2PError} error the error callback.
  */
-_STD_.ws.request(receiver, protocol, bytes, success, error);
+_STD_.p2p.request(receiver, protocol, bytes, success, error);
 
 /**
  * @param {P2PMessage} request the request to which this message responds.
@@ -317,7 +317,7 @@ _STD_.ws.request(receiver, protocol, bytes, success, error);
  * @param {P2PSuccess} success the success callback.
  * @param {P2PError} error the error callback.
  */
-_STD_.ws.respond(recipient, payload, success, error);
+_STD_.p2p.respond(recipient, payload, success, error);
 
 /**
  * @property {string[]} messageProtcols message protocols the node will support and use to send and receive messages.
