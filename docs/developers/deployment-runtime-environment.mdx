@@ -424,9 +424,9 @@ type P2PStream = {
 /**
  * @function P2PStreamRead
  * @param {number} n the number of bytes to read from the stream.
- * @return {Promise<number>} a promise that resolves with the actual number of bytes read.
+ * @return {Promise<Buffer>} a promise that resolves with bytes read.
  */
-type P2PStreamRead = (n) => Promise<number>;
+type P2PStreamRead = (n) => Promise<Buffer>;
 
 /**
  * @function P2PStreamWrite
