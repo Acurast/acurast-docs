@@ -281,6 +281,165 @@ type WsHandler = (payload) => void;
 type WsPayload = { sender: string, recipient: string, payload: string };
 ```
 
+### **P2P**
+
+```javascript
+/**
+ * @param {P2PConfig} config the node configuration.
+ * @param {P2PSuccess} success the success callback.
+ * @param {P2PError} error the error callback.
+ */
+_STD_.p2p.start(config, success, error);
+
+/**
+ * @param {P2PSuccess} success the success callback.
+ * @param {P2PError} error the error callback.
+ */
+_STD_.p2p.close(success, error);
+
+/**
+ * @param {P2PMessageListener} listener the listener called on each incoming message.
+ */
+_STD_.p2p.onMessage(listener);
+
+/**
+ * @param {P2PPeer} receiver the peer who should receive the message.
+ * @param {string} protocol the ID of the message protocol that should be used to transmit the message.
+ * @param {string} bytes the payload to send as a hex string.
+ * @param {P2PSuccess} success the success callback.
+ * @param {P2PError} error the error callback.
+ */
+_STD_.p2p.request(receiver, protocol, bytes, success, error);
+
+/**
+ * @param {P2PMessage} request the request to which this message responds.
+ * @param {string} bytes the payload to send as a hex string.
+ * @param {P2PSuccess} success the success callback.
+ * @param {P2PError} error the error callback.
+ */
+_STD_.p2p.respond(request, bytes, success, error);
+
+/**
+ * @param {string} peer the address or peer ID of the target peer to establish a connection with.
+ * @param {P2PSuccess} success the success callback.
+ * @param {P2PError} error the error callback.
+ */
+_STD_.p2p.connect(peer, success, error);
+
+/**
+ * @param {string} peer the address or peer ID of the target peer whose connection should be terminated.
+ * @param {P2PSuccess} success the success callback.
+ * @param {P2PError} error the error callback.
+ */
+_STD_.p2p.disconnect(peer, success, error);
+
+/**
+ * @param {string} peer the address or peer ID of the target peer to which the stream will be opened.
+ * @param {string} protocol the protocol to be used for the stream.
+ * @param {P2PStreamSuccess} success the success callback.
+ * @param {P2PError} error the error callback.
+ */
+_STD_.p2p.openOutgoingStream(peer, protocol, success, error);
+
+/**
+ * @param {P2PStreamListener} listener the listener called on each incoming stream.
+ */
+_STD_.p2p.onIncomingStream(listener);
+
+/**
+ * @property {string[]} messageProtcols message protocols the node will support and use to send and receive messages.
+ * @property {string[]} relays a list of public nodes that will serve as a proxy helping establish connections with nodes behind NATs and firewalls.
+ * @property {number?} idleConnectionTimeout time in milliseconds after which idle connections will be closed, defaults to 15s if not provided.
+ */
+type P2PConfig = {
+  messageProtocols: string[]
+  relays: string[]
+  idleConnectionTimeout?: number
+};
+
+/**
+ * @callback P2PSuccess
+ */
+type P2PSuccess = () => void;
+
+/**
+ * @callback P2PStreamSuccess
+ * @param {P2PStream} stream
+ */
+type P2PStreamSuccess = (stream) => void;
+
+/**
+ * @callback P2PError
+ * @param {string} message an error message.
+ */
+type P2PError = (message) => void;
+
+/**
+ * @callback P2PMessageListener
+ * @param {P2PMessage} message
+ */
+type P2PMessageListener = (payload) => void;
+
+/**
+ * @callback P2PStreamListener
+ * @param {P2PStream} stream
+ */
+type P2PStreamListener = (stream) => void;
+
+/**
+ * @property {P2PMessageType} type the type of the message.
+ * @property {string} id internal id,
+ * @property {P2Peer} sender the sender of the message.
+ * @property {string} protocol the message protocol that was used to transmit this message.
+ * @property {string} bytes the payload represented as a hex string.  
+ */
+type P2PMessage = { 
+  type: P2PMessageType
+  id: string
+  sender: P2PPeer
+  protocol: string
+  bytes: string 
+};
+
+type P2PMessageType = 'request' | 'response';
+
+type P2PPeer = { type: P2PPeerType, value: string };
+type P2PPeerType = 'address' | 'peerId';
+
+/**
+ * @property {string} protocol
+ * @property {P2PPeer} peer
+ * @function read reads n bytes from the stream.
+ * @function write writes bytes to the stream.
+ * @function close closes the stream.
+ */
+type P2PStream = {
+  protocol: string
+  peer: P2PPeer
+  read: P2PStreamRead
+  write: P2PStreamWrite
+  close: P2PStreamClose
+};
+
+/**
+ * @function P2PStreamRead
+ * @param {number} n the number of bytes to read from the stream.
+ * @return {Promise<Buffer>} a promise that resolves with bytes read.
+ */
+type P2PStreamRead = (n) => Promise<Buffer>;
+
+/**
+ * @function P2PStreamWrite
+ * @param {Uint8Array | string} bytes the data to be written to the stream, provided as a `Uint8Array` or hex string.
+ */
+type P2PStreamWrite = (bytes) => Promise<void>;
+
+/**
+ * @function P2PStreamClose
+ */
+type P2PStreamClose = () => Promise<void>;
+```
+
 ### **Substrate functions**
 
 ```javascript
