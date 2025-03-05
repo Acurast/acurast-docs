@@ -8,7 +8,7 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: "Acurast Docs",
-  tagline: "Decentralized Serverless Cloud",
+  tagline: "Real Decentralized Compute Network - Powered by Phones",
   url: "https://docs.acurast.com",
   baseUrl: "/",
   // GitHub pipeline throws a broken link that doesn't appear on a local build for some reason.
