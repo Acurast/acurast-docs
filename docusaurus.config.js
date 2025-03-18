@@ -68,8 +68,8 @@ const config = {
         },
         items: [
           {
-            href: "https://console.acurast.com/",
-            label: "Acurast Console",
+            href: "https://hub.acurast.com/",
+            label: "Acurast Hub",
             position: "right",
           },
           {
