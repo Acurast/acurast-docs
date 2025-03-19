@@ -58,6 +58,7 @@ const sidebars = {
     "networks",
     "wallets",
     "tokenomics",
+    "faq",
   ],
 };
 
