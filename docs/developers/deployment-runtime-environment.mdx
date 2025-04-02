@@ -321,10 +321,11 @@ _STD_.p2p.respond(request, bytes, success, error);
 
 /**
  * @param {string} peer the address or peer ID of the target peer to establish a connection with.
+ * @param {P2PConnectOptions|undefined} options an optional configuration of this call.
  * @param {P2PSuccess} success the success callback.
  * @param {P2PError} error the error callback.
  */
-_STD_.p2p.connect(peer, success, error);
+_STD_.p2p.connect(peer, options, success, error);
 
 /**
  * @param {string} peer the address or peer ID of the target peer whose connection should be terminated.
@@ -345,6 +346,17 @@ _STD_.p2p.openOutgoingStream(peer, protocol, success, error);
  * @param {P2PStreamListener} listener the listener called on each incoming stream.
  */
 _STD_.p2p.onIncomingStream(listener);
+
+/**
+ * @param {P2PConnectedRelayListener} listener the listener called whenever a relay is connected.
+ */
+_STD_.p2p.onRelayConnected(listener);
+
+/**
+ * @param {string} publicKey the public key from which the peer ID should be generated.
+ * @return {string} the peer ID.
+ */
+_STD_.p2p.peerIdFromPublicKey(publicKey): string;
 
 /**
  * @property {string[]} messageProtcols message protocols the node will support and use to send and receive messages.
@@ -381,10 +393,23 @@ type P2PError = (message) => void;
 type P2PMessageListener = (payload) => void;
 
 /**
+ * @property {number|string|undefined} timeout an optional duration in milliseconds for which the client will attempt to establish a connection with the peer. If the connection is being established through a relay, the client will wait for a direct connection within the timeout period. If unsuccessful, it will fallback to the relayed connection, if available.
+ */
+type P2PConnectOptions = {
+  timeout?: number | string
+}
+
+/**
  * @callback P2PStreamListener
  * @param {P2PStream} stream
  */
 type P2PStreamListener = (stream) => void;
+
+/**
+ * @callback P2PConnectedRelayListener
+ * @param {string} address the address of the connected relay.
+ */
+type P2PConnectedRelayListener = (address) => void;
 
 /**
  * @property {P2PMessageType} type the type of the message.
