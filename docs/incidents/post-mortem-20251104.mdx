@@ -1,0 +1,60 @@
+---
+title: Post Mortem - 2025-11-04 - Acurast Canary chain stalled
+slug: /incidents/post-mortem-20251104
+---
+
+## Post Mortem
+
+### Date & Time
+
+11.04.2025 at 2:30 GMT+2
+
+### Engineer
+
+Andreas Gassmann, Mike Godenzi
+
+### Summary
+
+The Acurast Canary chain stopped regularly producing new blocks for about 2 hours.
+
+### Status
+
+Resolved
+
+### Root causes
+
+The Acurast collators could not produce any new blocks because the Kusama relay chain nodes they were connected to were in a crash loop, exhibiting the behavior described in [this Github issue](https://github.com/paritytech/polkadot-sdk/issues/4934).
+
+The Kusama nodes were running on a version containing the bug detailed in the issue linked above. Restarting the nodes did not improve the situation.
+
+After around 2 hours the Kusama relay nodes started to work properly again.
+
+### Trigger
+
+Kusama relay chain nodes used by the Acurast collators entered in a crash loop because of a bug described in [this Github issue](https://github.com/paritytech/polkadot-sdk/issues/4934).
+
+### Resolution
+
+The relay chain nodes affected started to work again after around 2 hours. Afterwards they have been all updated to the latest version.
+
+In addition, all Acurast collators node have been configured with additional relay chain nodes as fallback.
+
+### Timeline
+
+2:30: 
+- block production halts
+
+2:42: 
+- initial triage of issue
+- discovered Kusama relay chain nodes used by the Acurast collators entered in a crash loop
+- restarting of Kusama relay chain nodes
+- restarting of all acurast parachain nodes
+- continues triage of issue after chain still did not recover
+
+4:33:
+- Kusama relay chain nodes started to work again
+
+### Lesson learned
+
+- Keep Kusama nodes up to date
+- Have more additional backup nodes configured as the relay chain nodes for the Acurast Collators.
