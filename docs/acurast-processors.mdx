@@ -52,3 +52,101 @@ If the device is rooted, the access to the Trusted Execution Environment will be
 ### iOS
 
 All iPhones starting iPhone 6S (iOS15) and newer are supported.
+
+## Performance
+
+The [Acurast Benchmark](https://github.com/Acurast/acurast-benchmark) suite is designed to evaluate the performance of processors running in the Acurast network. It provides a comprehensive set of tests to measure computational throughput, memory allocation and access efficiency, and storage read/write performance. The benchmarks include support for multithreaded execution to leverage modern multi-core architectures.
+
+### Benchmarks
+
+#### CPU
+The CPU benchmarks evaluate the computational capabilities of the device. They include:
+- **Crypto**: Measures encryption and decryption throughput using [AES-256](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard) and hashing throughput using [SHA-256](https://en.wikipedia.org/wiki/Secure_Hash_Algorithms).
+- **Math**: Tests matrix multiplication performance, with support for three algorithms:
+    - [**Divide and Conquer**](https://en.wikipedia.org/wiki/Matrix_multiplication_algorithm#Divide-and-conquer_algorithm): A recursive algorithm used for single-threaded execution when SIMD is disabled or for multithreaded benchmarks in general.
+    - [**Iterative**](https://en.wikipedia.org/wiki/Matrix_multiplication_algorithm#Iterative_algorithm): A straightforward implementation used when SIMD optimization is enabled but the device lacks the required hardware capabilities.
+    - **SIMD-Optimized**: An optimized version of the iterative algorithm leveraging SIMD instructions, used when the device supports the required hardware capabilities.
+- **Sort**: Benchmarks sorting algorithms, including single-threaded and multithreaded [merge sort](https://en.wikipedia.org/wiki/Merge_sort).
+
+The CPU benchmark suite is available in two variations:
+- **Single-Core**: Executes all tests using a single thread to evaluate the performance of a single core.
+- **Multi-Core**: Executes all tests using multiple threads to leverage the full computational power of the device.
+
+#### RAM
+The RAM benchmarks assess memory allocation and access patterns:
+- **Allocation**: Measures the time taken to allocate and initialize memory.
+- **Access**: Evaluates sequential, random, and concurrent memory access patterns.
+
+#### Storage
+The storage benchmarks focus on file I/O performance:
+- **Access**: Measures sequential and random read/write throughput for files on the storage medium.
+
+### Methodology
+
+#### CPU
+
+##### Configuration
+- **Crypto**: Configure the duration of the test and the size of the data to encrypt and hash.
+- **Math**: Specify the matrix size, whether to enable SIMD optimizations, and the duration of the test.
+- **Sort**: Define the size of the dataset and the duration of the test.
+
+##### Execution
+- **Crypto**: The test encrypts and decrypts data using AES-256 and computes hashes using SHA-256.
+- **Math**: Performs matrix multiplication using one of three algorithms:
+    - **Divide and Conquer**: Used for single-threaded execution when SIMD is disabled or for multithreaded benchmarks.
+    - **Iterative**: Used when SIMD is enabled but the device lacks the required hardware capabilities.
+    - **SIMD-Optimized**: Used when SIMD is enabled and the device supports the required hardware capabilities.
+- **Sort**: Executes merge sort on a dataset, either single-threaded or multithreaded.
+
+##### Results
+- **Crypto**: Reports the throughput in bytes per second for encryption and hashing.
+- **Math**: Outputs the number of operations per second for matrix multiplication.
+- **Sort**: Provides the number of sorted elements per second.
+
+##### Evaluation
+- **Score**: The CPU score is calculated as the average of the throughput ($`TPS`$) values from the Crypto, Math, and Sort benchmarks. Higher throughput results in a higher score.
+
+```math
+score_{CPU} = \frac{TPS_{crypto} + TPS_{math} + TPS_{sort}}{3}
+```
+
+#### RAM
+
+##### Configuration
+- **Allocation**: Specify the number of iterations and the size of memory to allocate in each iteration.
+- **Access**: Configure the number of iterations and the size of data for sequential, random, and concurrent access patterns.
+
+##### Execution
+- **Allocation**: Allocates and initializes memory repeatedly to measure allocation performance.
+- **Access**: Reads and writes data in sequential, random, and concurrent patterns to evaluate memory access efficiency.
+
+##### Results
+- **Allocation**: Reports the average time taken to allocate and initialize memory.
+- **Access**: Provides average times for sequential, random, and concurrent access patterns.
+
+##### Evaluation
+- **Total RAM**: The total available RAM memory.
+- **Score**: The RAM score is calculated based on the inverse of the average times ($`T`$) for Allocation and Access benchmarks. Higher efficiency results in a higher score.
+
+```math
+score_{RAM} = \frac{T_{alloc}^{-1} + T_{access\_seq}^{-1} + T_{access\_rand}^{-1} + T_{access\_concurr}^{-1}}{4}
+```
+
+#### Storage
+
+##### Configuration
+- **Access**: Define the number of iterations and the size of data for sequential and random read/write operations.
+
+##### Execution
+- **Access**: Creates temporary files and performs sequential and random read/write operations. Files are removed after each iteration.
+
+##### Results
+- **Access**: Reports the average time for sequential and random read/write operations.
+
+##### Evaluation
+- **Available Storage**: The available storage capacity.
+- **Score**: The Storage score is calculated as the average of the inversed average times ($`T`$) for sequential and random read/write operations. Lower average times result in a higher score.
+
+```math
+score_{storage} = \frac{T_{access\_seq}^{-1} + T_{access\_rand}^{-1}}{2}
+```
