@@ -104,11 +104,11 @@ The storage benchmarks focus on file I/O performance:
 - **Sort**: Provides the number of sorted elements per second.
 
 ##### Evaluation
-- **Score**: The CPU score is calculated as the average of the throughput ($`TPS`$) values from the Crypto, Math, and Sort benchmarks. Higher throughput results in a higher score.
+- **Score**: The CPU score is calculated as the average of the throughput ($TPS$) values from the Crypto, Math, and Sort benchmarks. Higher throughput results in a higher score.
 
-```math
+$$
 score_{CPU} = \frac{TPS_{crypto} + TPS_{math} + TPS_{sort}}{3}
-```
+$$
 
 #### RAM
 
@@ -126,11 +126,11 @@ score_{CPU} = \frac{TPS_{crypto} + TPS_{math} + TPS_{sort}}{3}
 
 ##### Evaluation
 - **Total RAM**: The total available RAM memory.
-- **Score**: The RAM score is calculated based on the inverse of the average times ($`T`$) for Allocation and Access benchmarks. Higher efficiency results in a higher score.
+- **Score**: The RAM score is calculated based on the inverse of the average times ($T$) for Allocation and Access benchmarks. Higher efficiency results in a higher score.
 
-```math
+$$
 score_{RAM} = \frac{T_{alloc}^{-1} + T_{access\_seq}^{-1} + T_{access\_rand}^{-1} + T_{access\_concurr}^{-1}}{4}
-```
+$$
 
 #### Storage
 
@@ -145,8 +145,8 @@ score_{RAM} = \frac{T_{alloc}^{-1} + T_{access\_seq}^{-1} + T_{access\_rand}^{-1
 
 ##### Evaluation
 - **Available Storage**: The available storage capacity.
-- **Score**: The Storage score is calculated as the average of the inversed average times ($`T`$) for sequential and random read/write operations. Lower average times result in a higher score.
+- **Score**: The Storage score is calculated as the average of the inversed average times ($T$) for sequential and random read/write operations. Lower average times result in a higher score.
 
-```math
+$$
 score_{storage} = \frac{T_{access\_seq}^{-1} + T_{access\_rand}^{-1}}{2}
-```
+$$
