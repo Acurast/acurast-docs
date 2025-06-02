@@ -1,86 +1,46 @@
 ---
-title: Acurast Processors
-slug: /acurast-processors
+title: Benchmarks
+slug: /acurast-processors/benchmarks
 ---
 
 import ThemedImage from "@theme/ThemedImage";
 import useBaseUrl from "@docusaurus/useBaseUrl";
 
-Acurast Processors are the infrastructure providers for Acurast's decentralized compute network. Processors provide the compute power of their phone and are used by developers to run their Deployments.
-
-## Processor Lite
-
-Provide compute with your phone and join Acurast's decentralized compute netowrk.
-
-Install the Acurast Processor Lite application on Android or iOS to get started.
-
-**[Google Play ↗](https://play.google.com/store/apps/details?id=com.acurast.attested.executor.sbs.canary)**  
-**[Apple App Store ↗](https://apps.apple.com/us/app/acurast-processor/id6517361921)**
-
-## Processor Core
-
-_Only available for Android_
-
-Provide compute with a dedicated phone, completely locked down and setup as a compute provider and join Acurast's decentralized compute network. Factory reset your Android phone, install the Acurast Processor to get started.
-
-**[Acurast Hub ↗](https://hub.acurast.com/)**
-
-## Rewards
-
-- **Bootstrapping**: Earn 250 cACU each month in Bootstrapping Rewards. Run your Processor, connected to the internet, for a month and earn 250 cACU in bootstrapping rewards. You will earn a fraction of the full reward each hour.
-- **Deployments**: Earn cACU when your compute power is used by developers. Developers that deploy to the Acurast Cloud provide a reward for the compute power used. When your Processor has been selected, you’ll receive part of that reward.
-- **Cloud Rebellion**: Join the [Cloud Rebellion](https://rebellion.acurast.com/) and harvest MIST ☁️ points. Become a Rebel and cloud-harvest MIST (points) by completing quests, onboarding Processors, and inviting others to join the Rebellion.
-
-## Recommended Phones
-
-Make sure to check out if your phone is on the list of recommended phones.
-
-:::info
-
-**[Recommended Phones ↗](https://docs.google.com/spreadsheets/d/1ZvzmMVey4CM2tuif_zJfWiIxH1qkgA-l7BNJMw4vh54/edit#gid=1844886586)**
-
-:::
-
-### Android
-
-All phones with Android 12 and newer are supported.
-
-Some phones with Android are also supported, try to set it up and give us feedback on Discord or Telegram, if you were successful.
-
-If the device is rooted, the access to the Trusted Execution Environment will become void and the device is no longer eligible for Deployments and rewards.
-
-### iOS
-
-All iPhones starting iPhone 6S (iOS15) and newer are supported.
-
 ## Performance
 
-*The Benchmarking is currently not yet deployed on Acurast Canary, the active system does not yet score the hardware but regards one phone as one device when it comes to rewards.*
+_The Benchmarking is currently not yet deployed on Acurast Canary, the active system does not yet score the hardware but regards one phone as one device when it comes to rewards._
 
 The [Acurast Benchmark](https://github.com/Acurast/acurast-benchmark) suite is designed to evaluate the performance of processors running in the Acurast network. It provides a comprehensive set of tests to measure computational throughput, memory allocation and access efficiency, and storage read/write performance. The benchmarks include support for multithreaded execution to leverage modern multi-core architectures.
 
 ### Benchmarks
 
 #### CPU
+
 The CPU benchmarks evaluate the computational capabilities of the device. They include:
+
 - **Crypto**: Measures encryption and decryption throughput using [AES-256](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard) and hashing throughput using [SHA-256](https://en.wikipedia.org/wiki/Secure_Hash_Algorithms).
 - **Math**: Tests matrix multiplication performance, with support for three algorithms:
-    - [**Divide and Conquer**](https://en.wikipedia.org/wiki/Matrix_multiplication_algorithm#Divide-and-conquer_algorithm): A recursive algorithm used for single-threaded execution when SIMD is disabled or for multithreaded benchmarks in general.
-    - [**Iterative**](https://en.wikipedia.org/wiki/Matrix_multiplication_algorithm#Iterative_algorithm): A straightforward implementation used when SIMD optimization is enabled but the device lacks the required hardware capabilities.
-    - **SIMD-Optimized**: An optimized version of the iterative algorithm leveraging SIMD instructions, used when the device supports the required hardware capabilities.
+  - [**Divide and Conquer**](https://en.wikipedia.org/wiki/Matrix_multiplication_algorithm#Divide-and-conquer_algorithm): A recursive algorithm used for single-threaded execution when SIMD is disabled or for multithreaded benchmarks in general.
+  - [**Iterative**](https://en.wikipedia.org/wiki/Matrix_multiplication_algorithm#Iterative_algorithm): A straightforward implementation used when SIMD optimization is enabled but the device lacks the required hardware capabilities.
+  - **SIMD-Optimized**: An optimized version of the iterative algorithm leveraging SIMD instructions, used when the device supports the required hardware capabilities.
 - **Sort**: Benchmarks sorting algorithms, including single-threaded and multithreaded [merge sort](https://en.wikipedia.org/wiki/Merge_sort).
 
 The CPU benchmark suite is available in two variations:
+
 - **Single-Core**: Executes all tests using a single thread to evaluate the performance of a single core.
 - **Multi-Core**: Executes all tests using multiple threads to leverage the full computational power of the device.
 
 #### RAM
+
 The RAM benchmarks assess memory allocation and access patterns:
+
 - **Allocation**: Measures the time taken to allocate and initialize memory.
 - **Access**: Evaluates sequential, random, and concurrent memory access patterns.
 
 #### Storage
+
 The storage benchmarks focus on file I/O performance:
+
 - **Access**: Measures sequential and random read/write throughput for files on the storage medium.
 
 ### Methodology
@@ -88,24 +48,28 @@ The storage benchmarks focus on file I/O performance:
 #### CPU
 
 ##### Configuration
+
 - **Crypto**: Configure the duration of the test and the size of the data to encrypt and hash.
 - **Math**: Specify the matrix size, whether to enable SIMD optimizations, and the duration of the test.
 - **Sort**: Define the size of the dataset and the duration of the test.
 
 ##### Execution
+
 - **Crypto**: The test encrypts and decrypts data using AES-256 and computes hashes using SHA-256.
 - **Math**: Performs matrix multiplication using one of three algorithms:
-    - **Divide and Conquer**: Used for single-threaded execution when SIMD is disabled or for multithreaded benchmarks.
-    - **Iterative**: Used when SIMD is enabled but the device lacks the required hardware capabilities.
-    - **SIMD-Optimized**: Used when SIMD is enabled and the device supports the required hardware capabilities.
+  - **Divide and Conquer**: Used for single-threaded execution when SIMD is disabled or for multithreaded benchmarks.
+  - **Iterative**: Used when SIMD is enabled but the device lacks the required hardware capabilities.
+  - **SIMD-Optimized**: Used when SIMD is enabled and the device supports the required hardware capabilities.
 - **Sort**: Executes merge sort on a dataset, either single-threaded or multithreaded.
 
 ##### Results
+
 - **Crypto**: Reports the throughput in bytes per second for encryption and hashing.
 - **Math**: Outputs the number of operations per second for matrix multiplication.
 - **Sort**: Provides the number of sorted elements per second.
 
 ##### Evaluation
+
 - **Score**: The CPU score is calculated as the average of the throughput ($TPS$) values from the Crypto, Math, and Sort benchmarks. Higher throughput results in a higher score.
 
 $$
@@ -115,18 +79,22 @@ $$
 #### RAM
 
 ##### Configuration
+
 - **Allocation**: Specify the number of iterations and the size of memory to allocate in each iteration.
 - **Access**: Configure the number of iterations and the size of data for sequential, random, and concurrent access patterns.
 
 ##### Execution
+
 - **Allocation**: Allocates and initializes memory repeatedly to measure allocation performance.
 - **Access**: Reads and writes data in sequential, random, and concurrent patterns to evaluate memory access efficiency.
 
 ##### Results
+
 - **Allocation**: Reports the average time taken to allocate and initialize memory.
 - **Access**: Provides average times for sequential, random, and concurrent access patterns.
 
 ##### Evaluation
+
 - **Total RAM**: The total available RAM memory.
 - **Score**: The RAM score is calculated based on the inverse of the average times ($T$) for Allocation and Access benchmarks. Higher efficiency results in a higher score.
 
@@ -137,15 +105,19 @@ $$
 #### Storage
 
 ##### Configuration
+
 - **Access**: Define the number of iterations and the size of data for sequential and random read/write operations.
 
 ##### Execution
+
 - **Access**: Creates temporary files and performs sequential and random read/write operations. Files are removed after each iteration.
 
 ##### Results
+
 - **Access**: Reports the average time for sequential and random read/write operations.
 
 ##### Evaluation
+
 - **Available Storage**: The available storage capacity.
 - **Score**: The Storage score is calculated as the average of the inversed average times ($T$) for sequential and random read/write operations. Lower average times result in a higher score.
 

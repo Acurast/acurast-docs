@@ -1,0 +1,110 @@
+---
+title: Staked Compute
+slug: /staked-compute
+---
+
+import ThemedImage from "@theme/ThemedImage";
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
+## TLDR — why this matters
+
+- Staked compute plays a significant role for Acurast: 70% of the inflation is allocated to “Staked Compute”
+- Accessible first design: Onboard smartphone compute without token purchase or gatekeepers
+- People without hardware can still earn by delegating their stake to compute providers
+- Compute providers can accept delegation and earn additional rewards
+- Staked compute can be restaked
+
+## Introduction
+
+In a Decentralized Physical Infrastructure Network (DePIN) network like Acurast, tokens play an integral role in incentivizing behaviour that the network considers beneficial, such that it can achieve its intended mission. In Acurast’s case, this mission is to become the largest global compute network, accessible by anyone, anywhere, all without gatekeepers. More on that ["It's time to rethink compute"](https://acurast.medium.com/its-time-to-rethink-compute-thoughts-from-our-co-founder-alessandro-de-carli-f4fba2b68b97).
+
+As a decentralized protocol, Acurast is secured through economic incentives with nominated proof of stake, and additionally taps into the shared security of Polkadot. However,, this protocol differs from others in its novel approach to solving the challenge of liveliness of the provided compute. We introduce a new concept called “Staked Compute”, making it an evolution in consensus algorithms, combining Proof of Stake with the Quality of Service of the compute provided.
+
+First, let’s clarify where these staking incentives are coming from before getting into the details of the staking mechanics:
+
+<ThemedImage
+  sources={{
+    light: useBaseUrl("/img/inflation.png"),
+    dark: useBaseUrl("/img/inflation.png"),
+  }}
+/>
+
+## Inflation
+
+As no central party provides the required infrastructure, decentralized systems like Bitcoin, Ethereum, and others solved the incentivization problem by simply minting tokens whenever a new block is created. Usually, consensus rules allow whoever creates the new block to include a transaction that mints a predefined amount of tokens.
+
+This model has similarities with that of Acurast. There is a major difference — instead of just rewarding the block producer, the consensus rules enforce that the larger part of the inflation is distributed to different pools with specific purposes:
+
+- 70% of the inflation will go to the staked compute pool
+- 15% of the inflation will go to the on-chain treasury
+- 10% of the inflation will go to the compute pool
+- 5% of the inflation will go to the block producers. (this can be kept low because of restaking and shared security)
+
+It’s essential to notice that participation in the compute and staked compute pools is not mutually exclusive, meaning there is an automatic participation in the compute pool if the user participates in the staked compute pool, but not vice versa.
+
+At genesis, Acurast will start with a fixed inflation of 5%; however, through on-chain governance votes, this inflation as well will be adaptable. Also the proposed splits between the pools
+
+Let’s describe the parameters of these pools in more detail:
+
+### On-Chain Treasury Pool
+
+As outlined in the tokenomics of Acurast, the on-chain treasury receives at genesis 24% of the [total supply](https://acurast.medium.com/acurast-tokenomics-fueling-decentralized-compute-with-acu-be4f33632f41). To ensure the protocol stays future proof, maintained, and further developed, the protocol inflation continuously replenishes this treasury pool of tokens. An on-chain governance process decides whether to fund proposals put forward by the token holders or simply burn all the tokens in the treasury.
+
+### Compute Pool
+
+For the highest possible accessibility, the design decision was made that users should be able to onboard compute power based on the hardware of smartphones provided by individuals without the need to acquire Acurast tokens first.
+
+The compute pool exists to incentivize any phone-based compute onboarded to Acurast. The weight a phone is assigned in the pool depends on the score of the benchmark the hardware can achieve. [Read more here](/processors/benchmarks). Unless a phone is executing an assigned workload by the protocol, it defaults to a predefined workload that every phone in the network runs, the benchmarking report that is submitted to the protocol with a heartbeat transaction in a 30-minute interval.
+
+The purpose of this pool is to incentivize onboarding new compute to the network. A remaining issue with this pool is the long-term availability and reliability of compute.
+
+That is where the staked compute pool comes into play.
+
+### Staked Compute Pool
+
+As a global compute network, the availability and reliability of compute play a major role. For that reason, most of the inflation is assigned to the staked compute pool. Similar to the compute pool, the weight of a pool participant depends on the phone’s benchmark report. Still, the expected future availability of the compute has to be set by staking a collateral deposit of ACU. This collateral ensures that these compute providers can be held accountable, if the provided compute becomes no longer accessible. The next section will explain how the staked compute mechanics work.
+
+### Staked Compute
+
+The general compute onboarded to Acurast receives two security properties by design, these are a must for a decentralized compute network:
+
+- Verifiability: Assuring that the hardware actually exists, is genuine, and the compute execution cannot be tampered with.
+- Confidentiality: Ensuring that the provider of the compute hardware cannot inspect the execution or extract any data from it.
+
+In Acurast’s case, these two properties are provided by a Trusted Execution Environment (TEE) that resides in the hardware security module that phones are equipped with. A device attestation proof signed by the TEE, with a device manufacturer provided private key, is verified on a protocol level and only accepted, if the devices’ integrity is given, meaning that the hardware is in the same condition as when it left the factory and the operating system with its checks in place e.g., if the phone is rooted or has an unlocked bootloader.
+
+However, the TEE cannot provide liveliness guarantees, meaning that this environment cannot protect against loss of power or network connection, in short, liveliness. This makes it necessary to introduce an additional layer of security through economic incentives on the protocol level, which is where Staked Compute comes into play.
+
+As the name suggests, in addition to specifying the future compute availability, the compute provider assigns a certain stake to their commitment. The stake ensures that there is a strong incentive for the compute provider to actually comply with their commitment, making the need for a central authority completely obsolete.
+
+### Slashing
+
+If the compute provider breaches their commitment, their stake will be slashed. The slashed amount depends on how long the compute provider has breached their commitment. The Slashing mechanism is only applicable to unscheduled downtimes; for in advance scheduled maintenance, there is no slashing penalty. It’s also important to notice that slashing doesn’t happen immediately. If a heartbeat is missed, there is a grace period. The technical specification will share exact details on the slashing mechanism and the amounts.
+
+### Participation
+
+To participate in the staked compute pool, one must define how long the compute provider will provide that compute going forward. The compute provider can decide to commit compute (up to a maximum of 80% of their last benchmark average score over the previous 24 hours) for one or more epochs, where one epoch is equal to 28 days, up to a maximum of 16 epochs (16 \* 28 = 448 days). Every compute provider deciding to create staked compute is eligible for a share of the inflation assigned to the pool relative to the other pool participants. The weight of a participants share is defined as:
+
+```
+staked_compute_weight = benchmark_in_heartbeat * commit_time * stake_amount
+```
+
+**While this formula looks simple, the incentivization effects are powerful:**
+
+- Compute providers who commit more compute for a longer period are further incentivized.
+- There is a high incentive to onboard compute because the optimal weight is reached if all three factors are high, if i.e., if only the stake is large but the compute is low, someone else with a smaller stake but more compute is prioritized.
+- Creating a fair setup benefiting the protocol, whoever is willing to commit compute for a long period of time is equally rewarded the most. This ensures stability and reliability.
+
+It’s important to note that `“benchmark_in_heartbeat”` should be seen as the aggregation of all phones of a given compute provider, not just a single one. Meaning even if a compute provider will experience a malfunction on one phone, they can compensate with another phone.
+
+### Stake Delegation
+
+Not every staker will need to have their own hardware setup. They will be able to earn rewards from staking by delegating their stake to other compute providers on the network.
+
+Every compute provider can stake and accept a delegated stake. As shown in the previous formula, the total amount of stake “stake_weight” is the sum of the own + delegated stake. To avoid centralisation and align slashing, the target is set at a 9:1 ratio of own stake vs. allowed delegated stake. If a compute provider decides to allow delegations, they must specify a fee applied programmatically on a protocol level during the reward distribution to the delegators.
+
+### Restaking
+
+Restaking is a concept that became very popular in the web3 world because of projects like i.e. [EigenLayer](https://www.eigenlayer.xyz/). The main advantage of restaking is its capital efficiency. Instead of having a stake just sitting “idle” you can use that stake instead for other functions.
+
+As staked compute already aligns with the long-term thinking of the protocol and its mission, stakers will be able to use their stake directly as weight for on-chain governance as well as block producer nominations. The beauty of having restaking as an integral part of the protocol is that not only it will be more capital efficient, but it will also offer the user a way simpler user experience.

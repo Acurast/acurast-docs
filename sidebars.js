@@ -19,19 +19,27 @@ const sidebars = {
   // But you can create a sidebar manually
   docs: [
     "introduction",
+    "roadmap",
+    "tokenomics",
+    "staked-compute",
     {
       type: "category",
       label: "Developers",
       items: [
         "developers/deploy-first-app",
-        "developers/deployment-creation",
+        "developers/llm-on-acurast",
         "developers/deployment-runtime-environment",
         "developers/on-demand-deployments",
-        "developers/llm-on-acurast",
       ],
       collapsed: false,
     },
-    "acurast-processors",
+    {
+      type: "category",
+      label: "Processors",
+      items: ["processors/acurast-processors", "processors/benchmarks"],
+      collapsed: false,
+    },
+
     {
       type: "category",
       label: "Acurast Protocol",
@@ -52,12 +60,12 @@ const sidebars = {
           collapsed: false,
         },
         "acurast-protocol/node-setup",
+        "integrations",
+        "networks",
       ],
     },
-    "integrations",
-    "networks",
+
     "wallets",
-    "tokenomics",
     "faq",
   ],
 };
