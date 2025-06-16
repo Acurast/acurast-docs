@@ -11,8 +11,6 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
 Running multiple Acurast processors presents additional challenges. For optimal performance and availability, it is recommended to set up each processor with Acurast Core on a freshly wiped device. Below are recommendations and best practices for managing multiple Acurast devices.
 
 
-## Onboarding multiple devices
-
 ### Use a separate wallet
 Each Acurast processor is managed by a designated manager address. If you plan to run multiple Acurast processors, ensure they are all managed by the same account. This manager account will be responsible for overseeing all devices and will collect the associated computation rewards.
 
@@ -51,26 +49,26 @@ The Acurast Hub is the place to manage your Acurast processors. User's find it o
 
 On the *Phones* page users see a list of phones they have deployed the Acurast processor to. This page helps you to manage your devices. 
 
-- *Acurast address*: Device address with *identicon* (click on the identicon to copy the device's address)
-- *Last seen*, When the last heartbeat was detected
-- Attested: If the device got attestation
-- Battery: Battery health information (needs to be activated)
-- Star rating: Devices reputation, based on sucessfully completed jobs (default is 0.5)
-- Processor version: OS and processor version
-- Status: Number of currently running Deployments
+- *Acurast address*: Device address with *identicon* (click on the identicon to copy the device's address)  
+- *Last seen*: When the last heartbeat was detected  
+- *Attested*: If the device got attestation  
+- *Battery*: Battery health information (needs to be activated, see below)  
+- *Star rating*: Devices reputation, based on sucessfully completed jobs (default is 0.5)  
+- *Processor version*: OS and processor version  
+- *Status*: Number of currently running Deployments  
 
-- Cog wheel: Opens the device settings
-- Bin: Remove the device from your list and deregister it from Acurast
+- *Settings* (Cog wheel:) Opens the device settings  
+- *Bin*: Remove the device from your list and deregister it from Acurast  
 
-- Advanced: Toggle advanced settings
+- *Advanced*: Toggle advanced settings  
+  - *Activate management endpoint* (needed to activate battery monitoring)  
+  - *Enter* a custom management endpoint (eg. for a self hostend management backend)  
 
-  - Activate management endpoint (needed to activate battery monitoring)
-  - Custom management endpoint (eg. for a self hostend management backend)
+  - *Processor Ownership:* Transfer all processors to a different manager 
 
 
 
-
-- Update processors
+- *Update processors*: Sends a signal to trigger the update of the processor apps (the update can take a few minutes to be reflected)
 
 
 ### Monitoring processors
@@ -80,14 +78,16 @@ On the *Phones* page users see a list of phones they have deployed the Acurast p
 
 #### Battery monitoring
 
-
 #### Advanced battery monitoring with self hosted backend
 
 
 ### Practical issues
 
-- separate your wifi
-- ensure connectivity (5Ghz better than 2.4 Ghz)
+#### WiFi recommendations
+
+- Ideally, the WiFi access point for Acurast should be separate and not used for other purposes. 
+- 5Ghz WiFi is preferable if users want to connect many devices as it offers more non-overlapping channels.
+- If you run a massive farm, ensure your devices have the network capacity, even if they all are running deployments
 
 
 
