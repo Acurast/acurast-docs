@@ -76,9 +76,21 @@ On the *Phones* page users see a list of phones they have deployed the Acurast p
 
 #### Telegram Bot
 
+To track the recent performance of the processors and additional information, users can use the Acurast Monitoring Bot on Telegram: [@AcurastBot](https://t.me/AcurastBot)
+
 #### Battery monitoring
 
+The Acurast Hub offers some battery health and status indicators for every phone. This feature needs to be activated.
+
+1. Connect your wallet to the [Acurast Hub](https://hub.acurast.com)
+2. Go to *Phones*
+3. Toggle the *Advanced* functions
+4. Toggle management endpoint by setting it to *active*
+5. Wait until the devices show a battery indicator (this can take up to 2 heartbeats and a reload of the page)
+
 #### Advanced battery monitoring with self hosted backend
+
+Management Backend. This tool is intended for advanced users who can host their own software and need to monitor a large number of phones. It also enables integration with external systems — for example, to control smart plugs or trigger third party systems. An early version of the tool is available here: [Acurast processor Management Backend](https://github.com/Acurast/acurast-processor-management-backend). 
 
 
 ### Practical issues
@@ -88,6 +100,17 @@ On the *Phones* page users see a list of phones they have deployed the Acurast p
 - Ideally, the WiFi access point for Acurast should be separate and not used for other purposes. 
 - 5Ghz WiFi is preferable if users want to connect many devices as it offers more non-overlapping channels.
 - If you run a massive farm, ensure your devices have the network capacity, even if they all are running deployments
+
+#### Safety Recommendations 
+
+Running smartphones 24/7 — especially older or partially damaged devices - can accelerate wear and tear, particularly on the battery. Some users have reported battery swelling, which is a sign of degradation and potential risk. While there have been no known fire incidents among Acurast users, we strongly advise all operators, especially those running multiple devices, to take basic safety precautions:
+
+- Avoid placing phones on flammable surfaces.  
+- Ensure adequate ventilation around devices to prevent overheating.  
+- Regularly check batteries for swelling or unusual heat. Remove phones with swelled batteries.  
+- Use certified chargers and power strips with surge protection.  
+
+Your safety is a priority - please run your setup responsibly.
 
 
 
