@@ -1,9 +1,92 @@
-
 ---
-title: Run Multiple Processors
+title: Run Multiple Processors (Farms)
 slug: /acurast-processors/multiple-processors
 ---
 
 import ThemedImage from "@theme/ThemedImage";
 import useBaseUrl from "@docusaurus/useBaseUrl";
+
+### Running multiple Acurast Processors
+
+Running multiple Acurast processors come with additional challenges. It is recommended that the processors are set up with Acurast Core on freshly wiped devices, to ensure maximum performance and availability. Here are recommendations and best practices for running multiple Acurast devices.
+
+
+## Onboarding multiple devices
+
+### Use a separate wallet
+Each Acurast processor is managed by a manager address. If you intend to run multiple Acurast processors, you should ensure that they are all run by the same manager account. That manager account will be used to manage all your devices and will collect the computation rewards.
+
+Good experiencs have been made with the following wallets / browser extensions made for substrate chains:
+
+- SubWallet
+- Talisman
+
+Also well supported although not specifically substrate wallets are:
+
+- Metamask
+- Solana wallets
+- Other EVM wallets via Walletconnect
+
+Set up an account for Acurast, backup the seed according to general best practices, and connect it to the Acurast Hub. Then get some initial funds from the faucet, which you need to register your first phones to the Acurast chain.
+
+### Onboarding multiple phones at once
+
+In order to onboard multiple phones at once, users can choose to receive a QR code which is suited to onboard more than one device at a time. Additionally that QR code can already contain the WiFi Access Point data, so the user does not need to enter this on manually the phone. 
+
+1. Connect to the Hub
+2. Click *Add Phone* and sign from your wallet
+3. Above the QR code change to *Multi Use* and sign again
+4. A QR code for multiple onboardings will be displayed
+5. Toggle the *Advanced* functions
+6. Set the WiFi SSID to your Access Point, enter the WiFi Password for that AP and set the right WiFi Type, click *Save Changes*
+7. Ensure phones are wiped, tap 6x on the first screen after starting the phone and scan the displayed QR code to set up the phones
+8. Follow the indstructions on screen
+
+
+### Manage the phones in the Hub
+
+#### Phones list page
+
+On the *Phones* page users see a list of phones they have deployed the Acurast processor to. This page helps you to manage your devices. 
+
+- *Acurast address*: Device address with *identicon* (click on the identicon to copy the device's address)
+- *Last seen*, When the last heartbeat was detected
+- Attested: If the device got attestation
+- Battery: Battery health information (needs to be activated)
+- Star rating: Devices reputation, based on sucessfully completed jobs (default is 0.5)
+- Processor version: OS and processor version
+- Status: Number of currently running Deployments
+
+- Cog wheel: Opens the device settings
+- Bin: Remove the device from your list and deregister it from Acurast
+
+- Advanced: Toggle advanced settings
+
+  - Activate management endpoint (needed to activate battery monitoring)
+  - Custom management endpoint (eg. for a self hostend management backend)
+
+
+
+
+- Update processors
+
+
+### Monitoring processors
+
+
+#### Telegram Bot
+
+#### Battery monitoring
+
+
+#### Advanced battery monitoring with self hosted backend
+
+
+### Practical issues
+
+- separate your wifi
+- ensure connectivity (5Ghz better than 2.4 Ghz)
+
+
+
 
