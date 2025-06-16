@@ -1,0 +1,116 @@
+---
+title: Run Multiple Processors (Farms)
+slug: /acurast-processors/multiple-processors
+---
+
+import ThemedImage from "@theme/ThemedImage";
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
+### Running multiple Acurast Processors
+
+Running multiple Acurast processors presents additional challenges. For optimal performance and availability, it is recommended to set up each processor with Acurast Core on a freshly wiped device. Below are recommendations and best practices for managing multiple Acurast devices.
+
+### Use a separate wallet
+
+Each Acurast processor is managed by a designated manager address. If you plan to run multiple Acurast processors, ensure they are all managed by the same account. This manager account will be responsible for overseeing all devices and will collect the associated computation rewards.
+
+Good experiences have been made with the following wallets / browser extensions made for substrate chains:
+
+- SubWallet
+- Talisman
+
+Also well supported although not specifically substrate wallets are:
+
+- Metamask
+- Solana wallets
+- Other EVM wallets via Walletconnect
+
+Set up an Acurast account, back up the seed phrase according to standard best practices, and connect the account to the Acurast Hub. Then, obtain some initial funds from the faucet - these are required to register your first devices on the Acurast chain.
+
+### Onboarding multiple phones at once
+
+To onboard multiple phones simultaneously, users can opt to receive a QR code designed for bulk onboarding. This QR code can also include Wi-Fi access point information, eliminating the need to manually enter it on each device.
+
+1. Connect your wallet to the [Acurast Hub](https://hub.acurast.com)
+2. Click _Add Phone_ and sign from your wallet
+3. Above the QR code change to _Multi Use_ and sign again
+4. A QR code for multiple onboardings will be displayed
+5. Toggle the _Advanced_ functions
+6. Set the WiFi SSID to your Access Point, enter the WiFi Password for that AP and set the right WiFi Type, click _Save Changes_
+7. Ensure phones are wiped, tap 6x on the first screen after starting the phone and scan the displayed QR code to set up the phones
+8. Follow the instructions on screen
+
+### Manage the phones in the Hub
+
+The Acurast Hub is the place to manage your Acurast processors. Users find it on [hub.acurast.com](https://hub.acurast.com)
+
+#### Phones list page
+
+On the _Phones_ page users see a list of phones they have deployed the Acurast processor to. This page helps you to manage your devices.
+
+<ThemedImage
+  alt="Hub Phones List"
+  sources={{
+    light: useBaseUrl("/img/hub_phone_list.png"),
+    dark: useBaseUrl("/img/hub_phone_list.png"),
+  }}
+/>
+
+- _Acurast address_: Device address with _identicon_ (click on the identicon to copy the device's address)
+- _Last seen_: When the last heartbeat was detected
+- _Attested_: If the device got attestation
+- _Battery_: Battery health information (needs to be activated, see below)
+- _Star rating_: Devices reputation, based on successfully completed jobs (default is 0.5)
+- _Processor version_: OS and processor version
+- _Status_: Number of currently running Deployments
+
+- _Settings_ (Cog wheel:) Opens the device settings
+- _Bin_: Remove the device from your list and deregister it from Acurast
+
+- _Advanced_: Toggle advanced settings
+
+  - _Activate management endpoint_ (needed to activate battery monitoring)
+  - _Enter_ a custom management endpoint (eg. for a self hosted management backend)
+
+  - _Processor Ownership:_ Transfer all processors to a different manager
+
+- _Update processors_: Sends a signal to trigger the update of the processor apps (the update can take a few minutes to be reflected)
+
+### Monitoring processors
+
+#### Telegram Bot
+
+To track the recent performance of the processors and additional information, users can use the Acurast Monitoring Bot on Telegram: [@AcurastBot](https://t.me/AcurastBot)
+
+#### Battery monitoring
+
+The Acurast Hub offers some battery health and status indicators for every phone. This feature needs to be activated.
+
+1. Connect your wallet to the [Acurast Hub](https://hub.acurast.com)
+2. Go to _Phones_
+3. Toggle the _Advanced_ functions
+4. Toggle management endpoint by setting it to _active_
+5. Wait until the devices show a battery indicator (this can take up to 2 heartbeats and a reload of the page)
+
+#### Advanced battery monitoring with self hosted management backend
+
+This tool is intended for advanced users who can host their own software and need to monitor a large number of phones. It also enables integration with external systems — for example, to control smart plugs or trigger third party systems. An early version of the tool is available here: [Acurast processor Management Backend](https://github.com/Acurast/acurast-processor-management-backend).
+
+### Practical issues
+
+#### WiFi recommendations
+
+- Ideally, the WiFi access point for Acurast should be separate and not used for other purposes.
+- 5Ghz WiFi is preferable if users want to connect many devices as it offers more non-overlapping channels.
+- If you run a massive farm, ensure your devices have the network capacity, even if they all are running deployments
+
+#### Safety Recommendations
+
+Running smartphones 24/7 — especially older or partially damaged devices - can accelerate wear and tear, particularly on the battery. Some users have reported battery swelling, which is a sign of degradation and potential risk. While there have been no known fire incidents among Acurast users, we strongly advise all operators, especially those running multiple devices, to take basic safety precautions:
+
+- Avoid placing phones on flammable surfaces.
+- Ensure adequate ventilation around devices to prevent overheating.
+- Regularly check batteries for swelling or unusual heat. Remove phones with swelled batteries.
+- Use certified chargers and power strips with surge protection.
+
+Your safety is a priority - please run your setup responsibly.

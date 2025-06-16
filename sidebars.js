@@ -36,7 +36,7 @@ const sidebars = {
     {
       type: "category",
       label: "Processors",
-      items: ["processors/acurast-processors", "processors/benchmarks"],
+      items: ["processors/acurast-processors", "processors/benchmarks", "processors/multiple-processors"],
       collapsed: false,
     },
 
