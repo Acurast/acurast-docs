@@ -67,3 +67,44 @@ This will start the Acurast node in detached mode. You can check the logs by run
 ```bash
 docker compose logs -f
 ```
+
+## Run a Collator
+
+A node can be turned into a collator configuring its identity. One way to do so is to use a tool like [subkey](https://docs.rs/crate/subkey/latest).
+
+```bash
+subkey generate
+```
+
+The output of the above command is something like:
+
+```
+Secret phrase:       <MNEMONIC>
+  Network ID:        substrate
+  Secret seed:       0x4f....
+  Public key (hex):  0x86....
+  Account ID:        0x86....
+  Public key (SS58): 5F7Cm8Kt57dX3SkdtYYDGdMn3yiPvC8dr3oSratmGjjLmSss
+  SS58 Address:      5F7Cm8Kt57dX3SkdtYYDGdMn3yiPvC8dr3oSratmGjjLmSss
+```
+
+Then configure the node with the generated key by calling the following RPC:
+
+```bash
+curl -H "Content-Type: application/json" \
+--data '{
+  "jsonrpc":"2.0",
+  "method":"author_insertKey",
+  "params":[
+    "aura",
+    "INSERT_SECRET_PHRASE",
+    "INSERT_PUBLIC_KEY_HEX_FORMAT"
+  ],
+  "id":1
+}' \
+http://localhost:8845
+```
+
+In order for the above call to succeed, the node needs to be started with `--rpc-methods unsafe`. Once the key has been registered, the node can be restarted with the `--collator` flag.
+
+The node is now setup as a collator, but it will not start authoring blocks yet. At this stage on the Canary network, the Acurast team manages the list of collators that can actually author blocks until staking functionally is introduced.
