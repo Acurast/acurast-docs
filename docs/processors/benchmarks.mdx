@@ -124,3 +124,36 @@ $$
 $$
 score_{storage} = \frac{T_{access\_seq}^{-1} + T_{access\_rand}^{-1}}{2}
 $$
+
+### Scoring 🚧
+
+> ⚠️ The compute score formula and weights are currently under development and may change in the future. As a starting point, all components are weighted equally, but the scoring method will be improved over time to better reflect real-world needs.
+
+> ⚠️ The $score_{storage}$ metric is currently inactive and does not affect the compute score at this time.
+
+The compute overall score is calculated as a weighted average that combines performance metrics from CPU, RAM, and Storage benchmarks to provide a comprehensive evaluation of a device's computational capabilities.
+
+$$
+score_{all} = w(score_{CPU\ SC}) + w(score_{CPU\ MC}) + w(mem_{RAM}) + w(score_{RAM}) + w(mem_{storage}) + w(score_{storage})
+$$
+
+Where:
+$$
+w(x_{t}) = x_{t} \times W_{t}
+$$
+And:
+- $W_{t}$: Weight assigned to each component ($0 \leqslant W_{t} \leqslant 1$ and $\sum_{t} W_{t} = 1$)
+- $score_{CPU\ SC}$: CPU performance score (Single-Core)
+- $score_{CPU\ MC}$: CPU performance score (Multi-Core)
+- $mem_{RAM}$: Total available RAM memory
+- $score_{RAM}$: RAM performance score
+- $mem_{storage}$: Available storage capacity
+- $score_{storage}$: Storage performance score
+
+#### Weights
+All components are weighted equally:
+$$
+W_{t} = \frac{1}{n} \text{ if active, or } W_{t} = 0 \text{ otherwise}
+$$
+Where:
+- $n$: The number of active metrics
