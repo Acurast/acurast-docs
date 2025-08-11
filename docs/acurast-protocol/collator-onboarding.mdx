@@ -1,0 +1,85 @@
+---
+title: Acurast Collator Onboarding
+slug: /acurast-protocol/collator-onboarding
+---
+
+import ThemedImage from "@theme/ThemedImage";
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
+This page describes the steps to take to onboard a collator on the Acurast Canary chain.
+
+## Pre registration checks
+
+- Make sure the node is setup with an identity as described in the [Node Setup ↗](/acurast-protocol/node-setup) guide.
+- Make sure the node is fully synced.
+- Make sure the node was started with the `--collator` flag.
+- Make sure the node is running on hardware that meet the minimum requirements. It is possible to check by looking at the node logs when it first starts:
+
+<ThemedImage
+  width="1000px"
+  sources={{
+    light: useBaseUrl("/img/node-hardware-checks.png"),
+    dark: useBaseUrl("/img/node-hardware-checks.png"),
+  }}
+/>
+
+  If  the hardware is good enough, there should not be any warning log message after the benchmarks logs shown in the screenshot above.
+
+## Set session key
+
+A session key needs to be registered. To do that, first perform the `author_rotateKeys` RPC call in order to generate a new session key:
+
+```bash
+curl -H "Content-Type: application/json" \
+--data '{
+  "jsonrpc":"2.0",
+  "method":"author_rotateKeys",
+  "params":[],
+  "id":1
+}' \
+http://localhost:9934
+```
+
+The output of the above command should be something like:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": "0xcc038816bd81c238bd1d163c48cea9c5e3b62899b8f193863f68268a719cca44"
+}
+```
+
+> **_WARNING:_** If the node exposes the RPC port to the internet, directly or through a reverse proxy, please make sure to restart the node with the argument `--rpc-methods safe` so that RPC methods related to the collator keys cannot be called anymore. For more information, see the [RPC Deployment](https://paritytech.github.io/devops-guide/guides/rpc_index.html?#important-flags-for-running-an-rpc-node) page of the Parachain Devops guide.
+
+Next, submit the extrinsic `session.setKeys` with the collator account to the Acurast Canary chain. The first parameter of the extrinsic call is the `result` hex string in the output of the previous RPC call.
+
+Any tool can be used to submit the extrinsic call, the important thing is that it is submitted by the collator account.
+
+One option is to use the [polkadotjs UI web app](https://dotapps-io.ipns.dweb.link/?rpc=wss%3A%2F%2Fpublic-rpc.canary.acurast.com#/extrinsics):
+
+<ThemedImage
+  width="1000px"
+  sources={{
+    light: useBaseUrl("/img/set-session-keys.png"),
+    dark: useBaseUrl("/img/set-session-keys.png"),
+  }}
+/>
+
+The screenshot above show how to call the `session.setKeys` extrinsic, where the first drop down menu selects the account submitting the extrinsic (in this example, the account comes from the PolkadotJS Chrome extension).
+
+Then the `submit the following extrinsic` box, the `session` pallet and the `setKeys` extrinsic are selected. Finally we provide the arguments, first the key, which corresponds to the result of the previous RPC call, and a `0x00` for the proof argument.
+
+## Register as candidate
+
+Once the session key is registered, the collator can be registered as a candidate, this is done through the extrinsic `collatorSelection.registerAsCandidate`, as before, the important thing is that the extrinsic is submitted by the collator account:
+
+<ThemedImage
+  width="1000px"
+  sources={{
+    light: useBaseUrl("/img/register-as-candidate.png"),
+    dark: useBaseUrl("/img/register-as-candidate.png"),
+  }}
+/>
+
+If the extrinsic is submitted successfully, the collator node is now fully onboarded and should start authoring blocks within 6-12 hours.
