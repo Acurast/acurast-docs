@@ -17,7 +17,7 @@ Acurast includes a module for running LLMs. Most models from [Hugging Face](http
 
 If you prefer to jump right in, you can take a look at our example project:
 
-- [LLMs on Acurast](https://github.com/Acurast/acurast-example-apps/tree/d835aa6c101e50ab0fd85118d29c4c464fbc003e/apps/app-llm)
+- [LLMs on Acurast](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-llm)
 
 You can either clone the repository, or set up a blank Acurast starter project by running `npx @acurast/cli new <project-name>`.
 
@@ -52,7 +52,7 @@ There is only one file that is specific to Acurast, which is `acurast.json`. Thi
 
 ### Writing the code
 
-First, let's start by creating a simple node.js project. You can find the code of the example, including all the build steps and configurations, on [GitHub](https://github.com/Acurast/acurast-example-apps/tree/d835aa6c101e50ab0fd85118d29c4c464fbc003e/apps/app-llm)
+First, let's start by creating a simple node.js project. You can find the code of the example, including all the build steps and configurations, on [GitHub](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-llm)
 
 The app will host a local LLM server and make it available over HTTP.
 
@@ -134,7 +134,7 @@ This localtunnel server is not secure and should not be used in production. We a
 
 ### Building the project
 
-To deploy a project to the Acurast Cloud, it needs to be bundled into a single js file. In our example, we use webpack. You can find the configuration in the example project on [GitHub](https://github.com/Acurast/acurast-example-apps/blob/d835aa6c101e50ab0fd85118d29c4c464fbc003e/apps/app-llm/)
+To deploy a project to the Acurast Cloud, it needs to be bundled into a single js file. In our example, we use webpack. You can find the configuration in the example project on [GitHub](https://github.com/Acurast/acurast-example-apps/blob/main/apps/app-llm/)
 
 Running `npm run bundle` will then output a single js file which includes all necessary dependencies.
 
