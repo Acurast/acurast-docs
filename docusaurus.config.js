@@ -166,6 +166,21 @@ const config = {
   plugins: [
     path.join(__dirname, "/plugins/monaco-editor"),
     [
+      'docusaurus-plugin-llms',
+      {
+        // Options here
+        generateLLMsTxt: true,
+        generateLLMsFullTxt: true,
+        docsDir: 'docs',
+        title: 'Acurast Documentation',
+        description: 'Complete reference documentation for Acurast',
+        includeBlog: false,
+
+        // Content cleaning options
+        excludeImports: true,
+        removeDuplicateHeadings: true,
+      },
+    ], [
       "@docusaurus/plugin-client-redirects",
       {
         redirects: [
