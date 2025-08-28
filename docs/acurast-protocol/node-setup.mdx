@@ -21,7 +21,7 @@ In the `docker-compose.yml` file, put the following content:
 ```yml
 services:
   node:
-    image: "acurast/node-canary:acurast-v0.16.0"
+    image: "acurast/node-canary:acurast-v0.18.0"
     command: "--chain /node/chain-specs/acurast-kusama-parachain-2239-raw.json \
       --base-path /node/data \
       --bootnodes /ip4/82.220.38.222/tcp/30334/ws/p2p/12D3KooWKrSDeVQ4tVQ1eGjqVAhAW3cgMQFHNCBbJrpmupEvdD4A \
@@ -30,6 +30,8 @@ services:
       --rpc-external \
       --rpc-methods safe \
       --rpc-cors all \
+      --name MyNode # choose an appropriate name here
+      --telemetry-url "wss://telemetry.polkadot.io/submit/ 0"
       --database=rocksdb \
       --pruning=archive"
     ports:
@@ -52,6 +54,8 @@ The configuration above will start the Acurast node with the following options:
 - `--rpc-external` - allows external access to the RPC interface
 - `--rpc-methods safe` - allows only safe RPC methods
 - `--rpc-cors all` - allows all CORS requests
+- `--name` - the name of the node
+- `--telemetry-url` - The telemetry URL, the node will send telemetry data to [telemetry.polkadot.io](https://telemetry.polkadot.io/#/0xce7681fb12aa8f7265d229a9074be0ea1d5e99b53eedcec2deade43857901808) under the configured `name`
 - `--database=rocksdb` - specifies the database type
 - `--pruning=archive` - specifies the pruning mode, change `archive` to the number of blocks to keep if you want to prune the database
 
