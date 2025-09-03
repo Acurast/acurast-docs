@@ -125,11 +125,7 @@ $$
 score_{storage} = \frac{T_{access\_seq}^{-1} + T_{access\_rand}^{-1}}{2}
 $$
 
-### Scoring 🚧
-
-> ⚠️ The compute score formula and weights are currently under development and may change in the future. As a starting point, all components are weighted equally, but the scoring method will be improved over time to better reflect real-world needs.
-
-> ⚠️ The $score_{storage}$ metric is currently inactive and does not affect the compute score at this time.
+### Scoring
 
 The compute overall score is calculated as a weighted average that combines performance metrics from CPU, RAM, and Storage benchmarks to provide a comprehensive evaluation of a device's computational capabilities.
 
@@ -139,10 +135,11 @@ $$
 
 Where:
 $$
-w(x_{t}) = x_{t} \times W_{t}
+w(m) = \frac{m}{N_{m}} \times W_{m}
 $$
 And:
-- $W_{t}$: Weight assigned to each component ($0 \leqslant W_{t} \leqslant 1$ and $\sum_{t} W_{t} = 1$)
+- $W_{m}$: Weight assigned to each metric pool ($0 \leqslant W_{m} \leqslant 1$ and $\sum_{m} W_{m} = 1$)
+- $N_{m}$: Normalization factor representing the sum of all scores submitted to the metric pool. Uses the previous epoch's total if available, otherwise the current epoch's total, or defaults to $1$ if no data exists on the chain.
 - $score_{CPU\ SC}$: CPU performance score (Single-Core)
 - $score_{CPU\ MC}$: CPU performance score (Multi-Core)
 - $mem_{RAM}$: Total available RAM memory
@@ -150,10 +147,24 @@ And:
 - $mem_{storage}$: Available storage capacity
 - $score_{storage}$: Storage performance score
 
-#### Weights
-All components are weighted equally:
+To make the final score more human-readable, a scaling factor of $10^9$ is applied.
 $$
-W_{t} = \frac{1}{n} \text{ if active, or } W_{t} = 0 \text{ otherwise}
+score_{display} = score_{all} \times 10^9
+$$
+
+#### Weights
+
+The components are weighted as follows:
+- CPU Single-Core: $W_{CPU\ SC} = 0.2307$
+- CPU Multi-Core: $W_{CPU\ MC} = 0.2307$
+- RAM Total: $W_{RAM\ mem} = 0.4615$
+- RAM Speed: $W_{RAM\ score} = 0$
+- Storage Total: $W_{storage\ mem} = 0.0769$
+- Storage Speed: $W_{storage\ score} = 0$
+
+If all weights equal $0$, the components are weighted equally:
+$$
+W_{m} = \frac{1}{n} \text{ if active, or } W_{m} = 0 \text{ otherwise}
 $$
 Where:
-- $n$: The number of active metrics
+- $n$: The number of active metric pools
