@@ -139,7 +139,7 @@ w(m) = \frac{m}{N_{m}} \times W_{m}
 $$
 And:
 - $W_{m}$: Weight assigned to each metric pool ($0 \leqslant W_{m} \leqslant 1$ and $\sum_{m} W_{m} = 1$)
-- $N_{m}$: Normalization factor representing the sum of all scores submitted to the metric pool. Uses the previous epoch's total if available, otherwise the current epoch's total, or defaults to $1$ if no data exists on the chain.
+- $N_{m}$: Normalization factor representing the sum of all scores submitted to the metric pool. Uses the previous epoch's total if available, otherwise the current epoch's total, or defaults to $m$ if no data exists on the chain.
 - $score_{CPU\ SC}$: CPU performance score (Single-Core)
 - $score_{CPU\ MC}$: CPU performance score (Multi-Core)
 - $mem_{RAM}$: Total available RAM memory
