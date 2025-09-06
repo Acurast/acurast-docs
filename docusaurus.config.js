@@ -165,6 +165,7 @@ const config = {
     }),
   plugins: [
     path.join(__dirname, "/plugins/monaco-editor"),
+    path.join(__dirname, "/plugins/mermaid"),
     [
       'docusaurus-plugin-llms',
       {
