@@ -1,0 +1,393 @@
+---
+title: Operations
+slug: /staked-compute/operations
+---
+
+# Public Operations
+
+(Each operation corresponds to a Pallet Compute Extrinsic)
+
+## Backing System
+
+### `offer_backing`
+
+Offers backing to a manager. An account can only have one outstanding offer and only offer if not already owner of a commitment.
+
+**Parameters:**
+- `origin`: Signed origin
+- `manager`: Account ID of the manager to back
+
+**Events:** `BackingOffered(who, manager_id)`
+
+**Errors:** `AlreadyBacking`
+
+---
+
+### `withdraw_backing_offer`
+
+Withdraws a previously made backing offer.
+
+**Parameters:**
+- `origin`: Signed origin
+
+**Events:** `BackingOfferWithdrew(who, manager_id)`
+
+**Errors:** `NoBackingOfferFound`
+
+---
+
+### `accept_backing_offer`
+
+Accepts a backing offer from a potential committer. Only upon acceptance does the offering account receive a new commitment_id.
+
+**Parameters:**
+- `origin`: Signed origin (manager)
+- `committer`: Account that made the backing offer
+
+**Events:** `BackingAccepted(commitment_id, manager_id)`, potentially `CommitmentCreated(committer, commitment_id)`
+
+**Errors:** `NoBackingOfferFound`
+
+---
+
+## Commitment Management (includes staking)
+
+### `commit_compute`
+
+Commits compute and stakes, defines commission for receiving delegations. Called by the committer that should already be backing a manager.
+
+**Parameters:**
+- `origin`: Signed origin (committer)
+- `amount`: Stake amount to commit
+- `cooldown_period`: Cooldown period in blocks
+- `commitment`: Bounded vector of compute commitments to pools
+- `commission`: Commission rate for delegations (Perbill)
+- `allow_auto_compound`: Whether to allow automatic compounding
+
+**Events:** `ComputeCommitted(commitment_id)`
+
+**Errors:** `NoManagerBackingCommitment`, `NoMetricsAverage`, `MaxMetricCommitmentExceeded`, `ZeroMetricsForValidPools`, `MaxStakeMetricRatioExceeded`
+
+---
+
+### `stake_more`
+
+Increases the stake amount for an existing commitment.
+
+**Parameters:**
+- `origin`: Signed origin (committer)
+- `extra_amount`: Additional amount to stake
+
+**Events:** `StakedMore(commitment_id, extra_amount)`
+
+**Errors:** `MaxStakeMetricRatioExceeded`
+
+---
+
+### `withdraw_commitment`
+
+Withdraws accrued rewards and slashes for a committer.
+
+**Parameters:**
+- `origin`: Signed origin (committer)
+
+**Events:** `CommitterWithdrew(committer, commitment_id, reward_amount)`
+
+**Errors:** `InternalError`
+
+---
+
+### `cooldown_compute_commitment`
+
+Initiates cooldown for a compute commitment.
+
+**Parameters:**
+- `origin`: Signed origin (committer)
+
+**Events:** `ComputeCommitmentCooldownStarted(commitment_id)`
+
+---
+
+### `end_compute_commitment`
+
+Ends a compute commitment after cooldown period has passed.
+
+**Parameters:**
+- `origin`: Signed origin (committer)
+
+**Events:** `ComputeCommitmentEnded(commitment_id)`
+
+---
+
+### `force_end_commitment`
+
+Force-unstakes a commitment, removing all delegations and the commitment's own stake. This is a root-only operation that bypasses normal cooldown and validation checks.
+
+**Parameters:**
+- `origin`: Root origin required
+- `committer`: Account owning the commitment to force end
+
+### `compound_stake`
+
+Compounds accrued stake rewards back into stake. If `committer` is provided, attempts to compound for a different committer, otherwise compounds for caller.
+
+**Parameters:**
+- `origin`: Signed origin
+- `committer`: Optional committer account (defaults to caller)
+
+**Errors:** `NoOwnerOfCommitmentId`, `CommitmentNotFound`, `AutoCompoundNotAllowed`
+
+---
+
+
+## Delegation Operations
+
+### `delegate`
+
+Delegates stake to a committer's commitment.
+
+**Parameters:**
+- `origin`: Signed origin (delegator)
+- `committer`: Account of the committer to delegate to
+- `amount`: Amount to delegate
+- `cooldown_period`: Cooldown period in blocks
+- `allow_auto_compound`: Whether to allow automatic compounding
+
+**Events:** `Delegated(delegator, commitment_id)`
+
+**Errors:** `MaxStakeMetricRatioExceeded`
+
+---
+
+### `delegate_more`
+
+Increases delegation stake to an existing commitment.
+
+**Parameters:**
+- `origin`: Signed origin (delegator)
+- `committer`: Account of the committer being delegated to
+- `extra_amount`: Additional amount to delegate
+
+**Events:** `DelegatedMore(delegator, commitment_id)`
+
+---
+
+### `cooldown_delegation`
+
+Initiates cooldown for a delegation.
+
+**Parameters:**
+- `origin`: Signed origin (delegator)
+- `committer`: Account of the committer being delegated to
+
+**Events:** `DelegationCooldownStarted(delegator, commitment_id)`
+
+---
+
+### `redelegate`
+
+Redelegates from one commitment to another if allowed. Rules for redelegation:
+- The delegator must currently be delegating to a commitment that is in cooldown
+- The delegator itself must not be in cooldown  
+- The new commitment must have higher own stake than the previous one
+
+**Parameters:**
+- `origin`: Signed origin (delegator)
+- `old_committer`: Current committer being delegated to
+- `new_committer`: New committer to delegate to
+
+**Events:** `Redelegated(delegator, old_commitment_id, new_commitment_id)`
+
+---
+
+### `end_delegation`
+
+Ends a delegation after cooldown period has passed.
+
+**Parameters:**
+- `origin`: Signed origin (delegator)
+- `committer`: Account of the committer being delegated to
+
+**Events:** `DelegationEnded(delegator, commitment_id)`
+
+---
+
+### `compound_delegation`
+
+Compounds accrued delegation rewards back into delegation. If `delegator` is provided, attempts to compound for a different delegator, otherwise compounds for caller.
+
+**Parameters:**
+- `origin`: Signed origin
+- `committer`: Account of the committer being delegated to
+- `delegator`: Optional delegator account (defaults to caller)
+
+**Errors:** `NotDelegating`, `AutoCompoundNotAllowed`
+
+---
+
+### `withdraw_delegation`
+
+Withdraws accrued rewards and slashes for a delegator.
+
+**Parameters:**
+- `origin`: Signed origin (delegator)
+- `committer`: Account of the committer being delegated to
+
+**Events:** `DelegatorWithdrew(delegator, commitment_id, reward_amount)`
+
+## Flow Diagrams
+
+### Committer Flow: Complete Lifecycle
+
+```mermaid
+sequenceDiagram
+    participant C as Committer
+    participant M as Manager  
+    participant P as Pallet
+    participant S as Staking System
+    
+    Note over C,S: Phase 1: Initial Setup
+    C->>P: offer_backing(manager)
+    P->>P: Store backing offer
+    M->>P: accept_backing_offer(committer)
+    P->>P: Create commitment_id NFT
+    P-->>M: BackingAccepted event
+    
+    Note over C,S: Phase 2: Compute Commitment
+    C->>P: commit_compute(amount, cooldown, commitment, commission, auto_compound)
+    P->>S: Lock stake amount
+    P->>P: Store compute commitments to pools
+    P->>P: Store commission settings
+    P-->>C: ComputeCommitted event
+    
+    Note over C,S: Phase 3: Optional Operations (during active period)
+    C->>P: stake_more(extra_amount)
+    P->>S: Lock additional amount
+    P-->>C: StakedMore event
+    
+    C->>P: withdraw_commitment()
+    P->>C: Transfer accrued rewards
+    P-->>C: CommitterWithdrew event
+    
+    C->>P: compound_stake(committer?)
+    P->>P: Compound rewards into stake
+    
+    Note over C,S: Phase 4: Ending Commitment
+    C->>P: cooldown_compute_commitment()
+    P->>P: Start cooldown period
+    P-->>C: ComputeCommitmentCooldownStarted event
+    
+    Note over C,P: Wait for cooldown period to pass
+    
+    C->>P: end_compute_commitment()
+    P->>S: Unlock all staked amounts
+    P->>P: Remove compute commitments
+    P-->>C: ComputeCommitmentEnded event
+```
+
+### Delegator Flow: Complete Lifecycle
+
+```mermaid
+sequenceDiagram
+    participant D as Delegator
+    participant C as Committer
+    participant P as Pallet
+    participant S as Staking System
+    
+    Note over D,S: Phase 1: Start Delegation
+    D->>P: delegate(committer, amount, cooldown, auto_compound)
+    P->>S: Lock delegation amount
+    P->>P: Join delegation pool
+    P-->>D: Delegated event
+    
+    Note over D,S: Phase 2: Optional Operations (during active delegation)
+    D->>P: delegate_more(committer, extra_amount)
+    P->>S: Lock additional amount
+    P->>P: Update delegation pool share
+    P-->>D: DelegatedMore event
+    
+    D->>P: withdraw_delegation(committer)
+    P->>D: Transfer accrued rewards
+    P-->>D: DelegatorWithdrew event
+    
+    D->>P: compound_delegation(committer, delegator?)
+    P->>P: Compound rewards into delegation
+    
+    Note over D,S: Phase 3: Redelegation (optional)
+    Note over D,P: Only if old commitment is in cooldown
+    D->>P: redelegate(old_committer, new_committer)
+    P->>P: Move delegation to new pool
+    P-->>D: Redelegated event
+    
+    Note over D,S: Phase 4: Ending Delegation
+    D->>P: cooldown_delegation(committer)
+    P->>P: Start cooldown period
+    P-->>D: DelegationCooldownStarted event
+    
+    Note over D,P: Wait for cooldown period to pass
+    
+    D->>P: end_delegation(committer)
+    P->>S: Unlock all delegated amounts
+    P->>P: Leave delegation pool
+    P-->>D: DelegationEnded event
+```
+
+### Combined Flow: Committer with Multiple Delegators
+
+```mermaid
+graph TD
+    A[Committer offers backing] --> B[Manager accepts backing]
+    B --> C[Committer commits compute]
+    C --> D[Delegator 1 delegates]
+    C --> E[Delegator 2 delegates]
+    C --> F[Delegator N delegates]
+    
+    D --> G[Active Period]
+    E --> G
+    F --> G
+    
+    G --> H{Rewards & Operations}
+    H --> I[delegate_more]
+    H --> J[withdraw rewards]
+    H --> K[compound rewards]
+    
+    H --> L[Committer initiates cooldown]
+    L --> M{Delegators must cooldown first}
+    M --> N[Each delegator cools down]
+    N --> O[Each delegator ends delegation]
+    
+    O --> P{All delegations ended?}
+    P -->|No| O
+    P -->|Yes| Q[Committer can end commitment]
+    Q --> R[System unlocks all funds]
+```
+
+### Error Handling Flow
+
+```mermaid
+graph TD
+    A[Extrinsic Call] --> B{Validation Checks}
+    
+    B -->|Pool not found| C[PoolNotFound Error]
+    B -->|Already backing| D[AlreadyBacking Error]
+    B -->|Insufficient funds| E[Token Error]
+    B -->|Max ratio exceeded| F[MaxStakeMetricRatioExceeded Error]
+    B -->|No metrics average| G[NoMetricsAverage Error]
+    B -->|Cooldown not finished| H[CooldownNotFinished Error]
+    
+    B -->|All checks pass| I[Execute Operation]
+    I --> J[Update Storage]
+    J --> K[Emit Events]
+    K --> L[Return Success]
+    
+    C --> M[Transaction Reverted]
+    D --> M
+    E --> M
+    F --> M
+    G --> M
+    H --> M
+```
+
+---
+
+This documentation covers all extrinsics in the pallet-acurast-compute pallet, showing the complete lifecycle from initial backing offers through commitment management, delegation operations, and final cleanup. The mermaid diagrams illustrate the typical flows that committers and delegators follow when interacting with the staking system.

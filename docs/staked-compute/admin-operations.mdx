@@ -1,0 +1,87 @@
+---
+title: Administrative Operations
+slug: /staked-compute/admin-operations
+---
+
+# Administrative Operations
+
+(Each operation corresponds to a Pallet Compute Extrinsic)
+
+## Pool Management
+
+### `create_pool`
+
+Creates a new metric pool with the specified parameters.
+
+**Parameters:**
+- `origin`: Root origin required
+- `name`: 24-byte pool identifier name 
+- `reward`: Reward ratio distributed per epoch (Perquintill)
+- `max_stake_metric_ratio`: Optional maximum ratio of stake to metric for commitments
+- `config`: Bounded vector of pool configuration values
+
+**Events:** `PoolCreated(pool_id, pool_state)`
+
+**Errors:** `PoolNameMustBeUnique`, `CalculationOverflow`
+
+---
+
+### `modify_pool`
+
+Modifies a pool's parameters including name, reward settings, max stake metric ratio, and configuration.
+
+**Parameters:**
+- `origin`: Root origin required
+- `pool_id`: ID of the pool to modify
+- `new_name`: Optional new pool name
+- `new_reward_from_epoch`: Optional tuple of (epoch, reward_ratio) to update rewards from specific epoch
+- `new_max_stake_metric_ratio`: Optional new maximum stake-to-metric ratio
+- `new_config`: Optional configuration changes (replace or update operations)
+
+**Errors:** `PoolNotFound`, `PoolNameMustBeUnique`, `RewardUpdateInvalid`
+
+---
+
+### `update_reward_distribution_settings`
+
+Updates the global reward distribution settings for the pallet.
+
+**Parameters:**
+- `origin`: Root origin required  
+- `settings`: Optional reward distribution settings including total reward per distribution, inflation settings, and distribution account
+
+## Reward and Slash Operations
+
+### `reward`
+
+Distributes rewards to all active commitments and delegations.
+
+**Parameters:**
+- `origin`: Root origin required
+- `amount`: Amount to distribute as rewards
+
+**Events:** `Rewarded(amount)`
+
+---
+
+### `slash`
+
+Slashes a commitment and its delegation pool.
+
+**Parameters:**
+- `origin`: Root origin required
+- `committer`: Account owning the commitment to slash
+- `amount`: Amount to slash
+
+**Events:** `Slashed(commitment_id, amount)`
+
+
+### `fake_metrics`
+
+Fakes or removes metrics and metric averages. This is a root-only operation for testing purposes.
+
+**Parameters:**
+- `origin`: Root origin required
+- `reset_for_processor`: Optional processor account to reset metrics for
+- `reset_average_of_manager`: Optional manager account to reset averages for  
+- `pretend_prev_average`: Optional manager account to pretend previous average for
