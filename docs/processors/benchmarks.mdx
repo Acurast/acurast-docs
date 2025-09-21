@@ -8,8 +8,6 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
 
 ## Performance
 
-_The Benchmarking is currently not yet deployed on Acurast Canary, the active system does not yet score the hardware but regards one phone as one device when it comes to rewards._
-
 The [Acurast Benchmark](https://github.com/Acurast/acurast-benchmark) suite is designed to evaluate the performance of Processors running in the Acurast network. It provides a comprehensive set of tests to measure computational throughput, memory allocation and access efficiency, and storage read/write performance. The benchmarks include support for multithreaded execution to leverage modern multi-core architectures.
 
 ### Benchmarks
@@ -134,10 +132,13 @@ score_{all} = w(score_{CPU\ SC}) + w(score_{CPU\ MC}) + w(mem_{RAM}) + w(score_{
 $$
 
 Where:
+
 $$
 w(m) = \frac{m}{N_{m}} \times W_{m}
 $$
+
 And:
+
 - $W_{m}$: Weight assigned to each metric pool ($0 \leqslant W_{m} \leqslant 1$ and $\sum_{m} W_{m} = 1$)
 - $N_{m}$: Normalization factor representing the sum of all scores submitted to the metric pool. Uses the previous epoch's total if available, otherwise the current epoch's total, or defaults to $m$ if no data exists on the chain.
 - $score_{CPU\ SC}$: CPU performance score (Single-Core)
@@ -148,6 +149,7 @@ And:
 - $score_{storage}$: Storage performance score
 
 To make the final score human-readable, a scaling factor of $10^9$ is applied.
+
 $$
 score_{display} = score_{all} \times 10^9
 $$
@@ -155,6 +157,7 @@ $$
 #### Weights
 
 The components are weighted as follows:
+
 - CPU Single-Core: $W_{CPU\ SC} = 0.2307$
 - CPU Multi-Core: $W_{CPU\ MC} = 0.2307$
 - RAM Total: $W_{RAM\ mem} = 0.4615$
@@ -163,8 +166,11 @@ The components are weighted as follows:
 - Storage Speed: $W_{storage\ score} = 0$
 
 If all weights equal $0$, the components are weighted equally:
+
 $$
 W_{m} = \frac{1}{n} \text{ if active, or } W_{m} = 0 \text{ otherwise}
 $$
+
 Where:
+
 - $n$: The number of active metric pools
