@@ -74,14 +74,3 @@ Slashes a commitment and its delegation pool.
 - `amount`: Amount to slash
 
 **Events:** `Slashed(commitment_id, amount)`
-
-
-### `fake_metrics`
-
-Fakes or removes metrics and metric averages. This is a root-only operation for testing purposes.
-
-**Parameters:**
-- `origin`: Root origin required
-- `reset_for_processor`: Optional processor account to reset metrics for
-- `reset_average_of_manager`: Optional manager account to reset averages for  
-- `pretend_prev_average`: Optional manager account to pretend previous average for
