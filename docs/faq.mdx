@@ -49,8 +49,8 @@ You can use any Polkadot-supported wallet. Wallets like MetaMask are also compat
 ### What is the difference between MIST, cACU & ACU?
 
 - MIST are points, not tokens, used to incentivize rebels via the Cloud Rebellion.
-- cACU is the canarynet (incentivized testnet) token of Acurast.
-- ACU is the native token of the Acurast Network.
+- cACU is the Acurast Canary (incentivized testnet) token.
+- ACU is the native token of the Acurast Mainnet.
 
 ### How can I fund my wallet?
 
@@ -70,9 +70,23 @@ Thank you for your continued support.
 
 ### What is the cACU to ACU conversion mechanism?
 
-The cACU to ACU conversion mechanism has not been finalized yet. There are a few technical details the team is currently working through. Once everything is in place, we will share an official announcement with the full details.
+#### How it works
 
-We kindly ask the community to avoid speculation until an official update is provided. We understand your interest and appreciate your patience. Rest assured, we’ll get back to you as soon as everything is ready.
+1. User inititates conversion on Acurast Canary
+2. cACU are burned on Canary
+3. ACU is assigned to the account on Mainnet with a 1 to 1 ratio.
+   e.g., 1000 cACU = 1000 ACU
+4. On Mainnet the lock can be updated once between 3 to 48 cycles:  
+   4.1. Default: Unlocked after 48x cyles at 28 days (3.7 years) = 1 to 1 ratio  
+   4.2. Minimum: Unlocked after 3x cycles (2.8 months) = 6.5% ACU  
+   4.3. Example: Unlocked after 24x cyles (1.75 years) = 50% ACU
+
+#### Features
+
+- Converted and locked ACU can be Staked in Staked Compute Pool from Day 1 of Mainnet.
+  ⟶ Staking Rewards are transferable (not locked) and claimable every epoch (1.5h)
+- Converted and locked ACU can be used to participate in on-chain Governance
+- If you continue to provide compute, you’ll earn ACU rewards, that are transferable, from the Compute Pool.
 
 ### When is the airdrop?
 
