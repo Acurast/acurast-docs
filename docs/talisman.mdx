@@ -1,0 +1,124 @@
+---
+title: Talisman
+slug: /talisman
+---
+
+import ThemedImage from "@theme/ThemedImage";
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
+### Create an Acurast address with Talisman
+
+This guide explains how to create an address with [Talisman](https://talisman.xyz/) wallet. To install the browser extensions, follow their setup instructions.
+
+:::info
+
+Most wallets allow to create a generic polkadot address that is supported by Acurast, this guide focuses on the Talisman wallet.
+
+:::
+
+<div class="padding-vert--md"></div>
+
+Once you created your recovery phrase follow this steps to create an Acurast address:
+
+1. Open the settings menu (more) in your Talisman browser extension and select *Add Account*
+2. Choose *New Polkadot Account*.
+
+<ThemedImage
+  sources={{
+    light: useBaseUrl("/guide/create-address/new_talisman.png"),
+    dark: useBaseUrl("/guide/create-address/new_talisman.png"),
+  }}
+/>
+
+<div class="padding-vert--md"></div>
+
+3. Select the Recovery Phrase to use and give your Account a name, eg "Acurast", then click *Create*
+
+
+<ThemedImage
+  sources={{
+    light: useBaseUrl("/guide/create-address/create_talisman.png"),
+    dark: useBaseUrl("/guide/create-address/create_talisman.png"),
+  }}
+/>
+<div class="padding-vert--md"></div>
+
+4. In order to display Acurast tokens, go to *Networks & Tokens* in the Settings menu and select *Manage Networks*. Then click *+ Add network*
+
+<ThemedImage
+  sources={{
+    light: useBaseUrl("/guide/create-address/addnetwork_talisman.png"),
+    dark: useBaseUrl("/guide/create-address/addnetwork_talisman.png"),
+  }}
+/>
+<div class="padding-vert--md"></div>
+
+5. Select *Polkadot* as platform, then enter the following data:
+
+For Acurast Canary:
+
+RPC Url: **`wss://public-rpc.canary.acurast.com`**  
+Native Token Symbol: **`cACU`**    
+Native Token Decimals: **`12`**    
+Native Token Name: **`cACU`**    
+Display Balances: **`Yes.`**   
+
+<ThemedImage
+  sources={{
+    light: useBaseUrl("/guide/create-address/network_talisman.png"),
+    dark: useBaseUrl("/guide/create-address/network_talisman.png"),
+  }}
+/>
+<div class="padding-vert--md"></div>
+
+6. Your Acurast Account on Talisman is now ready to be used and to sign transactions
+
+### Get the address of your Acurast account on Talisman
+
+Open your Talisman browser estension and select the Acurast account. Then click on the copy&paste symbol on top right and your Acurast account address will be copied into the clipboard. 
+
+<ThemedImage
+  sources={{
+    light: useBaseUrl("/guide/create-address/getaddress_talisman.png"),
+    dark: useBaseUrl("/guide/create-address/getaddress_talisman.png"),
+  }}
+/>
+<div class="padding-vert--md"></div>
+
+### Connect your Talisman account to the Acurast Hub
+
+1. Go to [hub.acurast.com](https://hub.acurast.com/) and click *Enter Hub*
+2. Click *Connect*
+3. Open your Talisman browser extension
+4. On top of your Talisman extension, select the account you want to connect with to hub.acurast.com
+
+<ThemedImage
+  sources={{
+    light: useBaseUrl("/guide/create-address/hub_talisman.png"),
+    dark: useBaseUrl("/guide/create-address/hub_talisman.png"),
+  }}
+/>
+<div class="padding-vert--md"></div>
+
+Select it and the bullt point will turn green:
+
+ThemedImage
+  sources={{
+    light: useBaseUrl("/guide/create-address/selectacc_talisman.png"),
+    dark: useBaseUrl("/guide/create-address/selectacc_talisman.png"),
+  }}
+/>
+<div class="padding-vert--md"></div>
+
+5. Go back to the hub.acurast.com page and click *Talisman*. The account will now appear under *Select Account*. Click it
+
+ThemedImage
+  sources={{
+    light: useBaseUrl("/guide/create-address/selacc_talisman.png"),
+    dark: useBaseUrl("/guide/create-address/selacc_talisman.png"),
+  }}
+/>
+<div class="padding-vert--md"></div>
+
+6. You are now connected to hub.acurast.com
+
