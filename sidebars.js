@@ -68,7 +68,7 @@ const sidebars = {
       type: "category",
       label: "Wallets",
       items: [
-        "wallets/wallets",
+        "wallets/wallet-overview",
         "wallets/wallets-talisman",
       ],
       collapsed: false,
