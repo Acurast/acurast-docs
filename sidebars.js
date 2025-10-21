@@ -64,9 +64,15 @@ const sidebars = {
         "networks",
       ],
     },
-
-    "wallets",
-    "talisman",
+    {
+      type: "category",
+      label: "Wallets",
+      items: [
+        "wallets/wallets",
+        "wallets/wallets-talisman",
+      ],
+      collapsed: false,
+    },
     "faq",
   ],
 };
