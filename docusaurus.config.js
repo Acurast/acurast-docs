@@ -217,7 +217,7 @@ const config = {
             from: "/acurast-protocol/architecture/networks",
           },
           {
-            to: "/wallets",
+            to: "/wallets/wallet-overview",
             from: "/developers/create-address",
           },
           {
