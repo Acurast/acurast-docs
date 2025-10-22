@@ -68,7 +68,17 @@ const sidebars = {
       type: "category",
       label: "Wallets",
       items: [
-        "wallets/wallet-overview",
+        {
+          type: "doc",
+          id: "wallets/wallet-overview",
+          label: "Overview",
+        },
+        {
+          type: "doc",
+          id: "wallets/wallets-airgap",
+          label: "AirGap",
+        },
+        "wallets/wallets-ledger",
         "wallets/wallets-talisman",
       ],
       collapsed: false,
