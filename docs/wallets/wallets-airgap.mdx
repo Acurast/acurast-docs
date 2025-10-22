@@ -6,9 +6,7 @@ slug: /wallets/wallets-airgap
 import ThemedImage from "@theme/ThemedImage";
 import useBaseUrl from "@docusaurus/useBaseUrl";
 
-# Secure offline setup of AirGap for Acurast (Acurast Canary)
-
-In order to have a bulletproof setup for Acurast (Acurast Canary) signers / custodians, we ask you to do the following AirGap setup and to strictly follow the offline policy for the seed phrase.
+# Secure offline setup of AirGap for Acurast
 
 AirGap is a self-custody solution, developed by Papers AG, with a two-device approach:
 
@@ -16,8 +14,6 @@ AirGap is a self-custody solution, developed by Papers AG, with a two-device app
 - **Online wallet** to execute transactions
 
 Signing payloads are transported via QR codes.
-
----
 
 ## 1. Make the offline phone ready and install AirGap Vault
 
@@ -35,18 +31,12 @@ For the best possible security, follow the steps below.
 2. You don't need to log in to a Google Account, but you need to set a **PIN code, pattern, fingerprint or face-id** for your device.
 3. Start the phone and update it to the latest OS.
 4. Take the phone offline, remove all previous Wi-Fi connections (so it can't connect accidentally), and set it to **Airplane Mode**.
-5. Download the latest AirGap Vault APK from GitHub: <https://github.com/airgap-it/airgap-vault/releases> and move it to the USB stick.
+5. Download the latest [AirGap Vault APK from GitHub](https://github.com/airgap-it/airgap-vault/releases) and move it to the USB stick.
 6. Plug it in and install the APK on your phone, give the necessary permissions.
-
----
 
 ## 2. Install AirGap Wallet on the online phone
 
-7. On the online phone, install AirGap Wallet from the Google Play Store or Apple App Store:
-   - <https://play.google.com/store/apps/details?id=it.airgap.wallet>
-   - <https://play.google.com/store/apps/details?id=it.airgap.wallet>
-
----
+7. On the online phone, install AirGap Wallet from the [Google Play Store](https://play.google.com/store/apps/details?id=it.airgap.wallet) or [Apple App Store](https://apps.apple.com/app/airgap-wallet/id1420996542).
 
 ## 3. Generate a new secret
 
@@ -61,16 +51,12 @@ For the best possible security, follow the steps below.
 14. Set an **encryption password** and ensure you always remember it.
     - ✅ You may use a password manager here (but never store the seed in it).
 
----
+## 4. Generate an Acurast account and sync with AirGap Wallet
 
-## 4. Generate an Acurast (Acurast Canary) account and sync with AirGap Wallet
-
-15. Add an Acurast (Acurast Canary) account and confirm with your encryption password and the device PIN. A new Acurast (Acurast Canary) address will be generated.
-16. Click on the new Acurast (Acurast Canary) account, then click on the **AirGap Wallet** button → a QR code will be displayed.
+15. Add an Acurast account and confirm with your encryption password and the device PIN. A new Acurast address will be generated.
+16. Click on the new Acurast account, then click on the **AirGap Wallet** button → a QR code will be displayed.
 17. Open AirGap Wallet and scan the QR code of the offline device.
-    - The account’s **public key** will be imported into your AirGap Wallet.
-
----
+    - The account's **public key** will be imported into your AirGap Wallet.
 
 ## 5. Verify the recovery
 
@@ -81,12 +67,10 @@ For the best possible security, follow the steps below.
 21. Go back to the main screen and select **Import**.
 22. Import the secret recovery phrase from your written notes.
 23. Set the same encryption password as before.
-24. Once done, generate an Acurast (Acurast Canary) account.
+24. Once done, generate an Acurast account.
 25. Compare the recovered account to the account synced in step 17.
     - ✅ If they match → recovery successful.
     - ❌ If not → delete and start again from step 10.
-
----
 
 ## Important to know
 
@@ -95,17 +79,17 @@ For the best possible security, follow the steps below.
 2. Follow best practices when storing the seed phrase:
    - Example: metal plate in safe, paper note in safe, ensure you can identify the right seed.
 3. Do not store the encryption password in the same place as the recovery seed.
-4. More docs: <https://support.airgap.it/>
+4. More documentation: [AirGap Support](https://support.airgap.it/)
 5. **NEVER** connect your offline phone to the internet.
    - If you must, first completely remove the secret from the phone.
 6. If you need to copy the account address, copy it from the online phone with AirGap Wallet.
 
----
-
 ## Resources
 
-- Step by step setup guide: <https://support.airgap.it/guides/step-by-step-guide/>
-- GitHub AirGap Vault: <https://github.com/airgap-it/airgap-vault/releases>
-- GitHub AirGap Wallet: <https://github.com/airgap-it/airgap-wallet/releases>
-- Google Play AirGap Wallet: <https://play.google.com/store/apps/details?id=it.airgap.wallet>
-- Google Play AirGap Vault: <https://play.google.com/store/apps/details?id=it.airgap.vault>
+- [AirGap Step by Step Setup Guide](https://support.airgap.it/guides/step-by-step-guide/)
+- [AirGap Vault Releases on GitHub](https://github.com/airgap-it/airgap-vault/releases)
+- [AirGap Wallet Releases on GitHub](https://github.com/airgap-it/airgap-wallet/releases)
+- [AirGap Wallet on Google Play Store](https://play.google.com/store/apps/details?id=it.airgap.wallet)
+- [AirGap Vault on Google Play Store](https://play.google.com/store/apps/details?id=it.airgap.vault)
+- [AirGap Wallet on Apple App Store](https://apps.apple.com/app/airgap-wallet/id1420996542)
+- [AirGap Vault on Apple App Store](https://apps.apple.com/app/airgap-vault/id1417126841)
