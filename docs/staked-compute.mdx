@@ -14,10 +14,10 @@ The specifics on this page are currently under review and subject to change.
 
 ## TLDR — why this matters
 
-- Staked compute plays a significant role for Acurast: 70% of the inflation is allocated to “Staked Compute”
+- Staked compute plays a significant role for Acurast: 70% of the inflation is allocated to "Staked Compute"
 - Accessible first design: Onboard smartphone compute without token purchase or gatekeepers
-- People without hardware can still earn by delegating their stake to compute providers
-- Compute providers can accept delegation and earn additional rewards
+- People without hardware can still receive rewards by delegating their stake to compute providers
+- Compute providers can accept delegation and receive additional rewards
 - Staked compute can be restaked
 
 ## Introduction
@@ -105,7 +105,7 @@ It’s important to note that `“benchmark_in_heartbeat”` should be seen as t
 
 ### Stake Delegation
 
-Not every staker will need to have their own hardware setup. They will be able to earn rewards from staking by delegating their stake to other compute providers on the network.
+Not every staker will need to have their own hardware setup. They will be able to receive rewards from staking by delegating their stake to other compute providers on the network.
 
 Every compute provider can stake and accept a delegated stake. As shown in the previous formula, the total amount of stake “stake_weight” is the sum of the own + delegated stake. To avoid centralisation and align slashing, the target is set at a 9:1 ratio of own stake vs. allowed delegated stake. If a compute provider decides to allow delegations, they must specify a fee applied programmatically on a protocol level during the reward distribution to the delegators.
 

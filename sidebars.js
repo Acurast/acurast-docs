@@ -36,7 +36,16 @@ const sidebars = {
     {
       type: "category",
       label: "Processors",
-      items: ["processors/acurast-processors", "processors/benchmarks", "processors/multiple-processors"],
+      items: [
+        {
+          type: "doc",
+          id: "processors/become-compute-provider",
+          label: "Become a Compute Provider",
+        },
+        "processors/acurast-processors",
+        "processors/benchmarks",
+        "processors/multiple-processors"
+      ],
       collapsed: false,
     },
 
