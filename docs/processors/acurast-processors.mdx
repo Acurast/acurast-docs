@@ -12,44 +12,49 @@ The Acurast processor is the app that is running on smartphones which take part 
 
 _Only available for Android_
 
-Provide compute with a dedicated phone, completely locked down and setup as a compute provider and join Acurast's decentralized compute network. Factory reset your Android phone, install the Acurast Processor to get started.
+Provide compute with a dedicated phone, completely locked down and setup as a compute provider and join Acurast's decentralized compute network. Processor Core transforms your Android device into a dedicated compute node, offering maximum performance and reliability.
 
-**[Acurast Hub ↗](https://hub.acurast.com/)**
+**Key Features:**
+- **Dedicated Setup**: The device runs only the Acurast Processor app with everything else completely locked down
+- **Maximum Performance**: Optimized for continuous operation and higher deployment execution rates
+- **Enhanced Security**: Factory-reset device ensures a clean, secure environment
+- **24/7 Operation**: Designed to run continuously, maximizing your reward potential
+- **Priority Selection**: Developers often prefer Core devices for longer-running, critical deployments
+
+**Requirements:**
+- Android 12 or newer
+- Device must not be rooted
+- Locked bootloader required
+- Factory reset necessary during setup
+
+**[Setup Guide ↗](/processors/become-compute-provider#step-4-install-and-setup)**
 
 ## Acurast Processor Lite
 
-Provide compute with your phone and join Acurast's decentralized compute network.
+Provide compute with your everyday phone and join Acurast's decentralized compute network. Processor Lite allows you to contribute compute power during edge-times (like while you sleep and charge) without dedicating an entire device.
 
-Install the Acurast Processor Lite application on Android or iOS to get started.
+**Key Features:**
+- **Use Your Everyday Phone**: No need for a dedicated device - runs alongside your regular apps
+- **Flexible Operation**: Provide compute during edge-times when your phone is idle (e.g., while charging overnight)
+- **No Factory Reset**: Install and start providing compute immediately without wiping your device
+- **Cross-Platform**: Available on both Android and iOS
+- **Easy Setup**: Simple installation process with minimal configuration required
+- **Android Work Profile**: Uses isolated work profile on Android for enhanced security and privacy
+
+**Requirements:**
+- **Android**: Android 12 or newer (non-rooted, locked bootloader)
+- **iOS**: iPhone 6S or newer (iOS 15+)
 
 **[Google Play ↗](https://play.google.com/store/apps/details?id=com.acurast.attested.executor.sbs.canary)**
 **[Apple App Store ↗](https://apps.apple.com/us/app/acurast-processor/id6517361921)**
+**[Setup Guide ↗](/processors/become-compute-provider#step-4-install-and-setup)**
 
-## Rewards
+## Security Audits
 
-- **Deployment Execution**: Tokens (cACU on Canary, ACU on Mainnet) are rewarded when a processor's compute power is used by developers to run code. Developers that deploy to the Acurast Cloud provide a reward for the compute power used. When your Processor has been selected, you'll receive part of that reward.
-- **Benchmark Rewards**: Providers receive rewards based on the [benchmarks](/acurast-processors/benchmarks) of their participating devices. On Canary, a total of 12'500 cACU are distributed per epoch (roughly every 1.5 hours). These rewards are split up to the different benchmarks pools and each phone competes with the others in the 4 benchmark pools. Higher specs usually lead to higher Benchmark Rewards.
-- **Cloud Rebellion**: Join the [Cloud Rebellion](https://rebellion.acurast.com/) and harvest MIST ☁️ points. Become a Rebel and cloud-harvest MIST (points) by completing quests, onboarding Processors, and inviting others to join the Rebellion.
-- ~~**Bootstrapping**: Receive 250 cACU each month in Bootstrapping Rewards. Run your Processor, connected to the internet, for a month and receive 250 cACU in bootstrapping rewards. You will receive a fraction of the full reward each hour.~~ (has been sundowned in favor of the Benchmark Rewards)
+Security is a top priority for the Acurast ecosystem. The Acurast Processor app has undergone professional security auditing to ensure the safety and integrity of the compute infrastructure.
 
-## Recommended Phones
+**xcBTC Audit**
 
-Make sure to check out if your phone is on the list of recommended phones. In general, phones with higher specs will receive more rewards.
+A comprehensive penetration test and security audit was performed by [Compass Security ↗](https://www.compass-security.com/) on the Acurast Processor app in the context of [xcBTC.com](https://xcbtc.com/), a Bitcoin bridge built on Acurast. This audit evaluated the security of the Acurast infrastructure, including the TEE (Trusted Execution Environment) implementation, to ensure it meets the high security standards required for handling sensitive operations.
 
-:::info
-
-**[Recommended Phones ↗](https://docs.google.com/spreadsheets/d/1ZvzmMVey4CM2tuif_zJfWiIxH1qkgA-l7BNJMw4vh54/edit#gid=1844886586)**
-
-:::
-
-### Android
-
-All phones with Android 12 and newer are supported.
-
-Some phones with Android are also supported, try to set it up and give us feedback on Discord or Telegram, if you were successful.
-
-If the device is rooted or has an unlocked bootloader, the access to the Trusted Execution Environment will become void and the device is no longer eligible for Deployments and rewards.
-
-### iOS
-
-All iPhones starting iPhone 6S (iOS15) and newer are supported.
+**[Acurast Processor App Security Audit Report (xcBTC.com) ↗](https://github.com/xcbtc-bridge/audits/blob/main/report_89395_Pentest_tzBTC_Android_App_v1.0.pdf)**
