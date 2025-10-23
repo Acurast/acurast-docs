@@ -42,9 +42,10 @@ const sidebars = {
           id: "processors/become-compute-provider",
           label: "Become a Compute Provider",
         },
+        "processors/multiple-processors",
         "processors/acurast-processors",
-        "processors/benchmarks",
-        "processors/multiple-processors"
+        "processors/rewards",
+        "processors/benchmarks"
       ],
       collapsed: false,
     },
