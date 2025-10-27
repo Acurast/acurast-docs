@@ -86,11 +86,20 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "wallets/wallets-subwallet",
+          label: "SubWallet",
+        },
+        "wallets/wallets-talisman",
+        {
+          type: "doc",
+          id: "wallets/wallets-ledger",
+          label: "Ledger",
+        },
+        {
+          type: "doc",
           id: "wallets/wallets-airgap",
           label: "AirGap",
         },
-        "wallets/wallets-ledger",
-        "wallets/wallets-talisman",
       ],
       collapsed: false,
     },
