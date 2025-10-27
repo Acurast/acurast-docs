@@ -11,7 +11,7 @@ slug: /faq
 
 Acurast is redefining compute by utilizing billions of smartphones – no data centers required. This verifiable, scalable, and confidential compute network enables users to run secure applications on decentralized infrastructure at scale—without compromising speed or privacy.
 
-Acurast has already onboarded 131,250+ compute units worldwide on its incentivized testnet making it the most decentralized verifiable compute network available today. This impressive amount of compute already powers mission critical workloads with high-security and AI requirements.
+Acurast has already onboarded 141,428+ compute units worldwide on its incentivized testnet making it the most decentralized verifiable compute network available today. This impressive amount of compute already powers mission critical workloads with high-security and AI requirements.
 
 This isn’t just another DePIN protocol — it’s a game-changer that’s redefining how the world computes.
 
@@ -46,6 +46,8 @@ Acurast enables decentralized, confidential, and scalable compute for various ap
 
 You can use any Polkadot-supported wallet. Wallets like MetaMask are also compatible.
 
+**[See the full list of supported wallets ↗](/wallets/wallet-overview)**
+
 ### What is the difference between MIST, cACU & ACU?
 
 - MIST are points, not tokens, used to incentivize rebels via the Cloud Rebellion.
@@ -56,17 +58,15 @@ You can use any Polkadot-supported wallet. Wallets like MetaMask are also compat
 
 You can use the [Acurast Faucet ↗](https://faucet.acurast.com/) to claim cACU tokens. On the Acurast Hub or in the Processor Lite app click on "Fund Account", this prefills your address. To request funds, select "Get tokens" and complete the captcha.
 
-### Why is my balance decreasing?
+### Why is my balance decreasing sometimes?
 
-The Acurast network requires transaction fees whenever your Processor interacts with the chain. However, this is usually negligible, sometimes around (0.01 cACU).
+Your balance may decrease slightly due to transaction fees when your Processor interacts with the Acurast network. Whenever the Processor reports to the chain (heartbeats, deployment acknowledgements, execution reports), minimal gas fees have to be paid, which can result in a decreasing balance. These fees are typically minimal, usually around 0.01 cACU per transaction.
 
 ### When is the TGE happening?
 
-The Token Generation Event (TGE) is planned for Q3 of this year. The team is actively working on strategic partnerships and technical development to ensure the project’s long-term success. We understand the community’s eagerness and appreciate your patience as we move toward this important milestone.
+Originally planned for Q3 2025, the TGE was announced for November 17, 2025.
 
-We’ve noticed some misinformation being shared within the community, suggesting the TGE will not happen. We want to clarify that this is false. While we welcome constructive feedback and questions, intentionally spreading misinformation is not acceptable. Repeated violations may lead to removal from the community to maintain a healthy and respectful environment for everyone.
-
-Thank you for your continued support.
+**[Read the full announcement ↗](https://acurast.com/blog/announcements/the-acurast-association-announces-launch-date-for-token-generation-event-tge-and-looks-ahead-to-next-steps/)**
 
 ### What is the cACU to ACU conversion mechanism?
 
@@ -101,9 +101,11 @@ The Acurast Association has announced the Cloud Rebellion Airdrop with 10,000,00
 
 Acurast Processor Core is meant for dedicated phones, completely locked down, and intended only to provide compute to Acurast.
 
-Whereas Lite is more flexible, can be installed on your everyday phone and activated to provide compute when it’s feasible for you.
+Whereas Lite is more flexible, can be installed on your everyday phone and activated to provide compute when it's feasible for you.
 
-If you have a phone that you don’t need any more for anything else, go with Core.
+If you have a phone that you don't need any more for anything else, go with Core.
+
+**[Learn more about Acurast Processors ↗](/acurast-processors)**
 
 ### What Android and iOS version are required?
 
@@ -131,31 +133,39 @@ Yes, most likely, you’ve connected a wallet to the Acurast Hub; follow these s
 
 The device heartbeats every 30 minutes. Scanning the blockchain allows you to look for all heartbeats, but that would take some time. To track the recent performance of your Processors, you can use the [Acurast Monitoring Bot](https://t.me/AcurastBot) on Telegram.
 
+### Do I still get rewards if my Processor is missing heartbeats?
+
+**[Benchmark rewards](/processors/rewards)** are distributed if one of 3 heartbeats of an epoch (roughly 90 minutes) was received on chain. This means your device can miss some heartbeats without missing out on rewards.
+
 ### Do I need to factory reset my phone?
 
-You only need to factory reset your phone if you are onboarding a Core device, you need to factory reset it. However, for Processor Lite, you can use your everyday device without factory resetting it.
+You only need to factory reset your phone if you are onboarding a Core device. However, for Processor Lite, you can use your everyday device without factory resetting it.
+
+Learn more about the differences between **[Core and Lite ↗](/acurast-processors)**
+
+For step-by-step instructions on getting started, see our **[Compute Provider onboarding guide ↗](/processors/become-compute-provider)**.
 
 ## Lite
 
 ### How do I install Acurast Processor Lite?
 
-Acurast Lite can be installed within minutes. Watch the onboarding video here.
-The Acurast Processor Lite application can run on Android or iOS. Simply install the app and follow the instructions.
+Acurast Lite can be installed within minutes. The Acurast Processor Lite application can run on Android or iOS.
 
-[**Google Play ↗**](https://play.google.com/store/apps/details?id=com.acurast.attested.executor.sbs.canary)  
-[**Apple App Store ↗**](https://apps.apple.com/kh/app/acurast-processor/id6517361921)
+**[Follow the step-by-step installation guide ↗](/processors/become-compute-provider#for-processor-lite)**
 
-### Android
+### Android: Why do I need to setup an "Android Work" profile?
 
-#### Why do I need to setup an “Android Work” profile?
+Android Work profiles are a built-in feature of Android, typically used by organizations to separate work apps and data from personal apps on the same device. This creates a secure, isolated container managed by an enterprise or organization.
 
-The Acurast Processor Lite leverages the advantages of the Android operating system by using the “Work” profile, a second profile completely independent from your private profile. By keeping your private profile separate from the one that provides compute, you’ll get the best security and have no impact on your privacy.
+The Acurast Processor Lite leverages this proven Android feature to create a secure, isolated environment for providing compute. The Work profile acts as a second profile completely independent from your private profile. By keeping your private profile separate from the one that provides compute, you'll get the best security and have no impact on your privacy.
 
-#### Who manages the “Android Work” profile?
+### Android: Who manages the "Android work" profile?
 
-You do. You’re in complete control. Your device is connected to the decentralized Acurast protocol (Acurast Canary) and controlled by you. In no way do any individuals have access to your phone to install other applications in that Work profile or make changes to it.
+You do. You're in complete control. Your device is connected to the decentralized Acurast protocol (Acurast Canary) and controlled by you. In no way do any individuals have access to your phone to install other applications in that work profile or make changes to it.
 
-#### How do I uninstall Acurast Processor Lite?
+**Important Note:** During setup, you may see standard Android messages like "Your device isn't private" or "Your IT admin may see your data...". These are default warnings that appear whenever a work profile is created. In the case of Acurast, you remain in complete control - these are simply standard messages Android displays for all work profile setups.
+
+### Android: How do I uninstall Acurast Processor Lite?
 
 Because Lite uses the Android work profile, you’ll have to remove it completely to uninstall the app from your device.
 
@@ -165,23 +175,15 @@ Uninstalling Processor Lite:
 
 1. Open the "Settings" with the cog on the top right on the Acurast Processor application (make sure you can see the compute status)
 1. Click "Uninstall" and "Continue"
-1. The app in the work profile has been removed, you can now uninstall the app from your private profile
-
-### iOS
+1. The Processor app in the work profile has been removed, you can now uninstall the lite app from your private profile and the work profile should be removed too (might be subject to Android version).
 
 ## Core
 
 ### How do I install Acurast Processor Core?
 
-- Get one of the [recommended Android phones ↗](https://docs.google.com/spreadsheets/d/1ZvzmMVey4CM2tuif_zJfWiIxH1qkgA-l7BNJMw4vh54/edit?gid=1844886586#gid=1844886586)
-- Factory reset the phone
-- Head over to the Acurast Hub and connect your wallet
-- Claim some cACU from the faucet with “Fund Account”
-- Select “Add New Device” and sign the message with your wallet
-- Take your phone and tap five to eight times on the start screen; the QR scanner should open
-- Scan the QR code from the Hub
-- Complete the setup process
-- That’s it. You’re providing compute now; keep the device powered up and connected to the internet
+Acurast Processor Core is designed for dedicated Android phones. Follow the detailed installation instructions to get started.
+
+**[Follow the step-by-step installation guide ↗](/processors/become-compute-provider#for-processor-core)**
 
 ### How to add Acurast Processor Core with NFC?
 
