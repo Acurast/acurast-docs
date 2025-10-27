@@ -45,7 +45,7 @@ const sidebars = {
         "processors/multiple-processors",
         "processors/acurast-processors",
         "processors/rewards",
-        "processors/benchmarks"
+        "processors/benchmarks",
       ],
       collapsed: false,
     },
@@ -101,7 +101,7 @@ const sidebars = {
           label: "AirGap",
         },
       ],
-      collapsed: false,
+      collapsed: true,
     },
     "faq",
   ],
