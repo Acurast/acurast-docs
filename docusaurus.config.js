@@ -233,10 +233,6 @@ const config = {
             from: "/acurast-protocol/modules/enterprise",
           },
           {
-            to: "/developers/deployment-creation",
-            from: "/developers/job-creation",
-          },
-          {
             to: "/developers/deployment-runtime-environment",
             from: "/developers/job-runtime-environment",
           },
