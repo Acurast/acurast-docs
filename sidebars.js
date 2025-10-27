@@ -72,7 +72,7 @@ const sidebars = {
         "acurast-protocol/node-setup",
         "integrations",
         "networks",
-        "security",
+        "audits",
       ],
     },
     {
