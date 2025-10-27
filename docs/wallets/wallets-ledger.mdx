@@ -56,13 +56,39 @@ Before you begin, ensure you have:
 To interact with Acurast using your Ledger, you'll need the Polkadot.js browser extension:
 
 1. Install the [Polkadot.js extension](https://polkadot.js.org/extension/) for your browser (Chrome, Firefox, or Brave)
-2. Open the Polkadot.js extension
-3. Click on the **+** icon and select **Attach Ledger account**
-4. Make sure your Ledger device is connected and unlocked
-5. Open the **Polkadot app** on your Ledger device (the screen should display "Polkadot ready")
-6. In the Polkadot.js extension, select the account index you want to use (usually Account 0)
-7. Give your account a descriptive name, e.g., "Acurast Ledger"
-8. Click **Import**
+2. Make sure your Ledger device is connected and unlocked
+3. Open the **Polkadot app** on your Ledger device (the screen should display "Polkadot ready")
+4. Open the Polkadot.js extension
+5. Click on the + icon on top right and select Connect Ledger device
+
+<ThemedImage
+  sources={{
+    light: useBaseUrl("/guide/ledger/attach_ledger.png"),
+    dark: useBaseUrl("/guide/ledger/attach_ledger.png"),
+  }}
+/>
+
+6. On the "Import Ledger Account" screen select "Polkadot Relay Chain"
+
+<ThemedImage
+  sources={{
+    light: useBaseUrl("/guide/ledger/select_network.png"),
+    dark: useBaseUrl("/guide/ledger/select_network.png"),
+  }}
+/>
+
+7. Select your connected Ledger device in the next popup and click "connect"
+8. Give your Account a meaningful name, e.g. "Acurast Manager"
+
+<ThemedImage
+  sources={{
+    light: useBaseUrl("/guide/ledger/import_ledger.png"),
+    dark: useBaseUrl("/guide/ledger/import_ledger.png"),
+  }}
+/>
+
+9. Leave Account Type and Index as is, or select your custom derivation path
+10. Click Import (your account should show up after a reload of the extension - close and open it)
 
 <div class="padding-vert--md"></div>
 
@@ -71,24 +97,37 @@ To interact with Acurast using your Ledger, you'll need the Polkadot.js browser 
 To view your Acurast balance and interact with the network:
 
 1. Go to [Polkadot.js Apps](https://polkadot.js.org/apps/)
-2. Click on the network name in the top-left corner
-3. Scroll down to **Development** or **Custom Endpoint**
-4. Enter the RPC endpoint for your desired network:
-   - **Acurast Canary:** **`wss://public-rpc.canary.acurast.com`**
-   - **Acurast Mainnet:** **`wss://public-rpc.mainnet.acurast.com`** (coming soon)
-5. Click **Switch** to connect to the Acurast network
-6. Your Ledger account should now display your token balance (cACU for Canary or ACU for Mainnet)
+2. Connect your account to the page in the polkadot.js popup
+
+<ThemedImage
+  sources={{
+    light: useBaseUrl("/guide/ledger/connect_ledger.png"),
+    dark: useBaseUrl("/guide/ledger/connect_ledger.png"),
+  }}
+/>
+
+3. Click on the network name in the top-left corner
+4. Scroll down to Polkadot & Parachains (for Mainnet) or Kusama & Parachains (for Canary) and select Acurast (via Acurast)
+5. Click the "Switch" icon on top of the sidebar to connect to the Acurast network
+
+<ThemedImage
+  sources={{
+    light: useBaseUrl("/guide/ledger/switch_ledger.png"),
+    dark: useBaseUrl("/guide/ledger/switch_ledger.png"),
+  }}
+/>
+
+6. Your Ledger account should now display your token balance (cACU for Canary or ACU for Mainnet) under Accounts/Accounts
 
 <div class="padding-vert--md"></div>
 
 ### Get the address of your Acurast account on Ledger
 
-Your Ledger Acurast address is the same as your Polkadot address but with a different prefix:
+Your Ledger Acurast address has a different format than the Polkadot address:
 
-1. Open the Polkadot.js extension
-2. Click on your Ledger account
-3. Click the copy icon next to your address to copy it to the clipboard
-4. You can also verify the address on your Ledger device screen for additional security
+1. Go to the account tab on polkadot.js.org/apps (with Acurast set as network)
+2. Make sure the ledger account is connected
+3. Click on the account icon (identicon) to copy & paste your acurast address to the clipboard
 
 <div class="padding-vert--md"></div>
 
@@ -98,9 +137,25 @@ Your Ledger Acurast address is the same as your Polkadot address but with a diff
 2. Open the **Polkadot app** on your Ledger (it should display "Polkadot ready")
 3. Go to [hub.acurast.com](https://hub.acurast.com/) and click **Enter Hub**
 4. Click **Connect**
-5. Select **Polkadot.js** as your wallet option
-6. In the Polkadot.js extension popup, select your Ledger account
-7. Click **Connect** to authorize hub.acurast.com to access your account
+5. In the Polkadot.js extension click "Connect Accounts" and select your account
+
+<ThemedImage
+  sources={{
+    light: useBaseUrl("/guide/ledger/pjs_connect_ledger2.png"),
+    dark: useBaseUrl("/guide/ledger/pjs_connect_ledger2.png"),
+  }}
+/>
+
+6. Select Talisman as your wallet option and the connected account will appear on the bottom of the modal
+
+<ThemedImage
+  sources={{
+    light: useBaseUrl("/guide/ledger/enterhub_ledger.png"),
+    dark: useBaseUrl("/guide/ledger/enterhub_ledger.png"),
+  }}
+/>
+
+7. Select the newly added account from the connect modal to enter the hub
 
 <div class="padding-vert--md"></div>
 
