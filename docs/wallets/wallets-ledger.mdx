@@ -1,12 +1,12 @@
 ---
-title: Ledger
+title: Ledger Hardware Wallet
 slug: /wallets/wallets-ledger
 ---
 
 import ThemedImage from "@theme/ThemedImage";
 import useBaseUrl from "@docusaurus/useBaseUrl";
 
-### Create an Acurast address with Ledger
+### Create an Acurast address with Ledger (and SubWallet)
 
 This guide explains how to create an address with [Ledger](https://www.ledger.com/) hardware wallet. Ledger provides secure cold storage for your crypto assets by keeping your private keys offline.
 
@@ -14,7 +14,7 @@ This guide explains how to create an address with [Ledger](https://www.ledger.co
 
 Acurast is built on Polkadot technology, so you'll need to install the Polkadot app on your Ledger device to manage Acurast accounts.
 
-This guide uses **Polkadot.js extension** as the wallet interface, but your Ledger hardware wallet can also be used with other Polkadot-compatible wallets such as [SubWallet](https://www.subwallet.app/) or [Talisman](https://talisman.xyz/).
+This guide is written for **Ledger hardware wallets** with the **SubWallet** extension in a **Chromium based browser**. Talisman, Polkadot.js and Firefox do not fully support this setup at this point in time.
 
 :::
 
@@ -28,12 +28,14 @@ Before you begin, ensure you have:
 2. Ledger Live application installed on your computer
 3. Your Ledger device initialized with a recovery phrase
 4. Latest firmware installed on your Ledger device
+5. A Chromium-based browser (e.g., Google Chrome, Brave, Microsoft Edge, or Chromium)
+6. SubWallet extension installed
 
 :::warning
 
 **Important Security Notes:**
 - Never share your 24-word recovery phrase with anyone
-- Always verify addresses on your Ledger device screen before confirming transactions
+- Always verify addresses and transactions on your Ledger device screen before signing
 - Keep your Ledger device firmware up to date
 
 :::
@@ -51,83 +53,49 @@ Before you begin, ensure you have:
 
 <div class="padding-vert--md"></div>
 
-### 2. Access Your Acurast Account Using Polkadot.js Extension
+### 2. Connect Your Ledger to SubWallet
 
-To interact with Acurast using your Ledger, you'll need the Polkadot.js browser extension:
+To interact with Acurast using your Ledger, you'll connect it through SubWallet:
 
-1. Install the [Polkadot.js extension](https://polkadot.js.org/extension/) for your browser (Chrome, Firefox, or Brave)
-2. Make sure your Ledger device is connected and unlocked
-3. Open the **Polkadot app** on your Ledger device (the screen should display "Polkadot ready")
-4. Open the Polkadot.js extension
-5. Click on the + icon on top right and select Connect Ledger device
-
-<ThemedImage
-  sources={{
-    light: useBaseUrl("/guide/ledger/attach_ledger.png"),
-    dark: useBaseUrl("/guide/ledger/attach_ledger.png"),
-  }}
-/>
-
-6. On the "Import Ledger Account" screen select "Polkadot Relay Chain"
-
-<ThemedImage
-  sources={{
-    light: useBaseUrl("/guide/ledger/select_network.png"),
-    dark: useBaseUrl("/guide/ledger/select_network.png"),
-  }}
-/>
-
-7. Select your connected Ledger device in the next popup and click "connect"
-8. Give your Account a meaningful name, e.g. "Acurast Manager"
-
-<ThemedImage
-  sources={{
-    light: useBaseUrl("/guide/ledger/import_ledger.png"),
-    dark: useBaseUrl("/guide/ledger/import_ledger.png"),
-  }}
-/>
-
-9. Leave Account Type and Index as is, or select your custom derivation path
-10. Click Import (your account should show up after a reload of the extension - close and open it)
+1. Make sure your Ledger device is connected to your computer and unlocked
+2. Open the **Polkadot app** on your Ledger device (the screen should display "Polkadot ready")
+3. Open the SubWallet extension in your browser
+4. Click on the account selector at the top of the extension
+5. Click **"Attach account"**
+6. Select **"Connect a Ledger device"**
+7. In the popup, select your Ledger device and click **"Connect"**
+8. SubWallet will automatically detect and import your Ledger accounts
+9. Select the account(s) you want to import and click **"Import"**
+10. Your Ledger account is now connected to SubWallet
 
 <div class="padding-vert--md"></div>
 
-### 3. Configure Acurast Network in Polkadot.js Apps
+### 3. Enable Acurast Network in SubWallet
 
 To view your Acurast balance and interact with the network:
 
-1. Go to [Polkadot.js Apps](https://polkadot.js.org/apps/)
-2. Connect your account to the page in the polkadot.js popup
-
-<ThemedImage
-  sources={{
-    light: useBaseUrl("/guide/ledger/connect_ledger.png"),
-    dark: useBaseUrl("/guide/ledger/connect_ledger.png"),
-  }}
-/>
-
-3. Click on the network name in the top-left corner
-4. Scroll down to Polkadot & Parachains (for Mainnet) or Kusama & Parachains (for Canary) and select Acurast (via Acurast)
-5. Click the "Switch" icon on top of the sidebar to connect to the Acurast network
-
-<ThemedImage
-  sources={{
-    light: useBaseUrl("/guide/ledger/switch_ledger.png"),
-    dark: useBaseUrl("/guide/ledger/switch_ledger.png"),
-  }}
-/>
-
-6. Your Ledger account should now display your token balance (cACU for Canary or ACU for Mainnet) under Accounts/Accounts
+1. Open the SubWallet extension
+2. Click the **hamburger menu** (three horizontal lines) in the top left
+3. Select **"Manage networks"** or **"Manage chains"**
+4. In the search bar, type **"Acurast"**
+5. Enable the Acurast network by toggling the switch next to it
+   - For Mainnet: Enable **"Acurast"** (coming soon)
+   - For Canary: Enable **"Acurast Canary"**
+6. Close the network settings
+7. Your Ledger account should now display your token balance (ACU for Mainnet or cACU for Canary) in the main view
 
 <div class="padding-vert--md"></div>
 
-### Get the address of your Acurast account on Ledger
+### Get the address of your Acurast account
 
-Your Ledger Acurast address has a different format than the Polkadot address:
+To copy your Acurast address from SubWallet:
 
-1. Go to the account tab on polkadot.js.org/apps (with Acurast set as network)
-2. Make sure the ledger account is connected
-3. Click on the account icon (identicon) to copy & paste your acurast address to the clipboard
+1. Open the SubWallet extension
+2. Make sure you have the Acurast network enabled (see section 3)
+3. Select your Ledger account from the account list
+4. Click on the account name or address to view account details
+5. Click on your address or the **copy icon** to copy your Acurast address to the clipboard
+6. Your address will be in the correct Acurast format
 
 <div class="padding-vert--md"></div>
 
@@ -137,41 +105,31 @@ Your Ledger Acurast address has a different format than the Polkadot address:
 2. Open the **Polkadot app** on your Ledger (it should display "Polkadot ready")
 3. Go to [hub.acurast.com](https://hub.acurast.com/) and click **Enter Hub**
 4. Click **Connect**
-5. In the Polkadot.js extension click "Connect Accounts" and select your account
-
-<ThemedImage
-  sources={{
-    light: useBaseUrl("/guide/ledger/pjs_connect_ledger2.png"),
-    dark: useBaseUrl("/guide/ledger/pjs_connect_ledger2.png"),
-  }}
-/>
-
-6. Select Talisman as your wallet option and the connected account will appear on the bottom of the modal
-
-<ThemedImage
-  sources={{
-    light: useBaseUrl("/guide/ledger/enterhub_ledger.png"),
-    dark: useBaseUrl("/guide/ledger/enterhub_ledger.png"),
-  }}
-/>
-
-7. Select the newly added account from the connect modal to enter the hub
+5. Select **SubWallet** as your wallet option
+6. In the SubWallet extension popup, select your Ledger account
+7. Click **Connect** or **Confirm** to authorize the connection
+8. On the connection modal of the hub, the new account appears, click it to enter the hub
+9. Your Ledger account is now connected to the Acurast Hub
 
 <div class="padding-vert--md"></div>
 
 ### Signing Transactions with Ledger
 
-When you make a transaction on the Acurast Hub:
+When you make a transaction using SubWallet with your Ledger:
 
-1. Your Ledger device will prompt you to review the transaction details
-2. **Carefully verify** the transaction information on your Ledger screen:
+1. Initiate a transaction in the Acurast Hub or SubWallet extension
+2. SubWallet will prompt you with a Signature Request to confirm the transaction
+3. Make sure your Ledger device is connected and unlocked with the Polkadot app open
+4. In SubWallet make sure the correct account is selected and click **"Approve"** (with the ledger symbol)
+5. Your Ledger device will display the transaction details for review
+6. **Carefully verify** the transaction information on your Ledger screen:
    - Transaction type
    - Amount (if applicable)
    - Destination address
    - Fees
-3. Use the buttons on your Ledger to navigate through the transaction details
-4. If everything is correct, approve the transaction on your Ledger device
-5. The transaction will be broadcast to the Acurast network
+6. Use the buttons on your Ledger to navigate through the transaction details
+7. If everything is correct, approve the transaction on your Ledger device by pressing both buttons
+8. SubWallet will process the signed transaction and broadcast it to the Acurast network
 
 <div class="padding-vert--md"></div>
 
@@ -181,7 +139,6 @@ When you make a transaction on the Acurast Hub:
 - Make sure your Ledger device is unlocked and the Polkadot app is open
 - Try a different USB cable or port
 - Ensure Ledger Live is closed (it can interfere with browser access)
-- Enable "Blind signing" in the Polkadot app settings on your Ledger if required
 
 **Transaction fails:**
 - Verify you have sufficient token balance for transaction fees (cACU for Canary or ACU for Mainnet)
@@ -193,5 +150,4 @@ When you make a transaction on the Acurast Hub:
 ### Additional Resources
 
 - [Ledger Official Support](https://support.ledger.com/)
-- [Polkadot.js Extension](https://polkadot.js.org/extension/)
 - [Polkadot on Ledger Guide](https://support.ledger.com/hc/en-us/articles/360016289919)
