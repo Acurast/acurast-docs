@@ -21,7 +21,17 @@ const sidebars = {
     "introduction",
     "roadmap",
     "tokenomics",
-    "staked-compute",
+    {
+      type: "category",
+      label: "Staked Compute",
+      items: [
+        "staked-compute",
+        "staked-compute/pool-distribution",
+        "staked-compute/operations",
+        "staked-compute/admin-operations",
+      ],
+      collapsed: true,
+    },
     {
       type: "category",
       label: "Developers",
