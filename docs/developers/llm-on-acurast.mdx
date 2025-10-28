@@ -9,13 +9,13 @@ import TOCInline from "@theme/TOCInline";
 
 ## Introduction
 
-In this tutorial, we will guide you through the process of deploying and running an LLM on Acurast.
+This tutorial walks you through deploying and running an LLM on Acurast.
 
 Acurast includes a module for running LLMs. Most models from [Hugging Face](https://huggingface.co/) in the `GGUF` format are supported.
 
 :::tip
 
-If you prefer to jump right in, you can take a look at our example project:
+If you prefer to jump right in, you can take a look at the example project:
 
 - [LLMs on Acurast](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-llm)
 
@@ -48,7 +48,7 @@ The structure of a project looks exactly like a normal Node.js project:
 └── webpack.config.js
 ```
 
-There is only one file that is specific to Acurast, which is `acurast.json`. This file is used to configure the deployment, and we will come back to it later in the tutorial.
+There is only one file that is specific to Acurast: `acurast.json`. This file configures the deployment and is covered later in the tutorial.
 
 ### Writing the code
 
@@ -116,7 +116,7 @@ async function main() {
 main();
 ```
 
-In this code, we first download a model from Hugging Face, then start the integrated LLM server and load it. Finally, we use localtunnel to make the server publicly available.
+This code first downloads a model from Hugging Face, then starts the integrated LLM server and loads it. Finally, it uses localtunnel to make the server publicly available.
 
 :::tip
 
@@ -124,17 +124,17 @@ The API is compatible with the [OpenAI-like API endpoints](https://lmstudio.ai/d
 
 :::
 
-We need to set the `LOCALTUNNEL_SUBDOMAIN` variable to specifiy where our server will be available. If we set it to `llm`, then the URL will be `https://llm.acu.run`.
+Set the `LOCALTUNNEL_SUBDOMAIN` variable to specify where the server will be available. If set to `llm`, the URL will be `https://llm.acu.run`.
 
 :::note
 
-This localtunnel server is not secure and should not be used in production. We are working on making this secure by default, but if you need a secure way to host your project now, please reach out to us.
+This localtunnel server is not secure and should not be used in production. Work is underway to make this secure by default, but if a secure way to host your project is needed now, please reach out via the community channels.
 
 :::
 
 ### Building the project
 
-To deploy a project to the Acurast Cloud, it needs to be bundled into a single js file. In our example, we use webpack. You can find the configuration in the example project on [GitHub](https://github.com/Acurast/acurast-example-apps/blob/main/apps/app-llm/)
+To deploy a project to the Acurast Cloud, it needs to be bundled into a single js file. This example uses webpack. You can find the configuration in the example project on [GitHub](https://github.com/Acurast/acurast-example-apps/blob/main/apps/app-llm/)
 
 Running `npm run bundle` will then output a single js file which includes all necessary dependencies.
 
@@ -144,7 +144,7 @@ This is the file that will be deployed to the Acurast Cloud.
 
 ## Setting up the Acurast CLI
 
-Now that our app is ready, we need to set up the Acurast CLI. The CLI is a tool that allows you to deploy and manage your applications on the Acurast Cloud.
+Now that the app is ready, the Acurast CLI needs to be set up. The CLI is a tool that allows you to deploy and manage your applications on the Acurast Cloud.
 
 ### Installation
 
@@ -182,7 +182,7 @@ Commands:
 
 ### Adding Acurast Config to the Project
 
-The next step is to add the Acurast Config to our project. To do that, run the following command:
+The next step is to add the Acurast Config to the project. To do that, run the following command:
 
 ```bash
 acurast init
@@ -194,7 +194,7 @@ If you checked out the sample project, the `acurast.json` already exists, so thi
 
 ### Getting ready for Deployment
 
-To deploy our application, we still need to do one thing. Getting some tokens from the faucet.
+To deploy the application, one more step is needed: getting some tokens from the faucet.
 
 > [!TIP]
 > You can import the mnemonic that was generated and stored in the .env file and import it in Talisman (Browser Extension) to access the same account in the [Web Console](https://hub.acurast.com/).
@@ -245,7 +245,7 @@ Success! You've successfully deployed your first application on Acurast!
 
 ## Conclusion
 
-Congratulations! You've successfully deployed your first application on Acurast! For more advanced features and detailed documentation, refer to [Acurast CLI Documentation](https://github.com/Acurast/acurast-cli/blob/main/README.md). Also make sure to join our Telegram or Discord to be part of our community!
+Congratulations! You've successfully deployed your first application on Acurast! For more advanced features and detailed documentation, refer to [Acurast CLI Documentation](https://github.com/Acurast/acurast-cli/blob/main/README.md). Also make sure to join the Telegram or Discord to be part of the community!
 
 ## More Examples
 
