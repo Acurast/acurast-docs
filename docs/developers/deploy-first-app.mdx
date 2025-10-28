@@ -28,7 +28,7 @@ This tutorial will guide you through deploying a simple application on Acurast. 
 
 :::tip
 
-If you prefer to jump right in, you can take a look at one of our example projects:
+If you prefer to jump right in, you can take a look at one of the example projects:
 
 - [Express Server on Acurast](https://github.com/Acurast/acurast-example-apps/tree/26ebfb27b1f0bdf4a146acafa792d47c155a34d5/apps/app-webserver)
 - [Fetch data from an API](https://github.com/Acurast/acurast-example-apps/tree/26ebfb27b1f0bdf4a146acafa792d47c155a34d5/apps/app-fetch).
@@ -62,7 +62,7 @@ The structure of a project looks exactly like a normal Node.js project:
 └── webpack.config.js
 ```
 
-There is only one file that is specific to Acurast, which is `acurast.json`. This file is used to configure the deployment, and we will come back to it later in the tutorial.
+There is only one file that is specific to Acurast: `acurast.json`. This file configures the deployment and is covered later in the tutorial.
 
 ### Writing the code
 
@@ -70,7 +70,7 @@ First, let's start by creating a simple node.js project. You can find the code o
 
 If you're interested only in the Acurast part of the tutorial, feel free to skip to the "Installing the Acurast CLI" step.
 
-The app we will build is a simple Express server that will return a "Hello, World!" message. This is the code of the app:
+This app is a simple Express server that returns a "Hello, World!" message. This is the code of the app:
 
 ```typescript
 import express from "express";
@@ -115,19 +115,19 @@ const startTunnel = async () => {
 startTunnel();
 ```
 
-In this code, we start a webserver using express on port 3000. We then start a localtunnel tunnel to make the server publicly available.
+This code starts a webserver using express on port 3000, then starts a localtunnel tunnel to make the server publicly available.
 
-We need to set the `LOCALTUNNEL_SUBDOMAIN` variable to specifiy where our server will be available. If we set it to `example`, then the URL will be `https://example.acu.run`.
+Set the `LOCALTUNNEL_SUBDOMAIN` variable to specify where the server will be available. If set to `example`, the URL will be `https://example.acu.run`.
 
 :::note
 
-This localtunnel server is not secure and should not be used in production. We are working on making this secure by default, but if you need a secure way to host your project now, please reach out to us.
+This localtunnel server is not secure and should not be used in production. Work is underway to make this secure by default, but if a secure way to host your project is needed now, please reach out via the community channels.
 
 :::
 
 ### Building the project
 
-To deploy a project to the Acurast Cloud, it needs to be bundled into a single js file. In our example, we use webpack. You can find the configuration in the example project on [GitHub](https://github.com/Acurast/acurast-example-apps/blob/26ebfb27b1f0bdf4a146acafa792d47c155a34d5/apps/app-webserver/)
+To deploy a project to the Acurast Cloud, it needs to be bundled into a single js file. This example uses webpack. You can find the configuration in the example project on [GitHub](https://github.com/Acurast/acurast-example-apps/blob/26ebfb27b1f0bdf4a146acafa792d47c155a34d5/apps/app-webserver/)
 
 Running `npm run bundle` will then output a single js file which includes all necessary dependencies.
 
@@ -137,7 +137,7 @@ This is the file that will be deployed to the Acurast Cloud. You can run it loca
 
 ## Setting up the Acurast CLI
 
-Now that our app is ready, we need to set up the Acurast CLI. The CLI is a tool that allows you to deploy and manage your applications on the Acurast Cloud.
+Now that the app is ready, the Acurast CLI needs to be set up. The CLI is a tool that allows you to deploy and manage your applications on the Acurast Cloud.
 
 ### Installation
 
@@ -175,7 +175,7 @@ Commands:
 
 ### Adding Acurast Config to the Project
 
-The next step is to add the Acurast Config to our project. To do that, run the following command:
+The next step is to add the Acurast Config to the project. To do that, run the following command:
 
 ```bash
 acurast init
@@ -204,7 +204,7 @@ No package.json file found. This is unusual. Are you sure you are in the right d
 You can deploy your app using 'acurast deploy'
 ```
 
-During the setup process, we set default values for most of the parameters, and they should work well for our example. You can always open the `acurast.json` file and change the configuration there. In the [CLI Docs](https://github.com/Acurast/acurast-cli?tab=readme-ov-file#configuration-details) you will find more information about the possible configurations.
+During the setup process, default values are set for most of the parameters, and they should work well for this example. You can always open the `acurast.json` file and change the configuration there. In the [CLI Docs](https://github.com/Acurast/acurast-cli?tab=readme-ov-file#configuration-details) you will find more information about the possible configurations.
 
 These are the files that were generated:
 
@@ -252,7 +252,7 @@ ACURAST_MNEMONIC=bounce crack ostrich put entry comic wage all tilt nature rebel
 
 ### Getting ready for Deployment
 
-To deploy our application, we still need to do one thing. Getting some tokens from the faucet.
+To deploy the application, one more step is needed: getting some tokens from the faucet.
 
 > [!TIP]
 > You can import the mnemonic that was generated and stored in the .env file and import it in Talisman (Browser Extension) to access the same account in the [Web Console](https://hub.acurast.com/).
@@ -313,7 +313,7 @@ To use environment variables in your project, you first need to add them to the 
 API_KEY=your-api-key
 ```
 
-To configure which of your deployments make use of the environment variables, we need to edit the `acurast.json` file and add all the environment variables we want to include in the deployment to the `includeEnvironmentVariables` array.
+To configure which of your deployments make use of the environment variables, edit the `acurast.json` file and add all the environment variables to include in the deployment to the `includeEnvironmentVariables` array.
 
 ```json
 {
@@ -359,7 +359,7 @@ If you run an interval based deployment with multiple executions, then you can e
 
 ## Conclusion
 
-Congratulations! You've successfully deployed your first application on Acurast! For more advanced features and detailed documentation, refer to [Acurast CLI Documentation](https://github.com/Acurast/acurast-cli/blob/main/README.md). Also make sure to join our Telegram or Discord to be part of our community!
+Congratulations! You've successfully deployed your first application on Acurast! For more advanced features and detailed documentation, refer to [Acurast CLI Documentation](https://github.com/Acurast/acurast-cli/blob/main/README.md). Also make sure to join the Telegram or Discord to be part of the community!
 
 ## More Examples
 
