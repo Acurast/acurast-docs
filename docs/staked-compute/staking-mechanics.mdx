@@ -1,0 +1,152 @@
+---
+title: Staking Mechanics
+slug: /staked-compute/staking-mechanics
+---
+
+import ThemedImage from "@theme/ThemedImage";
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
+:::info Under Review
+
+The content on this page is currently under review and subject to change.
+
+:::
+
+## How to Stake
+
+On the Staking page in the Acurast Hub, users can stake and have an overview over their Stakes and Delegations.
+
+To create a stake, Compute Providers (aka Committers) have to:
+
+1. Compute: select the amount of Compute they are comfortable to commit.
+2. Cooldown: select the Cooldown period. The cooldown period is measured in blocks. The Staking Frontend also provides an estimate expressed in time (days etc.)
+3. Tokens: Select the amount of tokens to stake
+4. Compound: Select if Autocompoundung is ON or OFF
+
+To do a delegation, Delgators have to:
+
+1. Committer: Select a Committer
+2. Cooldown: Select a Cooldown period
+3. Tokens: Select the amount of tokens to delegate
+4. Compound: Select if Autocompoundung is ON or OFF
+
+## How Compute is measured
+
+### What is Current Compute?
+
+The measured compute of a Compute Provider is displayed as **Current Compute** on the Staking frontend. It represents the total computational capacity across all of a provider's devices, broken down into four benchmark metrics: CPU Single Core, CPU Multi Core, RAM, and Storage.
+
+### How Benchmarks Are Measured
+
+Compute is measured through four benchmark tests conducted on every device running the Acurast processor. These tests run automatically during each device heartbeat (every 30 minutes) and the results are reported on-chain. At least one valid benchmark report per epoch (900 blocks / roughly 90 minutes) is required to maintain a device's measured compute. Read more about the technical aspects of the benchmarks [here](/processors/benchmarks).
+
+### Benchmark Metric Weights
+
+Each of the four benchmark metrics has a weight assigned to reflect its importance to the Acurast network's computational requirements and resource priorities:
+
+| Benchmark Metric | Weight |
+|-----------------|--------|
+| CPU Single Core | 0.2307 |
+| CPU Multi Core | 0.2307 |
+| RAM | 0.4615 |
+| Storage | 0.0769 |
+
+These weights ensure that providers are incentivized to maintain balanced, high-quality compute resources, with RAM being the most heavily weighted metric due to its critical role in application performance.
+
+The Staking frontend is showing the four metrics, as measured in the last epoch for each Committer.
+
+## Rewards
+
+Staking rewards are generated from Acurast's token inflation and distributed every epoch to committers and delegators who support the network. The amount each participant earns depends on three key factors: the strength of their committed compute (measured by benchmark scores), the size of their staked tokens, and the length of their cooldown period. In short: stronger hardware, bigger stake, longer commitment = bigger rewards.
+
+## Reward Flow
+
+Staking Rewards trickle down through several pools and are split up:
+
+**Inflation → Staked Compute Pool**
+
+Each epoch, a share of the inflation (70% on Mainnet / 1% on Canary) goes to the Staked Compute Pool. These reward tokens are created by block producers and minted directly into the Staked Compute Pool.
+
+**Staked Compute Pool → 4 Benchmark metric pools**
+
+From the Staked Compute Pool, the reward tokens are further split between four Benchmark Metric Pools according to the Benchmark Metric Weights
+
+**Benchmark Metric Pools → Committers**
+
+The share of rewards each committer gets depends on the following factors, which can be chosen or influenced by the committer when creating the stake. The reward split is calculated per Benchmark Metric Pool:
+
+`weight = benchmark_score * stake_amount * cooldown`
+
+In short: stronger hardware, bigger stake, longer commitment = bigger rewards.
+
+**Committer's Share → Self vs. Delegators**
+
+A committer's reward is split between their own stake and the total stake of their delegators, relative to the token amounts.
+
+**Delegators Split**
+
+The remaining delegator rewards are split between all delegators of the same committer, according to each delegator's stake weight. Also the delegation fee is split of to the Committer. The following factors influence delegation rewards:
+
+`rewards = stake_amount * commit_time - delegation fee - potential committer slashings`
+
+### Where the rewards come from
+
+Acurast inflates its token supply every year, by 5% (currently, can be changed by governance). That inflation is split between the following pools:
+
+**On Mainnet:**
+- 70% → Staked Compute Pool (The rewards for Staking)
+- 15% → Treasury
+- 10% → Benchmark rewards (Base rewards processors, shared in relation to the benchmarks, independent from Staking)
+- 5% → Acurast blockchain block producers (Collators aka Validators)
+
+<ThemedImage
+  sources={{
+    light: useBaseUrl("/img/inflation.png"),
+    dark: useBaseUrl("/img/inflation.png"),
+  }}
+/>
+
+**On Canary:**
+- 1% → Staked Compute Pool (The rewards for Staking)
+- 99% → Benchmark rewards (Base rewards processors, shared in relation to the benchmarks, independent from Staking)
+
+### When are rewards distributed
+
+Rewards are distributed to every committer and their delegators once every epoch (one epoch is 900 blocks) with the first reported heartbeat of the committer.
+
+## Rewards to be Expected
+
+Staking rewards in the Acurast network are dynamic and cannot be precisely predicted in advance, as they depend on the collective behavior of all participants. Individual rewards are determined by the participant's share of the total network commitment - calculated from benchmark scores, stake size, and cooldown duration relative to all other stakers. As more participants join with varying parameters, or as existing participants adjust their commitments, the reward distribution shifts accordingly. Additionally, rewards are split across four separate benchmark metric pools, meaning performance in each metric directly impacts the share of that pool's rewards.
+
+Once the system goes live and staking activity stabilizes, estimated Annual Percentage Rates (APR) will become available to help participants gauge potential returns. However, the fundamental principle remains: stronger hardware, larger stakes, and longer commitment periods will always yield proportionally higher rewards compared to participants with lower commitment levels.
+
+## Impact of Cooldown on Rewards and Slashings
+
+### Reduced Rewards During Cooldown
+
+When a committer triggers the cooldown period to exit their stake, both their reward weight and their delegators' reward weights are immediately reduced to 50% of the previous value. This means that throughout the entire cooldown period, the committer and all their delegators will earn only half the staking rewards they earned before cooldown was initiated. This reduction reflects the reduced commitment to the network, as the participant has signaled their intention to withdraw.
+
+### Slashing Remains at Full Rate
+
+Importantly, while rewards are halved during cooldown, slashing penalties are not reduced. Committers must continue to maintain their full committed compute throughout the cooldown period, and any shortfalls will result in standard slashing penalties calculated at 100% of the normal rate. This ensures that committers cannot reduce their hardware commitment once they've initiated cooldown - they must maintain their promised compute capacity until the cooldown period ends and they finalize their stake.
+
+## Staking Lifecycle
+
+**Committer:**
+
+* **Start staking:** Committer chooses the amount of computation to commit, tokens to stake, and cooldown length, then creates a stake.
+* **While staking:** Committers can add more tokens to the stake, increase duration and committed compute, and either compound or withdraw rewards. They must maintain their committed compute level to avoid slashing.
+* **Exit staking:** Committer triggers cooldown (reducing rewards to 50% but maintaining full slashing risk) and waits until it ends.
+* **Finalize (Withdraw/Claim):** After cooldown ends, committer finalizes the stake, withdrawing the unlocked funds and any unclaimed rewards.
+
+**Delegator:**
+
+* **Start Staking:** Delegators choose one or several committers to delegate to, then select the amount of tokens and cooldown period (which cannot exceed their chosen committer's cooldown).
+* **While staking:** Delegators can add more tokens, increase duration, compound or withdraw rewards. They can also redelegate their stake to a different committer with equal or greater parameters (committed compute, stake size, and cooldown duration).
+* **Exit staking:** Delegator triggers cooldown (reducing rewards to 50%) and waits until it ends.
+* **Finalize (Withdraw/Claim):** After cooldown ends, delegator finalizes the stake, withdrawing the unlocked funds and any unclaimed rewards.
+
+
+## Reward compounding (Autocompound)
+
+When creating a stake, committers and delegators can choose whether their staking rewards should be automatically compounded (immediately added back to their stake) or made available for withdrawal. If they choose not to autocompound, rewards accumulate and can be withdrawn at any time - users are then free to move these rewards or manually stake them again. Autocompounding simply automates this process, maximizing reward growth over time without requiring manual action.

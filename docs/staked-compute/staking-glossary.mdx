@@ -1,0 +1,93 @@
+---
+title: Staking Glossary
+slug: /staked-compute/staking-glossary
+---
+
+:::info Under Review
+
+The content on this page is currently under review and subject to change.
+
+:::
+
+# Staking Glossary
+
+## Core Concepts
+
+### Compute Provider
+(aka Manager): A user that runs the Acurast processor app on one or more phones.
+
+### Committer
+(aka Staker, Manager, Compute Provider): A user that is a Compute Provider who commits compute by Staking.
+
+### Delegator
+Users that are Staking Acurast tokens with Committer by attaching their stake to a Committer's stake.
+
+### Stake
+A Committers commitment, backed by an amount of Committed Compute, an amount of Acurast tokens and a Cooldown period of a chosen length.
+
+## Compute Metrics
+
+### Benchmark Metrics
+Four standardized tests that measure a device's computational capacity: CPU Single Core (0.2307 weight), CPU Multi Core (0.2307 weight), RAM Size (0.4615 weight), and Storage Size (0.0769 weight). These metrics are measured during every device heartbeat and reported on-chain to determine Current Compute and calculate rewards and slashing.
+
+### Current Compute
+The amount of compute that was measured across all processors in the last epoch for a specific Compute Provider. During that epoch, all devices ideally had written three heartbeats including three benchmark results. In order to determine the Current Compute for an epoch the ??? latest ??? recorded heartbeat off all devices are being used.
+
+### Committed Compute
+The amount of compute a Compute Provider commits to providing during the lifetime of a Stake, including its Cooldown period.
+
+### Stake Health
+The health state of a Stake, regarding the Current Compute in relation to the Committed Compute.
+
+## Staking Mechanics
+
+### Cooldown
+A countdown triggered when a user chooses to exit their stake. During the cooldown period, reward weights are reduced to 50% while slashing risk remains at 100%. When the cooldown period ends, the stake can be finalized and tokens become unlocked and transferable again. The cooldown is measured in blocks (minimum 28 days, maximum ~3.68 years).
+
+### Unstake
+The process of signaling the intention to end a Stake. Unstaking triggers the Cooldown.
+
+### Finalize
+The process of withdrawing a stake after the cooldown period has ended, returning the unlocked tokens and any unclaimed rewards to the staker or delegator. Also called "claiming a finalized stake."
+
+### Recommit
+After starting cooldown on a stake, users can choose to recommit if they change their mind. Recommitting immediately restores reward weight and vote weight to 100% and resets the cooldown countdown, returning the stake to its active state.
+
+## Rewards & Penalties
+
+### Total Staking Rewards
+The rewards paid to all Stakers by the inflation of the Acurast Blockchain per epoch.
+
+### Autocompounding
+Adding accrued rewards to the existing Stake instead of claiming them.
+
+### Claiming rewards
+Requesting the accrued rewards to be sent to the Staker or Delegator.
+
+### Slashing
+A penalty that can be forced upon Committers, if they do not succeed in keeping up the amount of Compute they committed to (the Committed Compute).
+
+### Slasher
+A user that triggers Slashing for a Stake that did not provide enough Compute to match its Committed Compute.
+
+### Slasher's Reward
+A percentage of the slashed amount, that is given to the Slasher as a reward for detecting a violated compute commitment.
+
+## Delegation
+
+### Redelegate
+Detaching a running Delegation from one Committer and attaching it to a new Committer. Can only be done if the new Committer shares the exact same or higher parameters (Committed Compute, Staked Tokens, Cooldown duration) than the previous Committer and is not in Cooldown.
+
+### Delegation Fee
+A fee Committers can set once upon creating a Stake and will receive from the rewards of the Delegations attached to their stake. The Delegation fee can not change during the lifetime of a Stake.
+
+### Delegation Capacity
+The amount of delegations a Committer can accept.
+
+## Time & Measurement
+
+### Epoch
+One epoch equals 900 blocks (approximately 1.5 hours).
+
+### Heartbeat
+A sign of life that all Acurast Processors emit in the form of a transaction that is sent to the Acurast blockchain. The heartbeat information also contains the results of a new benchmark test. Usually heartbeat is emitted and recorded once per cycle, which is three times per epoch. If a processor is offline, it will not emit heartbeats.
