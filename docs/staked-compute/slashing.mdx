@@ -1,0 +1,51 @@
+---
+title: Slashing
+slug: /staked-compute/slashing
+---
+
+:::info Under Review
+
+The content on this page is currently under review and subject to change.
+
+:::
+
+## How Slashing Works
+
+Slashing is a penalty mechanism designed to ensure committers keep their promise of providing consistent compute power over time. If a committer fails to stay online or their measured compute in any of the four benchmark metrics falls below what they committed - for example, because phones went offline and were not replaced - their stake gets slashed in proportion to the shortfall. For instance, if a committer promised 100 GB of RAM but only delivers 80 GB, they will be slashed proportionally for that 20% shortfall in the RAM metric.
+
+This mechanism incentivizes providers to actively maintain their deployed Acurast phones and farms, ensuring they're always running and replacing capacity with equally powerful devices when needed. Both the committer and their delegators share this risk, as slashing affects all staked tokens proportionally.
+
+### When Slashing Occurs
+
+When a committer's Current Compute falls below their Committed Compute in any of the four benchmark metrics during an epoch, they become slashable for that epoch. Slashing must be triggered on-chain by a **Slasher**- anyone with an Acurast account who detects the violation.
+
+### How Penalties Are Calculated
+
+Once slashing is triggered, penalties are calculated independently for each Benchmar Metric where there's a shortfall. The slashing amount for each metric is determined by multiplying the stake amount by the maximum slash rate (1% per epoch), the metric's weight, and the percentage shortfall.
+
+For example, if a committer with a 1,000-token stake falls 50% short on RAM (which has a weight of 0.4615), they would be slashed 2.3075 tokens for that metric alone. If they have shortfalls across multiple metrics, each penalty is calculated separately and then summed together - though the total can never exceed 1% of the stake per epoch.
+
+### Slashing Examples
+
+_Example 1: Complete Loss of Compute_
+
+A committer has a 1,000-token stake. In an observed epoch, their Current Compute falls 100% short in all four metrics (CPU Single, CPU Multi, RAM, and Storage). Since they failed to provide any of their committed compute, they face the maximum penalty of 1% of their stake, resulting in a total slash of 10 tokens. This breaks down as: 2.307 tokens for CPU Single Core, 2.307 tokens for CPU Multi Core, 4.615 tokens for RAM, and 0.769 tokens for Storage.
+
+_Example 2 (fictional): Partial Loss of exactly 50% Across All Metrics_
+
+A committer has a 1,000-token stake. In an observed epoch, their compute falls 50% short across all four metrics. They are slashed proportionally: 1.1535 tokens for CPU Single Core, 1.1535 tokens for CPU Multi Core, 2.3075 tokens for RAM, and 0.3845 tokens for Storage - totaling 5 tokens (0.5% of their stake).
+
+_Example 3 (realistic): Variable Shortfalls_
+
+A committer has a 1,000-token stake. In an observed epoch, their compute falls short by different amounts: 12% in CPU Single Core, 15% in CPU Multi Core, 10% in RAM, and 12% in Storage. The resulting penalties are: 0.27684 tokens for CPU Single Core, 0.34605 tokens for CPU Multi Core, 0.4615 tokens for RAM, and 0.09228 tokens for Storage - totaling approximately 1.18 tokens slashed.
+
+
+### What Happens to Slashed Tokens
+
+Of the slashed amount, 10% goes to the Slasher as a reward for detecting the violation, while the remaining 90% is immediately burned, reducing total supply and inflation.
+
+## Slashing Impact
+
+Importantly, committers still earn rewards for any metrics where they met their commitment; only metrics with shortfalls result in slashing. This means partial performance is still rewarded, while failures are penalized proportionally.
+
+Just as rewards flow from committers to their delegators, slashing penalties also affect delegators proportionally based on their stake. When a committer is slashed, each delegator loses the same percentage of their delegated stake as the committer loses from their own stake. However, delegators can redelegate to another committer at any time if they're concerned about their chosen committer's performance.

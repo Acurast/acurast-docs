@@ -21,7 +21,6 @@ const sidebars = {
     "introduction",
     "roadmap",
     "tokenomics",
-    "staked-compute",
     {
       type: "category",
       label: "Developers",
@@ -46,6 +45,19 @@ const sidebars = {
         "processors/acurast-processors",
         "processors/rewards",
         "processors/benchmarks",
+      ],
+      collapsed: false,
+    },
+    {
+      type: "category",
+      label: "Staked Compute",
+      items: [
+        "staked-compute/overview",
+        "staked-compute/staking-mechanics",
+        "staked-compute/slashing",
+        "staked-compute/mainnet-vs-canary",
+        "staked-compute/staking-faq",
+        "staked-compute/staking-glossary",
       ],
       collapsed: false,
     },
