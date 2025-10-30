@@ -73,11 +73,16 @@ From the Staked Compute Pool, the reward tokens are further split between four B
 
 **Benchmark Metric Pools → Committers**
 
-The share of rewards each committer gets depends on the following factors, which can be chosen or influenced by the committer when creating the stake. The reward split is calculated per Benchmark Metric Pool:
-
-`weight = benchmark_score * stake_amount * cooldown`
+The share of rewards each committer gets depends on a score calculated from following factors, which can be chosen or influenced by the committer when creating the stake.
 
 In short: stronger hardware, bigger stake, longer commitment = bigger rewards.
+
+The reward split is calculated per Benchmark Metric Pool, and the relative weight compared to other participants is calculated as
+
+`weight = min(sqrt(benchmarked_metric * stake_amount * cooldown/max_cooldown), target_weight_per_compute * benchmarked_metric)`.
+
+The minimum is to ensure that the stake backing a single farm stays within a reasonable range, derived from a global `target_weight_per_compute` that expresses the ideal staking rate given the current compute offered over our system.
+
 
 **Committer's Share → Self vs. Delegators**
 
