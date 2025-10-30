@@ -21,7 +21,7 @@ When a committer's Current Compute falls below their Committed Compute in any of
 
 ### How Penalties Are Calculated
 
-Once slashing is triggered, penalties are calculated independently for each Benchmar Metric where there's a shortfall. The slashing amount for each metric is determined by multiplying the stake amount by the maximum slash rate (1% per epoch), the metric's weight, and the percentage shortfall.
+Once slashing is triggered, penalties are calculated independently for each Benchmark Metric where there's a shortfall. The slashing amount for each metric is determined by multiplying the stake amount by the maximum slash rate (1% per epoch), the metric's weight, and the percentage shortfall.
 
 For example, if a committer with a 1,000-token stake falls 50% short on RAM (which has a weight of 0.4615), they would be slashed 2.3075 tokens for that metric alone. If they have shortfalls across multiple metrics, each penalty is calculated separately and then summed together - though the total can never exceed 1% of the stake per epoch.
 
