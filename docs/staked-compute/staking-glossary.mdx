@@ -42,7 +42,7 @@ The health state of a Stake, regarding the Current Compute in relation to the Co
 ## Staking Mechanics
 
 ### Cooldown
-A countdown triggered when a user chooses to exit their stake. During the cooldown period, reward weights are reduced to 50% while slashing risk remains at 100%. When the cooldown period ends, the stake can be finalized and tokens become unlocked and transferable again. The cooldown is measured in blocks (minimum 28 days, maximum ~3.68 years).
+A countdown triggered when a user chooses to exit their stake. During the cooldown period, reward weights are reduced to 50% while slashing risk remains at 100%. When the cooldown period ends, the stake can be finalized and tokens become unlocked and transferable again. The cooldown is measured in blocks and ranges differ by network: Mainnet (28 days to ~3.68 years) and Canary (1 hour to 48 hours). See [Mainnet vs. Canary](/staked-compute/mainnet-vs-canary) for details.
 
 ### Unstake
 The process of signaling the intention to end a Stake. Unstaking triggers the Cooldown.
