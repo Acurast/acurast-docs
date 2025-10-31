@@ -74,25 +74,42 @@ From the Staked Compute Pool, the reward tokens are further split between four B
 **Benchmark Metric Pools → Committers**
 
 The share of rewards each committer gets depends on a score calculated from following factors, which can be chosen or influenced by the committer when creating the stake.
+The share of rewards each committer gets depends on a score calculated from following factors, which can be chosen or influenced by the committer when creating the stake.
 
 In short: stronger hardware, bigger stake, longer commitment = bigger rewards.
 
-The reward split is calculated per Benchmark Metric Pool, and the relative weight compared to other participants is calculated as
+The reward split is calculated per Benchmark Metric Pool, and the relative score of a participant $c$ compared to other participants is calculated as
 
-`weight = min(sqrt(benchmarked_metric * stake_amount * cooldown/max_cooldown), target_weight_per_compute * benchmarked_metric)`.
+$$
+\text{committer\_score}_c = \min\left(\sqrt{\text{metric}_c \times \text{stake}_c \times \frac{\text{cooldown}_c}{\text{max\_cooldown}}}, \; T \times \text{metric}_c\right).
+$$
 
-The minimum is to ensure that the stake backing a single farm stays within a reasonable range, derived from a global `target_weight_per_compute` that expresses the ideal staking rate given the current compute offered over our system.
+The minimum ensures that the stake backing a single farm stays within a reasonable range, derived from a global $\text{target\_weight\_per\_compute}$
+
+$$
+T := \frac{0.8 \times \text{total\ supply}}{\text{total\ benchmarked\ metric}}
+$$
+
+that expresses the ideal staking rate given the current compute offered over our system.
+
+We later refer to this product by $\text{weight}$
+
+$$
+\text{weight} := \text{stake} \times \frac{\text{cooldown}}{\text{max\_cooldown}}
+$$
 
 
 **Committer's Share → Self vs. Delegators**
 
-A committer's reward is split between their own stake and the total stake of their delegators, relative to the token amounts.
+A committer's reward is split between their own weight and the total weight of their delegators, relative to the token amounts and chosen cooldown periods.
 
 **Delegators Split**
 
-The remaining delegator rewards are split between all delegators of the same committer, according to each delegator's stake weight. Also the delegation fee is split of to the Committer. The following factors influence delegation rewards:
+The remaining delegator rewards are split between all delegators of the same committer, according to each delegator's weight. Also the delegation fee is split off to the Committer. The following factors influence delegation rewards for a delegator $d$ towards a committer $c$:
 
-`rewards = stake_amount * commit_time - delegation fee - potential committer slashings`
+$$
+\text{delegator\ reward}_d = \text{delegator\ weight}_d - \text{delegation\ fee}_c - \text{potential\ slashings}_c
+$$
 
 ### Where the rewards come from
 
