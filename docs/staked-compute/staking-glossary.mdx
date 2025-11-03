@@ -88,6 +88,12 @@ The delegation fee is expressed as a percentage and is deducted from the delegat
 ### Delegation Capacity
 The amount of delegations a Committer can accept.
 
+### Stale Delegation
+A Delegation is stale if the Committer it was delegated to did trigger a cooldown which did end. A stale delegation will not earn any rewards and should be finalized.
+
+### Committer in Cooldown
+A delegation shows "Committer in cooldown" to indicate that the Committer this delegation was delegated to, started the cooldown. All following rewards will be halved, while slashing penalty will stay the same. Delegators can choose to trigger their own cooldown or to delegate to a different committer.
+
 ## Time & Measurement
 
 ### Epoch
