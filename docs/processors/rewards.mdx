@@ -10,10 +10,6 @@ As a Compute Provider running Acurast Processors, you receive rewards for contri
 
 ## Reward Types
 
-### Deployment Rewards
-
-Tokens (cACU on Canary, ACU on Mainnet) are rewarded when a processor's compute power is used by developers to run code. Developers that deploy to the Acurast Cloud pay a fee for the compute power used. When your Processor has been matched and does execute a deployment, you'll receive a share part of those fees collected.
-
 ### Base Benchmark Rewards (Compute Pool)
 
 Providers receive rewards based on the [benchmarks](/acurast-processors/benchmarks) of their participating devices. These rewards are paid from Acurast's token inflation. On Canary and Mainnet, a total of 10% of Acurast's inflation are distributed per epoch (900 blocks / roughly every 1.5 hours). This equals to 856.164 tokens per epoch to distributed as Base Benchmark Rewards (Compute Pool) among all Compute Providers, independent of their participation in Staked Compute. These rewards are split up to the different benchmarks pools and each phone competes with the others in the 4 benchmark pools. Higher specs usually lead to higher Base Benchmark Rewards (Compute Pool).
@@ -31,6 +27,10 @@ Compute Providers who participate in [Staked Compute](/staked-compute/overview) 
   <img src="/img/inflation.png" alt="Acurast Inflation Distribution" />
   <p style={{marginTop: '4px', fontSize: '0.875rem', fontStyle: 'italic', color: '#6b7280'}}>Acurast Inflation Distribution</p>
 </div>
+
+### Deployment Execution Bonus
+
+When a processor is detected executing a deployment during an epoch, it receives a bonus weight on the Benchmark Metrics that increases its scoring - and therefore its rewards - in both the Staked Compute Pool and the Compute Pool (Base Benchmarking Rewards) for that epoch. The deployment fees paid by developers will be burnt, which creates a deflationary effect.
 
 ### Cloud Rebellion
 

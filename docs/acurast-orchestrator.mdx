@@ -31,4 +31,6 @@ For example, data can be the observation of a public data point (e.g., from a pu
 
 ## Reward Flow
 
-For the reward flow, the developer defines the budget for the execution of the specified deployment. The budget can be defined in native ACU tokens, or for example, FIAT-pegged stablecoins. This mechanism allows for deterministic financial planning of executions for both the processor andthe developer. The processor automatically receives the reward upon successful execution of deployments.
+For the reward flow, the developer defines the budget for the execution of the specified deployment. The budget can be defined in native cACU/ACU tokens, or later as well, for example, in FIAT-pegged stablecoins. This mechanism allows for deterministic financial planning of executions for developers.
+
+When a deployment is executed, the deployment fee paid by the developer is burnt, creating a deflationary effect on the token supply. Processors executing deployments receive an indirect benefit through a Deployment Execution Bonus: they receive a bonus weight on their Benchmark Metrics that increases their scoring - and therefore their rewards - in both the Staked Compute Pool and the Compute Pool (Base Benchmarking Rewards) for that epoch. This mechanism ensures processors are rewarded for executing deployments while maintaining the deflationary tokenomics of the network.
