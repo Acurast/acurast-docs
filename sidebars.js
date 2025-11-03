@@ -105,12 +105,12 @@ const sidebars = {
         {
           type: "doc",
           id: "wallets/wallets-ledger",
-          label: "Ledger",
+          label: "Ledger (soon)",
         },
         {
           type: "doc",
           id: "wallets/wallets-airgap",
-          label: "AirGap",
+          label: "AirGap (soon)",
         },
       ],
       collapsed: true,
