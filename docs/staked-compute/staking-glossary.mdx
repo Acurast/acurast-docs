@@ -81,6 +81,10 @@ Detaching a running Delegation from one Committer and attaching it to a new Comm
 ### Delegation Fee
 A fee Committers can set once upon creating a Stake and will receive from the rewards of the Delegations attached to their stake. The Delegation fee can not change during the lifetime of a Stake.
 
+The delegation fee is expressed as a percentage and is deducted from the delegator's earned rewards before distribution. This fee compensates committers for maintaining reliable hardware and high compute capacity that benefits all delegators staking with them.
+
+**Example:** If a committer sets a 10% delegation fee and their delegators collectively earn 100 tokens in rewards during an epoch, the committer receives 10 tokens as their delegation fee from all delegators' accrued tokens, and the delegators receive the remaining 90 tokens.
+
 ### Delegation Capacity
 The amount of delegations a Committer can accept.
 
