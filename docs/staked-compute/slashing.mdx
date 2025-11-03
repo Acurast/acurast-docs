@@ -17,9 +17,9 @@ This mechanism incentivizes providers to actively maintain their deployed Acuras
 
 ### When Slashing Occurs
 
-When a committer's Current Compute falls below their Committed Compute in any of the four benchmark metrics during an epoch, they become slashable for that epoch. Slashing must be triggered on-chain by a **Slasher**- anyone with an Acurast account who detects the violation.
+When a committer's Current Compute falls below their Committed Compute in any of the four benchmark metrics during an epoch, they become slashable for that epoch. Slashing must be triggered on-chain by a **Slasher**- anyone with an Acurast account who detects the violation. Slashing can be triggered earliest in the epoch after the epoch where the commitment was violated.
 
-### How Penalties Are Calculated
+### How Slashing Penalties Are Calculated
 
 Once slashing is triggered, penalties are calculated independently for each Benchmark Metric where there's a shortfall. The slashing amount for each metric is determined by multiplying the stake amount by the maximum slash rate (0.003424657534% per epoch), the metric's weight, and the percentage shortfall.
 
