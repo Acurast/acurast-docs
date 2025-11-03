@@ -71,6 +71,20 @@ Each epoch, a share of the inflation (70% on Mainnet / 1% on Canary) goes to the
 
 From the Staked Compute Pool, the reward tokens are further split between four Benchmark Metric Pools according to the Benchmark Metric Weights
 
+**Committer's Share → Self vs. Delegators**
+
+A committer's reward is split relative to the token amounts and chosen cooldown periods, between their own weight
+
+$
+\text{committer\_weight}_c := \text{stake}_c \times \frac{\text{cooldown}_c}{\text{MAX\_COOLDOWN}}
+$
+
+and the total weight of their delegators
+
+$
+\text{delegators\_weight}_d := \sum_d{\left[ \text{stake}_d \times \frac{\text{cooldown}_d}{\text{MAX\_COOLDOWN}} \right]}
+$
+
 **Benchmark Metric Pools → Committers**
 
 The share of rewards each committer gets depends on a score calculated from following factors, which can be chosen or influenced by the committer when creating the stake.
@@ -78,38 +92,34 @@ The share of rewards each committer gets depends on a score calculated from foll
 
 In short: stronger hardware, bigger stake, longer commitment = bigger rewards.
 
-The reward split is calculated per Benchmark Metric Pool, and the relative score of a participant $c$ compared to other participants is calculated as
+The reward split is calculated for each Benchmark Metric Pool $p$ separately. The relative score of a participant $c$ compared to other participants is calculated as
 
-$$
-\text{committer\_score}_c = \min\left(\sqrt{\text{metric}_c \times \text{stake}_c \times \frac{\text{cooldown}_c}{\text{max\_cooldown}}}, \; T \times \text{metric}_c\right).
-$$
+$
+\text{committer\_score}_c^{(p)} = \min\left(\sqrt{\text{metric}_c^{(p)} \times (\text{committer\_weight}_c + \text{delegators\_weight}_d)}, \; T^{(p)} \times \text{metric}_c^{(p)}\right)
+$
 
-The minimum ensures that the stake backing a single farm stays within a reasonable range, derived from a global $\text{target\_weight\_per\_compute}$
+The minimum ensures that the stake backing a single farm stays within a reasonable range, derived from a global $\text{target\_weight\_per\_compute}^{(p)}$
 
-$$
-T := \frac{0.8 \times \text{total\ supply}}{\text{total\ benchmarked\ metric}}
-$$
+$
+T^{(p)} := \frac{0.8 \times \text{total\ supply}}{\text{total\ benchmarked\ metric}^{(p)}}
+$
 
 that expresses the ideal staking rate given the current compute offered over our system.
 
-We later refer to this product by $\text{weight}$
+In each epoch, the staking reward is split into rewards for each metric pool, $\text{REWARD}^{(p)}$, according to the weights described in [Benchmark Metric Weights](#benchmark-metric-weights).
+For one specific pool $p$ a committer $cs reward (to be shared with his delegators) is
 
-$$
-\text{weight} := \text{stake} \times \frac{\text{cooldown}}{\text{max\_cooldown}}
-$$
-
-
-**Committer's Share → Self vs. Delegators**
-
-A committer's reward is split between their own weight and the total weight of their delegators, relative to the token amounts and chosen cooldown periods.
+$
+\text{reward}_c^{(p)} = \frac{\text{committer\_score}_c^{(p)}}{\sum_c{\text{committer\_score}_c^{(p)}}}
+$
 
 **Delegators Split**
 
 The remaining delegator rewards are split between all delegators of the same committer, according to each delegator's weight. Also the delegation fee is split off to the Committer. The following factors influence delegation rewards for a delegator $d$ towards a committer $c$:
 
-$$
+$
 \text{delegator\ reward}_d = \text{delegator\ weight}_d - \text{delegation\ fee}_c - \text{potential\ slashings}_c
-$$
+$
 
 ### Where the rewards come from
 
