@@ -88,9 +88,6 @@ $
 **Benchmark Metric Pools → Committers**
 
 The share of rewards each committer gets depends on a score calculated from following factors, which can be chosen or influenced by the committer when creating the stake.
-The share of rewards each committer gets depends on a score calculated from following factors, which can be chosen or influenced by the committer when creating the stake.
-
-In short: stronger hardware, bigger stake, longer commitment = bigger rewards.
 
 The reward split is calculated for each Benchmark Metric Pool $p$ separately. The relative score of a participant $c$ compared to other participants is calculated as
 
@@ -113,6 +110,8 @@ $
 \text{reward}_c^{(p)} = \frac{\text{committer\_score}_c^{(p)}}{\sum_c{\text{committer\_score}_c^{(p)}}}
 $
 
+In short: stronger hardware, bigger stake, longer commitment = bigger rewards.
+
 **Delegators Split**
 
 The remaining delegator rewards are split between all delegators of the same committer, according to each delegator's weight. Also the delegation fee is split off to the Committer. The following factors influence delegation rewards for a delegator $d$ towards a committer $c$:
@@ -125,10 +124,9 @@ $
 
 Acurast inflates its token supply every year, by 5% (currently, can be changed by governance). That inflation is split between the following pools:
 
-**On Mainnet:**
 - 70% → Staked Compute Pool (The rewards for Staking)
 - 15% → Treasury
-- 10% → Benchmark rewards (Base rewards processors, shared in relation to the benchmarks, independent from Staking)
+- 10% → Base Benchmark Rewards (independent from Staking)
 - 5% → Acurast blockchain block producers (Collators aka Validators)
 
 <ThemedImage
@@ -137,10 +135,6 @@ Acurast inflates its token supply every year, by 5% (currently, can be changed b
     dark: useBaseUrl("/img/inflation.png"),
   }}
 />
-
-**On Canary:**
-- 1% → Staked Compute Pool (The rewards for Staking)
-- 99% → Benchmark rewards (Base rewards processors, shared in relation to the benchmarks, independent from Staking)
 
 ### When are rewards distributed
 
