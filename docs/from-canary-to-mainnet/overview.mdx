@@ -1,0 +1,64 @@
+---
+title: From Canary To Mainnet - Overview
+slug: /from-canary-to-mainnet/overview
+---
+
+# Acurast: Migration to Mainnet and Conversion from cACU to ACU
+
+
+## Migration vs Conversion
+
+### Migration
+Migration describes the process of moving funds and processors from Canary (cACU) to Mainnet (ACU). The migration window for cACU tokens is 90 days from when Mainnet goes live. After these 90 days, tokens can NEVER again be migrated from Canary to Mainnet. Processors can always be migrated from Canary to Mainnet (but never back).
+
+:::warning Attention
+**cACU tokens from Canary can only be migrated to Mainnet within the first 90 days after Mainnet start. After 90 days they can NEVER be migrated again to Mainnet. Plan accordingly!**
+:::
+
+### Conversion
+
+Conversion describes the process of unlocking ACU on Mainnet after the migration, at a specific ratio defined by the passed lock time. The first time when users can unlock ACU with a conversion is after the minimum lock time of 1296000 blocks (roughly 90 days).
+
+### How to migrate and convert
+
+1. User initiates migration on Acurast Canary on the [Acurast Hub](https://hub.acurast.com/)
+2. All cACU, except for a minimum existential amount, are burned on Canary
+3. ACU is assigned to the same account on Mainnet with a 1 to 1 ratio (e.g., 1000 cACU = 1000 ACU)
+4. Users can decide to unlock their tokens at any time after the minimum lock time has passed (1296000 blocks, roughly 90 days)
+5. Upon unlocking, a conversion ratio is applied that is relative to the time passed
+6. User will keep the converted amount, while the remaining amount is sent to the treasury
+
+### Conversion Examples
+
+Locked for the full duration: If the maximum lock time has passed (19353600 blocks, roughly 1344 days or 3.7 years) users receive 100 ACU for 100 conversion-locked ACU.
+
+Locked for half of the maximum duration: If only half of the time has passed (9676800 blocks, roughly 672 days or 1.8 years) users receive 50 ACU for 100 conversion-locked ACU.
+
+Locked for 10% of the maximum time: If only 10% of the maximum lock time has passed (1935360 blocks, roughly 134 days or 0.37 years) users get 10 ACU for 100 cACU
+
+
+### Conversion lock and Staking
+
+Conversion-locked ACU can be staked in the Staked Compute Pool starting from day one of Mainnet. All staking rewards are fully claimable and transferable, they are not locked.
+
+To trigger the conversion unlock, all tokens must first be completely unstaked. Please note that unstaking alone does not automatically remove the conversion lock.
+
+
+#### Conversion with Staking Example:
+A user has 1000 cACU. The total conversion lock time is roughly 3.7 years (44.8 months). They decide to stake with a cooldown period of 2 months.
+
+After 20.4 months (672 days) the cooldown period is triggered by the user and then the two month cooldown period starts. After a total of 22 months the stake is finalized. However, the tokens are still conversion locked. The user can now decide to stake again, or to unlock the tokens and convert them. Since they went through half the duration, if they decide to unlock them completely, a ratio of 2:1 is applied and the user would receive 0.5 ACU for each 1 cACU of their conversion locked balance.
+
+## Migration & Conversion FAQ
+
+#### What happens on conversion unlock to the tokens which are not distributed to the user due to preliminary unlock?
+
+These tokens are sent to the Treasury.
+
+#### If I get staking rewards on my conversion locked tokens, are the rewards liquid after unstaking, while the conversion locked tokens are still locked?
+
+ Yes, the the staking rewards are liquid
+
+#### Will my rewards from Base Benchmark Rewards and Staking Rewards for running processors be locked?
+
+No. All rewards are liquid (unless you selected autocompound in Staking, then the staking rewards are added to your locked Stake).
