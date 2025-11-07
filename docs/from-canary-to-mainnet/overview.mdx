@@ -17,7 +17,7 @@ Migration describes the process of moving funds and processors from Canary (cACU
 
 ### Conversion
 
-Conversion describes the process of unlocking ACU tokens, which were created by migrating cACU from Canary to Mainnet, using a time-based linear ratio system. After migrating from Canary to Mainnet (which must occur within 90 days), users' tokens are locked for a minimum of approximately 90 days before they can begin the conversion unlock process.
+Conversion describes the process of unlocking ACU tokens, which were created by migrating cACU from Canary to Mainnet, using a time-based linear ratio system. After migrating from Canary to Mainnet (which must occur within 90 days), users' tokens are locked for a minimum of approximately 84 days before they can begin the conversion unlock process.
 
 The conversion ratio is directly proportional to the lock time elapsed: the percentage of maximum lock time completed equals the percentage of tokens received, creating a linear relationship. Any tokens not received due to early unlocking are sent to the treasury.
 
@@ -31,13 +31,15 @@ Locked for half of the maximum duration: If only half of the time has passed (96
 
 Locked for 10% of the maximum time: If only 10% of the maximum lock time has passed (1935360 blocks, roughly 134 days or 0.37 years) users get 10 ACU for 100 cACU
 
+Locked for the minimum time of 84 days: If the minimum lock time of 84 days has passed (1209600 blocks) users get 6.25 ACU for 100 cACU.
+
 
 ### How to migrate and convert
 
 1. User initiates migration on Acurast Canary on the [Acurast Hub](https://hub.acurast.com/)
 2. All cACU, except for a minimum existential amount, are burned on Canary
 3. ACU is assigned to the same account on Mainnet with a 1 to 1 ratio (e.g., 1000 cACU = 1000 ACU)
-4. Users can decide to unlock their tokens at any time after the minimum lock time has passed (1296000 blocks, roughly 90 days)
+4. Users can decide to unlock their tokens at any time after the minimum lock time has passed (1209600 blocks, roughly 84 days)
 5. Upon unlocking, a conversion ratio is applied that is relative to the time passed
 6. User will keep the converted amount, while the remaining amount is sent to the treasury
 
