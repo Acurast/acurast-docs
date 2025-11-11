@@ -126,6 +126,11 @@ const sidebars = {
           id: "from-canary-to-mainnet/overview",
           label: "Overview",
         },
+        {
+          type: "doc",
+          id: "from-canary-to-mainnet/token-transfers",
+          label: "Transfers on Canary",
+        },
       ],
       collapsed: true,
     },
