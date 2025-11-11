@@ -85,8 +85,9 @@ const sidebars = {
         "integrations",
         "networks",
         "audits",
+        "whitepapers",
       ],
-      collapsed: true,
+      collapsed: false,
     },
     {
       type: "category",
