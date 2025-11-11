@@ -75,3 +75,17 @@ These tokens are sent to the Treasury.
 #### Will my rewards from Base Benchmark Rewards and Staking Rewards for running processors be locked?
 
 No. All rewards are liquid (unless you selected autocompound in Staking, then the staking rewards are added to your locked Stake).
+
+#### What if I want my funds and processors on a different account on Mainnet than on Canary? Can I split up accounts?
+
+Migration strictly happens between the exact same account on Canary as on Mainnet. If you want to transfer to different accounts you need to do that BEFORE the migration. Some limitations apply:
+
+**Transfer Processors:** Processors from one account can only be migrated as a whole from Canary to Mainnet and they will be assigned to the same manager account as before. It is possible to transfer all processors on Canary from one account to another, but only ALL processors at once and only to a fresh and unused Acurast account. You cannot split up processors between accounts, you cannot "send" processors to existing accounts that already have processors or tokens.
+
+**Transfer Tokens:** Tokens from one account can only be migrated as a whole from Canary to Mainnet and they will be assigned to the same manager account as before. But before the Migration function is activated, token transfers will also be activated on Canary. This means you can decide to split up funds between different Canary accounts BEFORE migrating them to mainnet. Once the funds are migrated, they will be locked and cannot move again, until they are unlocked. See Conversion about the locking mechanism that kicks in after migration.
+
+#### What is the right order to do all of this?
+
+1. Unstake your stakes on Canary. Make sure to do that BEFORE the 90 day window ends. Unstaking comes with a cooldown of up to two days!
+2. Migrate your funds from Canary to Mainnet
+3. Migrate your processors from Canary to Mainnet

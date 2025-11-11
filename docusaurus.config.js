@@ -268,6 +268,10 @@ const config = {
             to: "/integrations",
             from: "/integrations/introduction",
           },
+          {
+            to: "/staked-compute/overview",
+            from: "/staked-compute",
+          },
         ],
       },
     ],
