@@ -1,0 +1,64 @@
+---
+title: Transfers on Canary
+slug: /from-canary-to-mainnet/token-transfers
+---
+
+# Transfers on Canary
+
+:::info
+Token transfers on Canary will be activated on Tuesday, November 11, 2025 - 5pm UTC
+:::
+
+Migration (the process of moving funds and processors from Canary to Mainnet) strictly happens between the exact same account on Canary as on Mainnet. If you want to transfer tokens or processors to different accounts you need to do that **BEFORE** the migration on Canary. Some limitations apply:
+
+## Transfer Processors
+
+Processors from one account can only be migrated as a whole from Canary to Mainnet and they will be assigned to the same manager account as before. It is possible to transfer all processors on Canary from one account to another, but only ALL processors at once and only to a fresh and unused Acurast Canary account. You cannot split up processors between accounts, you cannot "send" processors to existing accounts that already have processors or tokens.
+
+## Transfer Tokens
+
+Tokens from one account can only be migrated as a whole from Canary to Mainnet and they will be assigned to the same manager account as before. But before the Migration function is activated, **token transfers will be activated on Canary**. This means you can decide to split up funds between different Canary accounts BEFORE migrating them to Mainnet. Once the funds are migrated to Mainnet, they will be locked and cannot move again, until they are unlocked. See [Conversion](/from-canary-to-mainnet/overview) about the locking mechanism that kicks in after migration.
+
+## Transfers and Impact on Stakes
+
+:::warning Attention
+**Do not transfer your processors to a different account if you have an active stake. You risk being slashed. Unstake first, wait for the cooldown to end, then transfer processors.**
+:::
+
+You must unstake and wait for the cooldown to end, if you want to transfer your processors to a different account, the account with the stake will suddenly lose all of its compute and you will be exposed to staking penalties. It's the same as if you would suddenly cut your internet connection.
+
+You must unstake and wait for the cooldown to end, before you can migrate to Mainnet. As the cooldown can take up to 48 hours, you should absolutely trigger unstake before the migration window of 90 days ends.
+
+## How to Transfer Funds on Canary
+
+There are two ways how you can transfer cACU tokens on Canary:
+
+**A) Use your Substrate based wallet**
+
+1. Use your Substrate based wallet (e.g. Talisman, SubWallet)
+2. Make sure you see the token in your account (check [Wallet page](/wallets/wallet-overview) for how-to)
+3. Transfer as usual: select token, enter target address and amount, send
+4. Sign with your wallet
+
+**B) Use the transfer function on [hub.acurast.com](https://hub.acurast.com)**
+
+1. Go to the balance section of the hub
+2. Click "Transfer"
+3. Enter amount and target address
+4. Click "Transfer" and sign with your wallet
+
+**Remember, tokens which are locked by staking cannot be transferred.**
+
+## How to Transfer Processors on Canary
+
+**DO NOT TRANSFER PROCESSORS IF YOU ARE STAKING! REALLY!**
+
+1. Go to the Phones section on [hub.acurast.com](https://hub.acurast.com)
+2. **Toggle Advanced** on top right
+3. In Processor Ownership click **Transfer**
+4. Carefully read what it says on the screen
+5. Enter your target address
+6. Double check your target address to ensure it's yours
+7. Click **Transfer Ownership**
+
+Remember, you can only transfer processors to fresh unused accounts with 0 balance. Otherwise it won't work. You can also only transfer all processors at once.
