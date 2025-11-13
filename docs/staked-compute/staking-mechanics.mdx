@@ -79,7 +79,7 @@ From the Staked Compute Pool, the reward tokens are further split between four B
 
 **Limited stake per commitment (incl. delegations)**
 
-Every committer will attract delegations, depending on his set commission. The total value (own stake + delegations' stake) we call the _commitment stake_. The desired total _commitment stake_ needs careful planning from the committer since it has a limit. Depending on the committer's own stake he can attract more or less delegated stake. The limit consists of two parts, whatever hits first rules:
+Every committer will attract delegations, depending on his set fee. The total value (own stake + delegations' stake) we call the _commitment stake_. The desired total _commitment stake_ needs careful planning from the committer since it has a limit. Depending on the committer's own stake he can attract more or less delegated stake. The limit consists of two parts, whatever hits first rules:
 
 - the committer needs to provide at least one part out of 10 from the total commitment stake (incl the delegators stakes). This corresponds a ratio of 1:9, own vs delegators stake.
 - An additional limit ensures that the stake backing a single farm stays within a reasonable range. This limit prevents someone from locking an enormous amount of ACU behind a small device and unfairly capturing rewards. The limit is derived from a global $\text{target\_weight\_per\_compute}^{(p)}$, that is in turn dependent from the total supply and total onboarded compute power, measured in regular benchmarked:
