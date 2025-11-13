@@ -65,11 +65,35 @@ Staking Rewards trickle down through several pools and are split up:
 
 **Inflation → Staked Compute Pool**
 
-Each epoch, a share of the inflation (70% on Mainnet and Canary) goes to the Staked Compute Pool. These reward tokens are created by block producers and minted directly into the Staked Compute Pool.
+Each epoch, a share of the inflation (70% on Mainnet and Canary) goes to the Staked Compute Pool. These reward tokens are created by the protocol and minted directly into the Staked Compute Pool.
 
 **Staked Compute Pool → 4 Benchmark metric pools**
 
-From the Staked Compute Pool, the reward tokens are further split between four Benchmark Metric Pools according to the Benchmark Metric Weights
+From the Staked Compute Pool, the reward tokens are further split between four Benchmark Metric Pools according to the Benchmark Metric Weights that are composeed from the committer's and his delegators' chosen parameters, mainly
+
+- the stakes (shared for all metric pools commited into)
+- the chosen cooldown periods for these stakes (shared for all metric pools commited into)
+- the committed compute (for the metric pool of consideration)
+
+:::info
+
+**Limited stake per commitment (incl. delegations)**
+
+Every committer will attract delegations, depending on his set commission. The total value (own stake + delegations' stake) we call the _commitment stake_. The desired total _commitment stake_ needs careful planning from the committer since it has a limit. Depending on the committer's own stake he can attract more or less delegated stake. The limit consists of two parts, whatever hits first rules:
+
+- the committer needs to provide at least one part out of 10 from the total commitment stake (incl the delegators stakes). This corresponds a ratio of 1:9, own vs delegators stake.
+- An additional limit ensures that the stake backing a single farm stays within a reasonable range. This limit prevents someone from locking an enormous amount of ACU behind a small device and unfairly capturing rewards. The limit is derived from a global $\text{target\_weight\_per\_compute}^{(p)}$, that is in turn dependent from the total supply and total onboarded compute power, measured in regular benchmarked:
+$
+T^{(p)} := \frac{0.8 \times \text{total\ supply}}{\text{total\ benchmarked\ metric}^{(p)}}
+$
+
+
+
+that expresses the ideal staking rate given the current compute offered over our system.
+
+:::
+
+
 
 **Committer's Share → Self vs. Delegators**
 
@@ -92,16 +116,10 @@ The share of rewards each committer gets depends on a score calculated from foll
 The reward split is calculated for each Benchmark Metric Pool $p$ separately. The relative score of a participant $c$ compared to other participants is calculated as
 
 $
-\text{committer\_score}_c^{(p)} = \min\left(\sqrt{\text{metric}_c^{(p)} \times (\text{committer\_weight}_c + \text{delegators\_weight}_d)}, \; T^{(p)} \times \text{metric}_c^{(p)}\right)
+\text{committer\_score}_c^{(p)} = \min\left[\text{committer\_weight}_c + \text{delegators\_weight}_d, \; T^{(p)} \times \text{metric}_c^{(p)}\right]
 $
 
-The minimum ensures that the stake backing a single farm stays within a reasonable range, derived from a global $\text{target\_weight\_per\_compute}^{(p)}$
 
-$
-T^{(p)} := \frac{0.8 \times \text{total\ supply}}{\text{total\ benchmarked\ metric}^{(p)}}
-$
-
-that expresses the ideal staking rate given the current compute offered over our system.
 
 In each epoch, the staking reward is split into rewards for each metric pool, $\text{REWARD}^{(p)}$, according to the weights described in [Benchmark Metric Weights](#benchmark-metric-weights).
 For one specific pool $p$ a committer $cs reward (to be shared with his delegators) is
