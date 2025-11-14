@@ -90,6 +90,11 @@ const sidebars = {
       collapsed: false,
     },
     {
+      type: "doc",
+      id: "acurast-token",
+      label: "Acurast Token",
+    },
+    {
       type: "category",
       label: "Wallets",
       items: [
