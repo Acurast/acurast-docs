@@ -1,0 +1,93 @@
+---
+title: Token
+slug: /token
+---
+
+import ThemedImage from "@theme/ThemedImage";
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
+# Acurast Token (ACU)
+
+## Chains and token contracts
+
+The Acurast Token (ACU) is the native utility token of the Acurast network, powering the decentralized compute economy. Acurast is multichain in nature and the token is available on the Acurast mainnet as well as on various other blockchains and ecosystems. Deployed on its native chain, it can be bridged to Ethereum using the Acurast HyperDrive bridge and further from Ethereum to various EVM chains via LayerZero bridges.
+
+### Overview
+ACU serves multiple critical functions within the Acurast ecosystem:
+
+* **Deployment Fees**: Submitted by developers using Acurast Compute
+* **Network Fees**: Required for transaction fees on the Acurast network
+* **Rewards**: Provides economic security through Staked Compute as well as Base Benchmark Rewards
+* **Collator rewards**: Rewards for validators and block producers
+* **Cross chain transfers**: Bridged instances of the ACU token, to be moved across various networks
+
+
+### ACU on Acurast Mainnet
+
+ACU is the native currency of the Acurast Mainnet, which is Substrate-based Polkadot parachain. ACU is used to pay for chain interactions and is the currency to submit for deployments and that is distributed for Staking Rewards, Base Benchmark Rewards and Collator Rewards.
+
+### ACU on Ethereum
+
+On Ethereum, ACU is available as an ERC20 token, deployed at `0x216b3643ff8b7BB30d8A48E9F1BD550126202AdD`
+
+Native Acurast tokens from Acurast Mainnet can be bridged to Ethereum and back, using the bridge at [hub.acurast.com](https://hub.acurast.com).
+
+### ACU on Binance Smart Chain (bridged)
+
+On Binance Smart Chain, ACU, is deployed as a LayerZero OFT, deployed at `0x160C58c70a1c73f769969C63158bcc48547a548B`
+
+ERC20 ACU from Ethereum can be bridged to BSC and back, using the LayerZero bridge.
+
+### ACU on Base (bridged)
+
+On Base, ACU, is deployed as a Layer Zero OFT, deployed at `0x160C58c70a1c73f769969C63158bcc48547a548B`
+
+ERC20 ACU from Ethereum can be bridged to Base and back, using the LayerZero bridge.
+
+### ACU on Peaq (bridged)
+
+On Peaq, ACU, is deployed as a Layer Zero OFT, deployed at `0x58A359e8C67Dd5b639Fb7d47CD9AD347A7C2F71E`
+
+ERC20 ACU from Ethereum can be bridged to Peaq and back, using the LayerZero bridge.
+
+### Bridging pathways and platforms
+
+Bridging ACU from and to the native Acurast Mainnet, can be done from and to Ethereum, via the [Acurast HyperDrive](/integrations#level-2) bridge.
+
+ACU from Ethereum can then be bridged via [LayerZero](https://layerzero.network/) to and from various EVM chains. Bridging is also possible between all target chains, eg. from BSC to Base, or from Peaq to BSC. ACU will be available on commonly used LayerZero bridging interfaces.
+
+<ThemedImage
+  sources={{
+    light: useBaseUrl("/img/bridges.png"),
+    dark: useBaseUrl("/img/bridges.png"),
+  }}
+/>
+<div class="padding-vert--md"></div>
+
+### Overview of deployed ACU token contracts and instances
+
+:::warning CAUTION
+
+Only token contracts listed on the official Acurast documentation are valid Acurast tokens. Beware of fake tokens sold for the purpose of deceiving users.
+
+:::
+
+| Chain               | ChainID           | Token Contract                             | Decimals | Type   | Symbol |
+|---------------------|-------------------|--------------------------------------------|----------|--------|--------|
+| Acurast Mainnet     | ParachainID: 3396 | native, no token contract                  | 12       | native | ACU    |
+| Ethereum            | 1 (0x1)           | 0x216b3643ff8b7BB30d8A48E9F1BD550126202AdD | 12       | ERC20  | ACU    |
+| Binance Smart Chain | 56 (0x38)         | 0x160C58c70a1c73f769969C63158bcc48547a548B | 18       | OFT    | ACU    |
+| Base                | 8453 (0x2105)     | 0x160C58c70a1c73f769969C63158bcc48547a548B | 18       | OFT    | ACU    |
+| Peaq                | 3338 (0xd0a)      | 0x58A359e8C67Dd5b639Fb7d47CD9AD347A7C2F71E | 18       | OFT    | ACU    |
+
+### ACU token on Coinlist
+
+On TGE, the ACU tokens for Coinlist sale participants will be withdrawable to Ethereum.
+
+### ACU token on various exchanges
+
+Exchanges decide which instance of the Acurast token they offer. Carefully study which instance has to be deposited or can be withdrawn before transacting these tokens.
+
+## Additional Resources
+
+For more detailed information about the token economics and distribution, please visit the [Tokenomics](/tokenomics) page.
