@@ -12,19 +12,51 @@ The content on this page is currently under review and subject to change.
 
 :::
 
-## How Compute is measured
+## What is Compute?
+
+Compute is the processing power and core value the Acurast Network offers to developers. Compute is physically embodied in the smartphones which run the Acurast processor app all around the globe. The main components of these phones, which are important for Acurast are their processors (CPU), the memory (RAM) and the Storage.
 
 ### What is Current Compute?
 
-The measured compute of a Compute Provider is displayed as **Current Compute** on the Staking frontend. It represents the total computational capacity across all of a provider's devices, broken down into four benchmark metrics: CPU Single Core, CPU Multi Core, RAM, and Storage.
+The measured compute of a Compute Provider is displayed as **Current Compute** on the Staking frontend. It represents the current total compute power measured across all of a provider's devices. Compute is broken down into four benchmark metrics: CPU Single Core, CPU Multi Core, RAM, and Storage.
 
-### How Benchmarks Are Measured
+### How Current Compute is measured
 
-Compute is measured through four benchmark tests conducted on every device running the Acurast processor. These tests run automatically during each device heartbeat (every 30 minutes) and the results are reported on-chain. The first valid benchmark report per epoch (900 blocks / roughly 90 minutes) will set a processor's measured compute and deployment activity state for that epoch. Read more about the technical aspects of the benchmarks [here](/acurast-processors/benchmarks).
+Current Compute is measured through four benchmark tests (CPU Single Core, CPU Multi Core, RAM and Storage) conducted on every device running the Acurast processor. These tests run automatically during each device heartbeat (every 30 minutes) and the results are reported on-chain. The first valid benchmark report per epoch (900 blocks / roughly 90 minutes) will set a processor's Current Compute per benchmark metric and it's deployment activity state for that epoch. Read more about the technical aspects of the benchmark tests [here](/acurast-processors/benchmarks).
 
-### Benchmark Metric Weights
+The results of the latest benchmark tests, show on the display of the processor app, if you tap the "Compute Score" card. Each Benchmark Metric card displays the exact results from the last benchmark test. The Relative Compute Score on top represents how this device scores against the global score of all devices in the Acurast network.
 
-Each of the four benchmark metrics has a weight assigned to reflect its importance to the Acurast network's computational requirements and resource priorities:
+<div style={{width: '35%', margin: '0 auto'}}>
+<ThemedImage
+  sources={{
+    light: useBaseUrl("/img/benchmarks.png"),
+    dark: useBaseUrl("/img/benchmarks.png"),
+  }}
+/>
+</div>
+
+<p style={{textAlign: 'center', fontSize: '0.9em', color: '#666', marginTop: '0.5em'}}>Screenshot of the processor app</p>
+
+On the Staking UI, the sum of all benchmark test scores is displayed - summed up per benchmark metric. Again, the Total Current Compute displayed on top, is just a relatve amount. The absolute sum per benchmark metric across all devices of this committer is shown below.
+
+<div style={{width: '50%', margin: '0 auto'}}>
+<ThemedImage
+  sources={{
+    light: useBaseUrl("/img/totalcurrentcompute.png"),
+    dark: useBaseUrl("/img/totalcurrentcompute.png"),
+  }}
+/>
+</div>
+
+<p style={{textAlign: 'center', fontSize: '0.9em', color: '#666', marginTop: '0.5em'}}>Screenshot of the staking UI</p>
+
+All scoring activities, which lead to rewards and potentially slashings, are done using the four absolute benchmark metrics which were reported in an epoch - not on the singular number that is displayd as "Relative Compute Score" on the processor or as "Total Current Compute" on the Staking UI.
+
+<div class="padding-vert--md"></div>
+
+### Benchmark Metric Weights define Benchmark Metric Pools
+
+Each of the four benchmark metrics has a weight assigned to reflect its importance to the Acurast network's computational requirements and resource priorities. These weights ensure that providers are incentivized to maintain balanced, high-quality compute resources, with RAM being the most heavily weighted metric due to its critical role in application performance:
 
 | Benchmark Metric | Weight |
 |-----------------|--------|
@@ -33,7 +65,7 @@ Each of the four benchmark metrics has a weight assigned to reflect its importan
 | RAM | 0.4615 |
 | Storage | 0.0769 |
 
-These weights ensure that providers are incentivized to maintain balanced, high-quality compute resources, with RAM being the most heavily weighted metric due to its critical role in application performance.
+These Benchmark Metric Weights define how staking rewards are split between the different Benchmark Metrics pools. For each 1 ACU that is emitted as staking reward, 0.2307 are assigned to the CPU Single Core Pool, 0.2307 are assigned to the CPU Multi Core Pool, 0.4615 is assigned to the RAM pool and 0.0769 is assigned to the Storage pool.
 
 The Staking frontend is showing the four metrics, as measured in the last epoch for each Committer.
 
@@ -53,7 +85,7 @@ Each epoch, a share of the inflation (70% on Mainnet and Canary) goes to the Sta
 
 From the Staked Compute Pool, the reward tokens are further split between four Benchmark Metric Pools according to the Benchmark Metric Weights that are composeed from the committer's and his delegators' chosen parameters, mainly
 
-- the stakes (shared for all metric pools commited into)
+- the staked token amount (shared for all metric pools commited into)
 - the chosen cooldown periods for these stakes (shared for all metric pools commited into)
 - the committed compute (for the metric pool of consideration)
 
