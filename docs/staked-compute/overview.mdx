@@ -3,51 +3,20 @@ title: Overview
 slug: /staked-compute/overview
 ---
 
-:::info Under Review
+## Acurast Staked Compute
 
-The content on this page is currently under review and subject to change.
+Acurast is building a decentralized compute network where anyone can contribute processing power using smartphones. To ensure this network stays reliable and doesn't degrade over time, Acurast uses a staking mechanism that creates economic incentives for consistent hardware availability.
 
-:::
+### How It Works
 
-Acurast Staked Compute: Compute Providers commit real hardware + token collateral for a chosen period of time. Delegators can stake with them, and together they share inflation rewards - but both risk slashing if the committer fails to support the deployed hardware long-term. This aligns the incentives to build the world's most accessible, reliable, and decentralized compute network.
+**Compute Providers (Committers)** run the Acurast processor app on actual devices and commit to providing specific compute capacity for a period of time. They stake Acurast tokens as collateral - essentially making a promise backed by Acurast tokens. If they keep their hardware online 24/7 and fulfill their commitment, they earn staking rewards based on their compute amount, stake size, and chosen cooldown duration. If they fail, they lose a portion of their stake through slashing.
 
-## Why Staked Compute matters
+**Delegators** are token holders who don't run hardware but want to support the network. They delegate their tokens to committers they trust, earning a share of the rewards (minus the committer's delegation fee). This helps strengthen providers' commitments while letting more people participate. However, delegators share the risk-if their chosen committer fails, delegators also get slashed proportionally. They can redelegate to different committers anytime.
 
-### Ensuring Network Reliability
+### Why This Matters
 
-Acurast aims to become a global decentralized compute network where anyone can contribute compute power by running the Acurast processor app on dedicated (Core) or personal phones (Lite). The critical challenge is ensuring that provided compute remains consistently available and overall capacity does not degrade over time. Network liveness is essential for building a reliable and powerful infrastructure that developers and users can depend on.
+This creates "skin in the game" for everyone. Providers are economically motivated to maintain their devices and keep capacity online because failure means losing staked capital. Delegators carefully choose reliable providers because they share the consequences.
 
-### Commitment-Based Incentives
+For developers, this means predictable, reliable compute capacity they can build on. Long-term commitments backed by financial collateral ensure the infrastructure will be there when needed.
 
-Staked Compute solves this through economic incentives. Compute Providers commit to supplying a specific amount of compute power - measured by four benchmark metrics - and stake Acurast tokens as collateral for a chosen duration. A stake is fundamentally a promise: providers promise to deliver compute and keep it online 24/7. If they fulfill their promise, they earn staking rewards based on their committed compute, stake size, and commitment duration. If they fail, they lose a portion of their staked tokens through slashing.
-
-This creates "skin in the game" - real economic consequences that align everyone's incentives with network success. Providers are motivated to actively maintain their devices, keep them operational, and replace capacity when needed, because failing to do so means losing their staked capital.
-
-### Building Stability for Developers
-
-The staking mechanism creates the consistent, predictable compute capacity that developers need. Long-term commitments backed by financial collateral ensure reliability. When providers commit for months or years, developers can confidently build applications on Acurast knowing the compute infrastructure will be there when needed.
-
-### Governance and Shared Benefits
-
-In a later phase, staked tokens will grant voting rights in Acurast's governance process through the Acurast DAO. Stakes will represent both economic commitment and voting power in decisions about protocol upgrades, parameter changes, and network strategy.
-
-The system creates a win-win ecosystem: Compute Providers earn rewards for reliable operation, delegators share in rewards without running hardware, and the network becomes more valuable and resilient as participation grows.
-
-## Who can participate
-
-There are two types of participants in Staked Compute:
-
-### Committers
-
-Committers run the Acurast processor app on actual hardware - smartphones- to provide compute and ensure the network's liveness. They stake their own tokens as collateral for their promised computation and receive staking rewards based on their chosen parameters (compute amount, stake size, and cooldown period). Committers can also accept delegations from other Acurast token holders and earn a delegation fee from these additional staked tokens.
-
-If they fail to fulfill their commitment to provide the promised computation power, they can be partially slashed and their stake (and all of their delegators stakes) will be reduced by an defined amount of tokens.
-
-
-### Delegators
-
-Delegators are users who hold Acurast tokens but do not run hardware on the network. They believe in Acurast's value and want to support the network long-term by delegating their tokens (and voting rights) to committers of their choosing. Think of it as lending tokens to strengthen a Compute Provider's commitment. By delegating, they participate in their chosen committer's success and earn staking rewards (minus the committer's delegation fee).
-
-Delegators also share the risk: if their committer fails to deliver on their commitment, delegators can be slashed proportionally. However, delegators can redelegate to another committer at any time if they're concerned about their chosen committer's performance.
-
-Note that committers can also act as delegators, creating one delegation to themselves and additional delegations to other committers - useful for creating multiple stakes with different cooldown periods or risk profiles
+The result is a win-win ecosystem: providers earn rewards for reliability, delegators earn passive income, and the network becomes more valuable as participation grows. Future plans include governance voting rights for staked tokens through the Acurast DAO.
