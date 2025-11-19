@@ -1,0 +1,43 @@
+---
+title: How To Stake
+slug: /staked-compute/how-to-stake
+---
+
+## How to Stake
+
+On the Staking page in the Acurast Hub, users can stake and have an overview over their Stakes and Delegations.
+
+To create a stake, Compute Providers (aka Committers) have to:
+
+1. Compute: select the amount of Compute they are comfortable to commit.
+2. Cooldown: select the Cooldown period. The cooldown period is measured in blocks. The Staking Frontend also provides an estimate expressed in time (days etc.)
+3. Tokens: Select the amount of tokens to stake
+4. Compound: Select if Autocompoundung is ON or OFF
+
+To do a delegation, Delgators have to:
+
+1. Committer: Select a Committer
+2. Cooldown: Select a Cooldown period
+3. Tokens: Select the amount of tokens to delegate
+4. Compound: Select if Autocompoundung is ON or OFF
+
+## Staking Lifecycle
+
+**Committer:**
+
+* **Start staking:** Committer chooses the amount of computation to commit, tokens to stake, and cooldown length, then creates a stake.
+* **While staking:** Committers can add more tokens to the stake, increase duration and committed compute, and either compound or withdraw rewards. They must maintain their committed compute level to avoid slashing.
+* **Exit staking:** Committer triggers cooldown (reducing rewards to 50% but maintaining full slashing risk) and waits until it ends.
+* **Finalize (Withdraw/Claim):** After cooldown ends, committer finalizes the stake, withdrawing the unlocked funds and any unclaimed rewards.
+
+**Delegator:**
+
+* **Start Staking:** Delegators choose one or several committers to delegate to, then select the amount of tokens and cooldown period (which cannot exceed their chosen committer's cooldown).
+* **While staking:** Delegators can add more tokens, increase duration, compound or withdraw rewards. They can also redelegate their stake to a different committer with equal or greater parameters (committed compute, stake size, and cooldown duration).
+* **Exit staking:** Delegator triggers cooldown (reducing rewards to 50%) and waits until it ends.
+* **Finalize (Withdraw/Claim):** After cooldown ends, delegator finalizes the stake, withdrawing the unlocked funds and any unclaimed rewards.
+
+
+## Reward compounding (Autocompound)
+
+When creating a stake, committers and delegators can choose whether their staking rewards should be automatically compounded (automatically added back to their stake) or made available for withdrawal. If they choose not to autocompound, rewards accumulate and can be withdrawn at any time - users are then free to move these rewards or manually stake them again. Autocompounding simply automates this process, maximizing reward growth over time without requiring manual action.

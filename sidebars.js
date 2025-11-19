@@ -53,6 +53,7 @@ const sidebars = {
       label: "Staked Compute",
       items: [
         "staked-compute/overview",
+        "staked-compute/how-to-stake",
         "staked-compute/staking-mechanics",
         "staked-compute/slashing",
         "staked-compute/mainnet-vs-canary",
