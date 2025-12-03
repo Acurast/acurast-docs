@@ -23,3 +23,6 @@ predefined-methods-string.ts
 
 # VS Code
 .vscode
+
+# Claude Code context
+.claude
