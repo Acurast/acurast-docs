@@ -8,27 +8,18 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
 
 The Acurast Orchestrator is a centerpiece of the consensus layer, combining the orchestration (i.e., the scheduling of deployments and enabling the liquid matching) of the Processor’s computational resources and Developers. The orchestrator plays an essential role in the definition, agreement, and enforcement of value exchange between processors and developers.
 
-The orchestrator is where the liquid matching engine pairs the advertised processor resources with the defined requirements of the developers. The orchestrator natively supports various price-finding mechanisms (e.g., auctions and advertisements), making DevEx highly accessible and seamless.
+The orchestrator is where the liquid matching engine pairs the advertised processor resources with the defined requirements of the developers. The orchestrator natively supports various price-finding mechanisms (e.g., auctions and advertisements), making Developer Experience (DevEx) highly accessible and seamless.
 
-Every agreement between processor and developer is specified in an entity called deployment. The deployment specifies (i) a set of instructions that are executed on the processor, (ii) its scheduling parameters, and (iii) settlement configuration (i.e., where the output is further processed or persisted), and (iv) finally, the rewards.
+Every agreement between processor and developer is specified in an entity called deployment. The deployment specifies (i) a set of instructions that are executed on the processor, (ii) its scheduling parameters, and (iii) the destination configuration (i.e., where the output is further processed or persisted).
 
-**The orchestrator reward is a core mechanism of the Acurast Protocol, formed by two flows**
+## Compute Costs & Rewards
 
-1. The compute/data flow
-1. The reward flow
+When scheduling a deployment, the developer defines the compute cost for the execution. The cost can be defined in native cACU/ACU tokens. This mechanism allows for deterministic financial planning of executions for developers.
 
-<ThemedImage
-  alt="Docusaurus themed image"
-  sources={{
-    light: useBaseUrl("/img/acurast-orchestrator-flows_light.svg"),
-    dark: useBaseUrl("/img/acurast-orchestrator-flows_dark.svg"),
-  }}
-/>
+:::info
 
-## Compute/Data Flow
+**All compute costs are paid as gas (transaction) fees. There is no direct reward flow from developers to processors.**
 
-For example, data can be the observation of a public data point (e.g., from a public API), an off-chain computation, the privacy-preserving querying of proprietary data (i.e., permissioned data), or even a combination of all these subcases. From the DevEx and developer’s perspective, it can be compared to defining requirements with a public cloud provider like e.g., Amazon Web Services, Google Cloud or Microsoft Azure.
+:::
 
-## Reward Flow
-
-For the reward flow, the developer defines the budget for the execution of the specified deployment. The budget can be defined in native ACU tokens, or for example, FIAT-pegged stablecoins. This mechanism allows for deterministic financial planning of executions for both the processor andthe developer. The processor automatically receives the reward upon successful execution of deployments.
+Instead, processors earn rewards through the **[staking pools](/staked-compute/overview)**. When processors execute deployments, they receive a [Deployment Execution Bonus](/processors/rewards#deployment-execution-bonus): a bonus weight on their Benchmark Metrics that increases their scoring—and therefore their share of rewards—in both the Staked Compute Pool and the Compute Pool (Base Benchmarking Rewards) for that epoch. This mechanism ensures processors are incentivized to execute deployments and burn gas fees.

@@ -6,43 +6,51 @@ slug: /staked-compute/staking-mechanics
 import ThemedImage from "@theme/ThemedImage";
 import useBaseUrl from "@docusaurus/useBaseUrl";
 
-:::info Under Review
+## What is Compute?
 
-The content on this page is currently under review and subject to change.
-
-:::
-
-## How to Stake
-
-On the Staking page in the Acurast Hub, users can stake and have an overview over their Stakes and Delegations.
-
-To create a stake, Compute Providers (aka Committers) have to:
-
-1. Compute: select the amount of Compute they are comfortable to commit.
-2. Cooldown: select the Cooldown period. The cooldown period is measured in blocks. The Staking Frontend also provides an estimate expressed in time (days etc.)
-3. Tokens: Select the amount of tokens to stake
-4. Compound: Select if Autocompoundung is ON or OFF
-
-To do a delegation, Delgators have to:
-
-1. Committer: Select a Committer
-2. Cooldown: Select a Cooldown period
-3. Tokens: Select the amount of tokens to delegate
-4. Compound: Select if Autocompoundung is ON or OFF
-
-## How Compute is measured
+Compute is the processing power and core value the Acurast Network offers to developers. Compute is physically embodied in the smartphones which run the Acurast processor app all around the globe. The main components of these phones, which are important for Acurast are their processors (CPU), the memory (RAM) and the Storage.
 
 ### What is Current Compute?
 
-The measured compute of a Compute Provider is displayed as **Current Compute** on the Staking frontend. It represents the total computational capacity across all of a provider's devices, broken down into four benchmark metrics: CPU Single Core, CPU Multi Core, RAM, and Storage.
+The measured compute of a Compute Provider is displayed as **Current Compute** on the Staking frontend. It represents the current total compute power measured across all of a provider's devices. Compute is broken down into four benchmark metrics: CPU Single Core, CPU Multi Core, RAM, and Storage.
 
-### How Benchmarks Are Measured
+### How Current Compute is measured
 
-Compute is measured through four benchmark tests conducted on every device running the Acurast processor. These tests run automatically during each device heartbeat (every 30 minutes) and the results are reported on-chain. At least one valid benchmark report per epoch (900 blocks / roughly 90 minutes) is required to maintain a device's measured compute. Read more about the technical aspects of the benchmarks [here](/acurast-processors/benchmarks).
+Current Compute is measured through four benchmark tests (CPU Single Core, CPU Multi Core, RAM and Storage) conducted on every device running the Acurast processor. These tests run automatically during each device heartbeat (every 30 minutes) and the results are reported on-chain. The first valid benchmark report per epoch (900 blocks / roughly 90 minutes) will set a processor's Current Compute per benchmark metric and it's deployment activity state for that epoch. Read more about the technical aspects of the benchmark tests [here](/acurast-processors/benchmarks).
 
-### Benchmark Metric Weights
+The results of the latest benchmark tests, show on the display of the processor app, if you tap the "Compute Score" card. Each Benchmark Metric card displays the exact results from the last benchmark test. The Relative Compute Score on top represents how this device scores against the global score of all devices in the Acurast network.
 
-Each of the four benchmark metrics has a weight assigned to reflect its importance to the Acurast network's computational requirements and resource priorities:
+<div style={{width: '35%', margin: '0 auto'}}>
+<ThemedImage
+  sources={{
+    light: useBaseUrl("/img/benchmarks.png"),
+    dark: useBaseUrl("/img/benchmarks.png"),
+  }}
+/>
+</div>
+
+<p style={{textAlign: 'center', fontSize: '0.9em', color: '#666', marginTop: '0.5em'}}>Screenshot of the processor app</p>
+
+On the Staking UI, the sum of all benchmark test scores is displayed - summed up per benchmark metric. Again, the Total Current Compute displayed on top, is just a relatve amount. The absolute sum per benchmark metric across all devices of this committer is shown below.
+
+<div style={{width: '50%', margin: '0 auto'}}>
+<ThemedImage
+  sources={{
+    light: useBaseUrl("/img/totalcurrentcompute.png"),
+    dark: useBaseUrl("/img/totalcurrentcompute.png"),
+  }}
+/>
+</div>
+
+<p style={{textAlign: 'center', fontSize: '0.9em', color: '#666', marginTop: '0.5em'}}>Screenshot of the staking UI</p>
+
+All scoring activities, which lead to rewards and potentially slashings, are done using the four absolute benchmark metrics which were reported in an epoch - not on the singular number that is displayd as "Relative Compute Score" on the processor or as "Total Current Compute" on the Staking UI.
+
+<div class="padding-vert--md"></div>
+
+### Benchmark Metric Weights define Benchmark Metric Pools
+
+Each of the four benchmark metrics has a weight assigned to reflect its importance to the Acurast network's computational requirements and resource priorities. These weights ensure that providers are incentivized to maintain balanced, high-quality compute resources, with RAM being the most heavily weighted metric due to its critical role in application performance:
 
 | Benchmark Metric | Weight |
 |-----------------|--------|
@@ -51,7 +59,7 @@ Each of the four benchmark metrics has a weight assigned to reflect its importan
 | RAM | 0.4615 |
 | Storage | 0.0769 |
 
-These weights ensure that providers are incentivized to maintain balanced, high-quality compute resources, with RAM being the most heavily weighted metric due to its critical role in application performance.
+These Benchmark Metric Weights define how staking rewards are split between the different Benchmark Metrics pools. For each 1 ACU that is emitted as staking reward, 0.2307 are assigned to the CPU Single Core Pool, 0.2307 are assigned to the CPU Multi Core Pool, 0.4615 is assigned to the RAM pool and 0.0769 is assigned to the Storage pool.
 
 The Staking frontend is showing the four metrics, as measured in the last epoch for each Committer.
 
@@ -65,43 +73,86 @@ Staking Rewards trickle down through several pools and are split up:
 
 **Inflation → Staked Compute Pool**
 
-Each epoch, a share of the inflation (70% on Mainnet / 1% on Canary) goes to the Staked Compute Pool. These reward tokens are created by block producers and minted directly into the Staked Compute Pool.
+Each epoch, a share of the inflation (70% on Mainnet and Canary) goes to the Staked Compute Pool. These reward tokens are created by the protocol and minted directly into the Staked Compute Pool.
 
 **Staked Compute Pool → 4 Benchmark metric pools**
 
-From the Staked Compute Pool, the reward tokens are further split between four Benchmark Metric Pools according to the Benchmark Metric Weights
+From the Staked Compute Pool, the reward tokens are further split between four Benchmark Metric Pools according to the Benchmark Metric Weights that are composeed from the committer's and his delegators' chosen parameters, mainly
+
+- the staked token amount (shared for all metric pools commited into)
+- the chosen cooldown periods for these stakes (shared for all metric pools commited into)
+- the committed compute (for the metric pool of consideration)
+
+:::info
+
+**Limited stake per commitment (incl. delegations)**
+
+Every committer will attract delegations, depending on his set fee. The total value (own stake + delegations' stake) we call the _commitment stake_. The desired total _commitment stake_ needs careful planning from the committer since it has a limit. Depending on the committer's own stake he can attract more or less delegated stake. The limit consists of two parts, whatever hits first rules:
+
+- the committer needs to provide at least one part out of 10 from the total commitment stake (incl the delegators stakes). This corresponds a ratio of 1:9, own vs delegators stake.
+- An additional limit ensures that the stake backing a single farm stays within a reasonable range. This limit prevents someone from locking an enormous amount of ACU behind a small device and unfairly capturing rewards. The limit is derived from a global $\text{target\_weight\_per\_compute}^{(p)}$, that is in turn dependent from the total supply and total onboarded compute power, measured in regular benchmarked:
+$
+T^{(p)} := \frac{0.8 \times \text{total\ supply}}{\text{total\ benchmarked\ metric}^{(p)}}
+$
+
+
+
+that expresses the ideal staking rate given the current compute offered over our system.
+
+:::
+
+
+
+**Committer's Share → Self vs. Delegators**
+
+A committer's reward is split relative to the token amounts and chosen cooldown periods, between their own weight
+
+$
+\text{committer\_weight}_c := \text{stake}_c \times \frac{\text{cooldown}_c}{\text{MAX\_COOLDOWN}}
+$
+
+and the total weight of their delegators
+
+$
+\text{delegators\_weight}_d := \sum_d{\left[ \text{stake}_d \times \frac{\text{cooldown}_d}{\text{MAX\_COOLDOWN}} \right]}
+$
 
 **Benchmark Metric Pools → Committers**
 
 The share of rewards each committer gets depends on a score calculated from following factors, which can be chosen or influenced by the committer when creating the stake.
 
+The reward split is calculated for each Benchmark Metric Pool $p$ separately. The relative score of a participant $c$ compared to other participants is calculated as
+
+$
+\text{committer\_score}_c^{(p)} = \min\left[\text{committer\_weight}_c + \text{delegators\_weight}_d, \; T^{(p)} \times \text{metric}_c^{(p)}\right]
+$
+
+
+
+In each epoch, the staking reward is split into rewards for each metric pool, $\text{REWARD}^{(p)}$, according to the weights described in [Benchmark Metric Weights](#benchmark-metric-weights).
+For one specific pool $p$ a committer $cs reward (to be shared with his delegators) is
+
+$
+\text{reward}_c^{(p)} = \frac{\text{committer\_score}_c^{(p)}}{\sum_c{\text{committer\_score}_c^{(p)}}}
+$
+
 In short: stronger hardware, bigger stake, longer commitment = bigger rewards.
-
-The reward split is calculated per Benchmark Metric Pool, and the relative weight compared to other participants is calculated as
-
-`weight = min(sqrt(benchmarked_metric * stake_amount * cooldown/max_cooldown), target_weight_per_compute * benchmarked_metric)`.
-
-The minimum is to ensure that the stake backing a single farm stays within a reasonable range, derived from a global `target_weight_per_compute` that expresses the ideal staking rate given the current compute offered over our system.
-
-
-**Committer's Share → Self vs. Delegators**
-
-A committer's reward is split between their own stake and the total stake of their delegators, relative to the token amounts.
 
 **Delegators Split**
 
-The remaining delegator rewards are split between all delegators of the same committer, according to each delegator's stake weight. Also the delegation fee is split of to the Committer. The following factors influence delegation rewards:
+The remaining delegator rewards are split between all delegators of the same committer, according to each delegator's weight. Also the delegation fee is split off to the Committer. The following factors influence delegation rewards for a delegator $d$ towards a committer $c$:
 
-`rewards = stake_amount * commit_time - delegation fee - potential committer slashings`
+$
+\text{delegator\ reward}_d = \text{delegator\ weight}_d - \text{delegation\ fee}_c - \text{potential\ slashings}_c
+$
 
 ### Where the rewards come from
 
 Acurast inflates its token supply every year, by 5% (currently, can be changed by governance). That inflation is split between the following pools:
 
-**On Mainnet:**
 - 70% → Staked Compute Pool (The rewards for Staking)
 - 15% → Treasury
-- 10% → Benchmark rewards (Base rewards processors, shared in relation to the benchmarks, independent from Staking)
+- 10% → Base Benchmark Rewards (independent from Staking)
 - 5% → Acurast blockchain block producers (Collators aka Validators)
 
 <ThemedImage
@@ -110,10 +161,6 @@ Acurast inflates its token supply every year, by 5% (currently, can be changed b
     dark: useBaseUrl("/img/inflation.png"),
   }}
 />
-
-**On Canary:**
-- 1% → Staked Compute Pool (The rewards for Staking)
-- 99% → Benchmark rewards (Base rewards processors, shared in relation to the benchmarks, independent from Staking)
 
 ### When are rewards distributed
 
@@ -134,24 +181,3 @@ When a committer triggers the cooldown period to exit their stake, both their re
 ### Slashing Remains at Full Rate
 
 Importantly, while rewards are halved during cooldown, slashing penalties are not reduced. Committers must continue to maintain their full committed compute throughout the cooldown period, and any shortfalls will result in standard slashing penalties calculated at 100% of the normal rate. This ensures that committers cannot reduce their hardware commitment once they've initiated cooldown - they must maintain their promised compute capacity until the cooldown period ends and they finalize their stake.
-
-## Staking Lifecycle
-
-**Committer:**
-
-* **Start staking:** Committer chooses the amount of computation to commit, tokens to stake, and cooldown length, then creates a stake.
-* **While staking:** Committers can add more tokens to the stake, increase duration and committed compute, and either compound or withdraw rewards. They must maintain their committed compute level to avoid slashing.
-* **Exit staking:** Committer triggers cooldown (reducing rewards to 50% but maintaining full slashing risk) and waits until it ends.
-* **Finalize (Withdraw/Claim):** After cooldown ends, committer finalizes the stake, withdrawing the unlocked funds and any unclaimed rewards.
-
-**Delegator:**
-
-* **Start Staking:** Delegators choose one or several committers to delegate to, then select the amount of tokens and cooldown period (which cannot exceed their chosen committer's cooldown).
-* **While staking:** Delegators can add more tokens, increase duration, compound or withdraw rewards. They can also redelegate their stake to a different committer with equal or greater parameters (committed compute, stake size, and cooldown duration).
-* **Exit staking:** Delegator triggers cooldown (reducing rewards to 50%) and waits until it ends.
-* **Finalize (Withdraw/Claim):** After cooldown ends, delegator finalizes the stake, withdrawing the unlocked funds and any unclaimed rewards.
-
-
-## Reward compounding (Autocompound)
-
-When creating a stake, committers and delegators can choose whether their staking rewards should be automatically compounded (immediately added back to their stake) or made available for withdrawal. If they choose not to autocompound, rewards accumulate and can be withdrawn at any time - users are then free to move these rewards or manually stake them again. Autocompounding simply automates this process, maximizing reward growth over time without requiring manual action.

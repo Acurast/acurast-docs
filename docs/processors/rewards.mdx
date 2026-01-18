@@ -10,23 +10,28 @@ As a Compute Provider running Acurast Processors, you receive rewards for contri
 
 ## Reward Types
 
-### Deployment Execution
+### Base Benchmark Rewards (Compute Pool)
 
-Tokens (cACU on Canary, ACU on Mainnet) are rewarded when a processor's compute power is used by developers to run code. Developers that deploy to the Acurast Cloud provide a reward for the compute power used. When your Processor has been selected, you'll receive part of that reward.
-
-### Benchmark Rewards
-
-Providers receive rewards based on the [benchmarks](/acurast-processors/benchmarks) of their participating devices. On Canary, a total of 12'500 cACU are distributed per epoch (roughly every 1.5 hours). These rewards are split up to the different benchmarks pools and each phone competes with the others in the 4 benchmark pools. Higher specs usually lead to higher Benchmark Rewards.
+Providers receive rewards based on the [benchmarks](/acurast-processors/benchmarks) of their participating devices. These rewards are paid from Acurast's token inflation. On Canary and Mainnet, a total of 10% of Acurast's inflation are distributed per epoch (900 blocks / roughly every 1.5 hours). This equals to 856.164 tokens per epoch to distributed as Base Benchmark Rewards (Compute Pool) among all Compute Providers, independent of their participation in Staked Compute. These rewards are split up to the different benchmarks pools and each phone competes with the others in the 4 benchmark pools. Higher specs usually lead to higher Base Benchmark Rewards (Compute Pool).
 
 <div>
   <img src="/img/reward_distribution.png" alt="Distribution per Benchmark Metric on Canary Network" />
   <p style={{marginTop: '4px', fontSize: '0.875rem', fontStyle: 'italic', color: '#6b7280'}}>Distribution per Benchmark Metric on Canary Network</p>
 </div>
 
+### Staking Rewards (Staked Compute Pool)
+
+Compute Providers who participate in [Staked Compute](/staked-compute/overview) earn additional rewards by committing their compute power and staking tokens. 70% of Acurast's inflation is distributed as Staking Rewards (Staked Compute Pool) every epoch, which is 5'993.15 tokens. Staking Rewards (Staked Compute Pool) are distributed based on hardware performance, stake size, and commitment duration. Learn more about [how Staked Compute works](/staked-compute/overview) and how to maximize your staking rewards.
+
+<div>
+  <img src="/img/inflation.png" alt="Acurast Inflation Distribution" />
+  <p style={{marginTop: '4px', fontSize: '0.875rem', fontStyle: 'italic', color: '#6b7280'}}>Acurast Inflation Distribution</p>
+</div>
+
+### Deployment Execution Bonus
+
+When a processor is detected executing a deployment during an epoch, it receives a bonus weight on the Benchmark Metrics that increases its scoring - and therefore its rewards - in both the Staked Compute Pool and the Compute Pool (Base Benchmarking Rewards) for that epoch. The deployment costs are paid as gas fees (i.e., transaction fees) by the developers.
+
 ### Cloud Rebellion
 
 Join the [Cloud Rebellion](https://rebellion.acurast.com/) and harvest MIST points. Become a Rebel and cloud-harvest MIST (points) by completing quests, onboarding Processors, and inviting others to join the Rebellion.
-
-### ~~Bootstrapping~~ (has been sundowned in favor of the Benchmark Rewards)
-
-~~Receive 250 cACU each month in Bootstrapping Rewards. Run your Processor, connected to the internet, for a month and receive 250 cACU in bootstrapping rewards. You will receive a fraction of the full reward each hour.~~

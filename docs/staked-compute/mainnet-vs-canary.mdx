@@ -3,17 +3,17 @@ title: Staking Mainnet vs. Canary
 slug: /staked-compute/mainnet-vs-canary
 ---
 
-:::info Under Review
-
-The content on this page is currently under review and subject to change.
-
-:::
-
 Acurast operates two networks - Mainnet and Canary - each with different staking reward structures and purposes.
 
 ## Staking on Acurast Canary Network
 
-Canary serves as Acurast's testing and experimental network, where new features are deployed and tested before moving to Mainnet. Staking rewards on Canary are significantly smaller, with only 1% of epoch inflation allocated to the Staked Compute Pool, while 99% goes to benchmark rewards. This distribution prioritizes onboarding new devices and testing network behavior over long-term staking incentives.
+Canary serves as Acurast's testing and experimental network, where new features are deployed and tested before moving to Mainnet. Staking rewards on Canary now match Mainnet's allocation, with 70% of epoch inflation allocated to the Staked Compute Pool. This distribution supports testing staking mechanisms with realistic reward structures before deployment to Mainnet.
+
+:::warning Canary Stakes And Conversion to Mainnet
+
+When Mainnet goes live, a 90 days conversion phase starts, allowing users to convert their funds from Canary to Mainnet using the Conversion process. In order to convert staked Canary funds to mainnet, all stakes and delegations on Canary need to be unstaked / undelegated. Users are advised to do that as soon as the conversion phase starts, in order to have enough time to convert. Non converted Canary funds and stakes can not be converted to Mainnet once the Conversion phase has ended.
+
+:::
 
 ## Staking on Acurast Mainnet
 
@@ -21,12 +21,17 @@ Mainnet is Acurast's production network with a mature reward structure designed 
 
 ## Key Parameters Comparison (Mainnet vs. Canary)
 
+:::info
+
+The Canary values are currently set to 1% of inflation and 85.6164 cACU. They will be set to the same as Mainnet on November 4, 2025 12pm UTC.
+
+:::
 
 | Parameter | Canary | Mainnet |
 |-----------|---------|---------|
-| Staked Compute Pool Allocation | 1% of inflation | 70% of inflation |
+| Staked Compute Pool Allocation | 70% of inflation | 70% of inflation |
 | Total Epoch Rewards | 8,561.64 cACU | 8,561.64 ACU |
-| Staking Rewards per Epoch | 85.62 cACU (1% of 8,561.64) | 5,993.15 ACU (70% of 8,561.64) |
+| Staking Rewards per Epoch | 5,993.15 cACU (70% of 8,561.64) | 5,993.15 ACU (70% of 8,561.64) |
 | Min Cooldown Period | 600 blocks (~ 1 hour) | 403,200 blocks (~ 28 days) |
 | Max Cooldown Period | 28,800 blocks (~ 48 hours)| 19,353,600 blocks (~ 1344 days / 3.68 years)|
 | Max Slashing per Epoch | 0.003424657534% of stake | 0.003424657534% of stake |

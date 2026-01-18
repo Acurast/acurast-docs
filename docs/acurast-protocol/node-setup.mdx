@@ -3,11 +3,17 @@ title: Node Setup
 slug: /acurast-protocol/node-setup
 ---
 
+import ThemedImage from "@theme/ThemedImage";
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
 The recommended way to run the Acurast node is by using the published [Docker image](https://hub.docker.com/r/acurast/node-canary/tags).
 
 ## Get the chain spec
 
-Download the Acurast Canary [chain spec](https://github.com/Acurast/acurast-substrate/blob/acurast-v0.13.3a/chain-specs/acurast-kusama-parachain-2239-raw.json) from the Acurast GitHub repository.
+Download the Acurast chain spec from the Acurast GitHub repository: 
+
+- [Acurast Canary chain spec](https://github.com/Acurast/acurast-substrate/blob/acurast-v0.21.0/chain-specs/acurast-kusama-parachain-2239-raw.json)
+- [Acurast Mainnet Candidate chain spec](https://github.com/Acurast/acurast-substrate/blob/acurast-v0.21.0/chain-specs/acurast-mainnet-parachain-3396-raw.json)
 
 ## Configure the node
 
@@ -18,10 +24,12 @@ Create an `acurast-node` folder. Inside this folder, the following 2 folders and
 
 In the `docker-compose.yml` file, put the following content:
 
+For Acurast Canary:
+
 ```yml
 services:
   node:
-    image: "acurast/node-canary:acurast-v0.18.0"
+    image: "acurast/node-canary:acurast-v0.20.0"
     command: "--chain /node/chain-specs/acurast-kusama-parachain-2239-raw.json \
       --base-path /node/data \
       --bootnodes /ip4/82.220.38.222/tcp/30334/ws/p2p/12D3KooWKrSDeVQ4tVQ1eGjqVAhAW3cgMQFHNCBbJrpmupEvdD4A \
@@ -30,8 +38,37 @@ services:
       --rpc-external \
       --rpc-methods safe \
       --rpc-cors all \
-      --name MyNode # choose an appropriate name here
-      --telemetry-url "wss://telemetry.polkadot.io/submit/ 0"
+      --name MyNode \ # choose an appropriate name here
+      --telemetry-url \"wss://telemetry.polkadot.io/submit/ 0\" \
+      --database=rocksdb \
+      --pruning=archive"
+    ports:
+      - "30334:30334"
+      - "9934:9934"
+    volumes:
+      - ./:/node
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+```
+
+For Acurast Mainnet Candidate:
+
+```yml
+services:
+  node:
+    image: "acurast/node-mainnet:acurast-v0.20.0"
+    command: "--chain /node/chain-specs/acurast-mainnet-parachain-3396-raw.json \
+      --base-path /node/data \
+      --bootnodes /ip4/82.220.38.222/tcp/30335/ws/p2p/12D3KooWMJM3htCon6tQ6FzRuWkxtwEkd3i5awZitdTviWwJX3KY \
+      --port 30334 \
+      --rpc-port 9934 \
+      --rpc-external \
+      --rpc-methods safe \
+      --rpc-cors all \
+      --name MyNode \ # choose an appropriate name here
+      --telemetry-url \"wss://telemetry.polkadot.io/submit/ 0\" \
       --database=rocksdb \
       --pruning=archive"
     ports:
@@ -111,4 +148,85 @@ http://localhost:9934
 
 In order for the above call to succeed, the node needs to be started with `--rpc-methods unsafe`. Once the key has been registered, the node can be restarted with the `--collator` flag.
 
-The node is now setup as a collator, but it will not start authoring blocks yet. At this stage on the Canary network, the Acurast team manages the list of collators that can actually author blocks until staking functionally is introduced.
+The node is now setup as a collator, but it will not start authoring blocks yet. At this stage, the Acurast team manages the list of collators that can actually author blocks.
+
+## Collator Onboarding
+
+### Pre registration checks
+
+- Make sure the node is setup with an identity as described above.
+- Make sure the node is fully synced.
+- Make sure the node was started with the `--collator` flag.
+- Make sure the node is running on hardware that meet the minimum requirements. It is possible to check by looking at the node logs when it first starts:
+
+<ThemedImage
+  width="1000px"
+  sources={{
+    light: useBaseUrl("/img/node-hardware-checks.png"),
+    dark: useBaseUrl("/img/node-hardware-checks.png"),
+  }}
+/>
+
+  If  the hardware is good enough, there should not be any warning log message after the benchmarks logs shown in the screenshot above.
+
+### Set session key
+
+A session key needs to be registered. To do that, first perform the `author_rotateKeys` RPC call in order to generate a new session key:
+
+```bash
+curl -H "Content-Type: application/json" \
+--data '{
+  "jsonrpc":"2.0",
+  "method":"author_rotateKeys",
+  "params":[],
+  "id":1
+}' \
+http://localhost:9934
+```
+
+The output of the above command should be something like:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": "0xcc038816bd81c238bd1d163c48cea9c5e3b62899b8f193863f68268a719cca44"
+}
+```
+
+> **_WARNING:_** If the node exposes the RPC port to the internet, directly or through a reverse proxy, please make sure to restart the node with the argument `--rpc-methods safe` so that RPC methods related to the collator keys cannot be called anymore. For more information, see the [RPC Deployment](https://paritytech.github.io/devops-guide/guides/rpc_index.html?#important-flags-for-running-an-rpc-node) page of the Parachain Devops guide.
+
+Next, submit the extrinsic `session.setKeys` with the collator account to the Acurast Canary or Acurast Mainnet Candidate chain. The first parameter of the extrinsic call is the `result` hex string in the output of the previous RPC call.
+
+Any tool can be used to submit the extrinsic call, the important thing is that it is submitted by the collator account.
+
+One option is to use the polkadotjs UI web app:
+
+- [Acurast Canary](https://dotapps-io.ipns.dweb.link/?rpc=wss%3A%2F%2Fpublic-rpc.canary.acurast.com#/extrinsics)
+- [Acurast Mainnet Candidate](https://dotapps-io.ipns.dweb.link/?rpc=wss%3A%2F%2Fpublic-rpc.mainnet.acurast.com#/extrinsics)
+
+<ThemedImage
+  width="1000px"
+  sources={{
+    light: useBaseUrl("/img/set-session-keys.png"),
+    dark: useBaseUrl("/img/set-session-keys.png"),
+  }}
+/>
+
+The screenshot above show how to call the `session.setKeys` extrinsic, where the first drop down menu selects the account submitting the extrinsic (in this example, the account comes from the PolkadotJS Chrome extension).
+
+Then the `submit the following extrinsic` box, the `session` pallet and the `setKeys` extrinsic are selected. Finally, provide the arguments: first the key, which corresponds to the result of the previous RPC call, and a `0x00` for the proof argument.
+
+### Register as candidate
+
+Once the session key is registered, the collator can be registered as a candidate, this is done through the extrinsic `collatorSelection.registerAsCandidate`, as before, the important thing is that the extrinsic is submitted by the collator account:
+
+<ThemedImage
+  width="1000px"
+  sources={{
+    light: useBaseUrl("/img/register-as-candidate.png"),
+    dark: useBaseUrl("/img/register-as-candidate.png"),
+  }}
+/>
+
+If the extrinsic is submitted successfully, the collator node is now fully onboarded and should start authoring blocks within 6-12 hours.

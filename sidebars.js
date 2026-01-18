@@ -30,7 +30,7 @@ const sidebars = {
         "developers/deployment-runtime-environment",
         "developers/on-demand-deployments",
       ],
-      collapsed: false,
+      collapsed: true,
     },
     {
       type: "category",
@@ -46,20 +46,21 @@ const sidebars = {
         "processors/rewards",
         "processors/benchmarks",
       ],
-      collapsed: false,
+      collapsed: true,
     },
     {
       type: "category",
       label: "Staked Compute",
       items: [
         "staked-compute/overview",
+        "staked-compute/how-to-stake",
         "staked-compute/staking-mechanics",
         "staked-compute/slashing",
         "staked-compute/mainnet-vs-canary",
         "staked-compute/staking-faq",
         "staked-compute/staking-glossary",
       ],
-      collapsed: false,
+      collapsed: true,
     },
 
     {
@@ -79,13 +80,20 @@ const sidebars = {
             "acurast-protocol/architecture/consensus-layer",
             "acurast-protocol/architecture/instances",
           ],
-          collapsed: false,
+          collapsed: true,
         },
         "acurast-protocol/node-setup",
         "integrations",
         "networks",
         "audits",
+        "whitepapers",
       ],
+      collapsed: false,
+    },
+    {
+      type: "doc",
+      id: "acurast-token",
+      label: "Acurast Token",
     },
     {
       type: "category",
@@ -105,12 +113,29 @@ const sidebars = {
         {
           type: "doc",
           id: "wallets/wallets-ledger",
-          label: "Ledger",
+          label: "Ledger (soon)",
         },
         {
           type: "doc",
           id: "wallets/wallets-airgap",
-          label: "AirGap",
+          label: "AirGap (soon)",
+        },
+      ],
+      collapsed: true,
+    },
+    {
+      type: "category",
+      label: "From Canary To Mainnet",
+      items: [
+        {
+          type: "doc",
+          id: "from-canary-to-mainnet/overview",
+          label: "Overview",
+        },
+        {
+          type: "doc",
+          id: "from-canary-to-mainnet/token-transfers",
+          label: "Transfers on Canary",
         },
       ],
       collapsed: true,
