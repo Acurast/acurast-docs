@@ -25,7 +25,7 @@ A Committers commitment, backed by an amount of Committed Compute, an amount of 
 Four standardized tests that measure a device's computational capacity: CPU Single Core (0.2307 weight), CPU Multi Core (0.2307 weight), RAM Size (0.4615 weight), and Storage Size (0.0769 weight). These metrics are measured during every device heartbeat and reported on-chain to determine Current Compute and calculate rewards and slashing.
 
 ### Current Compute
-The amount of compute that was measured across all processors in the last epoch for a specific Compute Provider. During that epoch, all devices ideally had written three heartbeats including three benchmark results. In order to determine the Current Compute for an epoch the ??? latest ??? recorded heartbeat off all devices are being used.
+The amount of compute that was measured across all processors in the last epoch for a specific Compute Provider. During that epoch, all devices ideally had written three heartbeats including three benchmark results. In order to determine the Current Compute for an epoch, the first recorded heartbeat of each device is being used.
 
 ### Committed Compute
 The amount of compute a Compute Provider commits to providing during the lifetime of a Stake, including its Cooldown period.
@@ -45,7 +45,7 @@ The process of signaling the intention to end a Stake. Unstaking triggers the Co
 The process of withdrawing a stake after the cooldown period has ended, returning the unlocked tokens and any unclaimed rewards to the staker or delegator. Also called "claiming a finalized stake."
 
 ### Recommit
-After starting cooldown on a stake, users can choose to recommit if they change their mind. Recommitting immediately restores reward weight and vote weight to 100% and resets the cooldown countdown, returning the stake to its active state.
+Stakes in cooldown cannot be recommitted. After the cooldown ended, they can be finalized and withdrawn.
 
 ## Rewards & Penalties
 
@@ -71,6 +71,8 @@ A percentage of the slashed amount, that is given to the Slasher as a reward for
 
 ### Redelegate
 Detaching a running Delegation from one Committer and attaching it to a new Committer. Can only be done if the new Committer shares the exact same or higher parameters (Committed Compute, Staked Tokens, Cooldown duration) than the previous Committer and is not in Cooldown.
+
+Redelegation can only be done if the current delegation is older than 7 days or if the stake of the chosen Committer is in cooldown.
 
 ### Delegation Fee
 A fee Committers can set once upon creating a Stake and will receive from the rewards of the Delegations attached to their stake. The Delegation fee cannot be increased during the lifetime of a Stake, but it can be decreased.
