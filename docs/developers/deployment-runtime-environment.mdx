@@ -465,6 +465,86 @@ type P2PStreamWrite = (bytes) => Promise<void>;
 type P2PStreamClose = () => Promise<void>;
 ```
 
+### **WebView**
+_Added in: <<TODO: add version, when released>> (Android)_
+
+```javascript
+/**
+ * Opens a new tab in the WebView.
+ * @param {string} url the URL to open.
+ * @param {WebViewNewTabSuccess} onSuccess the success callback.
+ * @param {WebViewError} onError the error callback.
+ */
+_STD_.webview.newTab(url, onSuccess, onError);
+
+/**
+ * Closes all open WebView tabs.
+ * @param {WebViewCloseSuccess} onSuccess the success callback.
+ * @param {WebViewError} onError the error callback.
+ */
+_STD_.webview.close(onSuccess, onError);
+
+/**
+ * Returns the debug URL of the WebView.
+ * @return {string} the debug URL.
+ */
+_STD_.getDebugUrl(): string;
+
+/**
+ * @callback WebViewCloseSuccess
+ * @param {WebviewTab} tab the opened tab.
+ */
+type WebViewNewTabSuccess = (tab) => void;
+
+/**
+ * @callback WebViewCloseSuccess
+ */
+type WebViewCloseSuccess = () => void;
+
+/**
+ * @callback WebViewCloseSuccess
+ * @param {string} error the error message.
+ */
+type WebViewError = (error) => void;
+
+/**
+ * @property {string} id the unique identifier of the WebView tab.
+ * @function close closes the WebView tab.
+ * @function startRefreshLoop starts the refresh loop for the WebView tab.
+ * @function stopRefreshLoop stops the ongoing refresh loop for the WebView tab.
+ */
+type WebViewTab = {
+  id: string
+  close: WebViewTabClose;
+  startRefreshLoop: WebViewStartRefreshLoop;
+  stopRefreshLoop: WebViewStopRefreshLoop;
+};
+
+/**
+ * @function WebViewTabClose
+ * Closes the WebView tab.
+ */
+type WebViewTabClose = () => Promise<void>;
+
+/**
+ * @function WebViewStartRefreshLoop
+ * Starts the refresh loop for the WebView tab.
+ * 
+ * This action may increase resource usage, so it should be used sparingly and
+ * only if absolutely necessary, for example in preparation for taking a screenshot.
+ * 
+ * When no longer needed, the refresh loop should be closed with `stopRefreshLoop`.
+ * @param {number|undefined} interval the interval of consecutive refreshes in milliseconds. If not provided, the default interval of 500 milliseconds is used.
+ */
+type WebViewStartRefreshLoop = (interval) => void;
+
+/**
+ * @function WebViewStopRefreshLoop
+ * Stops the ongoing refresh loop for the WebView tab.
+ */
+type WebViewStopRefreshLoop = () => void;
+```
+
 ### **Substrate functions**
 
 ```javascript
