@@ -13,7 +13,7 @@ The recommended way to run the Acurast node is by using the published [Docker im
 Download the Acurast chain spec from the Acurast GitHub repository: 
 
 - [Acurast Canary chain spec](https://github.com/Acurast/acurast-substrate/blob/acurast-v0.21.0/chain-specs/acurast-kusama-parachain-2239-raw.json)
-- [Acurast Mainnet Candidate chain spec](https://github.com/Acurast/acurast-substrate/blob/acurast-v0.21.0/chain-specs/acurast-mainnet-parachain-3396-raw.json)
+- [Acurast Mainnet chain spec](https://github.com/Acurast/acurast-substrate/blob/acurast-v0.21.0/chain-specs/acurast-mainnet-parachain-3396-raw.json)
 
 ## Configure the node
 
@@ -53,7 +53,7 @@ services:
         max-file: "3"
 ```
 
-For Acurast Mainnet Candidate:
+For Acurast Mainnet:
 
 ```yml
 services:
@@ -196,14 +196,14 @@ The output of the above command should be something like:
 
 > **_WARNING:_** If the node exposes the RPC port to the internet, directly or through a reverse proxy, please make sure to restart the node with the argument `--rpc-methods safe` so that RPC methods related to the collator keys cannot be called anymore. For more information, see the [RPC Deployment](https://paritytech.github.io/devops-guide/guides/rpc_index.html?#important-flags-for-running-an-rpc-node) page of the Parachain Devops guide.
 
-Next, submit the extrinsic `session.setKeys` with the collator account to the Acurast Canary or Acurast Mainnet Candidate chain. The first parameter of the extrinsic call is the `result` hex string in the output of the previous RPC call.
+Next, submit the extrinsic `session.setKeys` with the collator account to the Acurast Canary or Acurast Mainnet chain. The first parameter of the extrinsic call is the `result` hex string in the output of the previous RPC call.
 
 Any tool can be used to submit the extrinsic call, the important thing is that it is submitted by the collator account.
 
 One option is to use the polkadotjs UI web app:
 
 - [Acurast Canary](https://dotapps-io.ipns.dweb.link/?rpc=wss%3A%2F%2Fpublic-rpc.canary.acurast.com#/extrinsics)
-- [Acurast Mainnet Candidate](https://dotapps-io.ipns.dweb.link/?rpc=wss%3A%2F%2Fpublic-rpc.mainnet.acurast.com#/extrinsics)
+- [Acurast Mainnet](https://dotapps-io.ipns.dweb.link/?rpc=wss%3A%2F%2Fpublic-rpc.mainnet.acurast.com#/extrinsics)
 
 <ThemedImage
   width="1000px"
