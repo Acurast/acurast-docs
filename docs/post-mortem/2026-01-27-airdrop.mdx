@@ -1,0 +1,87 @@
+---
+title: Post-mortem - Acurast Air Drop
+slug: /post-mortem/2026-01-27-airdrop
+---
+
+import ThemedImage from "@theme/ThemedImage";
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
+**Date:** 2026-02-02
+
+**Authors:** Mike Godenzi
+
+**Status:** Complete
+
+---
+
+## Summary
+
+On the 27th of January 2026, Acurast launched the Air Drop event that allowed users of the Cloud Rebellion to receive ACU tokens on Acurast Mainnet.
+
+The received tokens were supposed to be locked in a vesting schedule for 24 months. Unfortunately some users were able to receive the ACU tokens partially or fully unlocked.
+
+## Impact
+
+Some of the users that claimed their Air Drop received the claimed ACU tokens partially or fully unlocked. Before the system was shut down, around 600'000 ACU tokens were claimed.
+
+## Detection
+
+Users reported being able to transfers the tokens that were just claimed for the Air Drop.
+
+## Root Causes
+
+The Air Drop functionality is implemented in the [pallet-acurast-token-claim](https://github.com/Acurast/acurast-substrate/tree/acurast-v0.23.14/pallets/token-claim) pallet.
+The claim functionality would transfer the claimed amount to the provided address and setup a vesting schedule through Substrate's [pallet-vesting](https://docs.rs/pallet-vesting/latest/pallet_vesting/) pallet. This vesting pallet places a lock on the user's account balance for the amount specified, which in this case is the Air Drop claimed amount. Users are then able to call the `vest` extrinsic on `pallet-vesting` to released from the lock the vested token so far.
+
+Users are also able to convert cACU token from the Acurast Canary network to Mainnet ACU tokens via the [pallet-acurast-token-conversion](https://github.com/Acurast/acurast-substrate/tree/acurast-v0.23.14/pallets/token-conversion) pallet. The converted tokens are placed in a `Hold` state on the user's account.
+
+The issue occurred because the lock used by `pallet-vesting` to lock up the claimed token is an overlapping lock that also takes into consideration the balance on `Hold`. This means that if a user used both the cACU to ACU conversion feature and the Air Drop claim, the converted balances would be counted in the locked balance in the vesting pallet, allowing the additional claimed Air Drop amount to be unlocked.
+
+## Trigger
+
+Any user using both the cACU to ACU conversion and the Air Drop claim features would trigger the issue described above.
+
+## Resolution
+
+[Explain how the incident was resolved, including any immediate fixes and longer-term solutions implemented.]
+
+At first, the Air Drop feature was disabled, then it was re-implemented to not use the [pallet-vesting](https://docs.rs/pallet-vesting/latest/pallet_vesting/) pallet. 
+Instead now the claimed amount is not right away sent to the user's account, but rather booked internally by the [pallet-acurast-token-claim](https://github.com/Acurast/acurast-substrate/tree/acurast-v0.23.14/pallets/token-claim) pallet and only released to the user's account when the `vest` extrinsic is called.
+
+---
+
+## Action Items
+
+| Action Item | Type | Owner | State |
+|-------------|------|-------|-------|
+| Disabling of Air Drop feature | mitigate | Andreas Gassmann | DONE |
+| Implementation of long term fix | prevent | Simon Wehrli | DONE |
+| Acurast Mainnet runtime upgrade to deploy fix | process | Mike Godenzi | DONE |
+
+---
+
+## Timeline
+
+- **2026-01-27 12:30 UTC** - Air Drop functionality released
+- **2026-01-27 14:30 UTC** - Air Drop issue surfaced and functionality disabled
+- **2026-02-03** - Corrected Air Drop functionality re-released
+
+---
+
+## Lessons Learned
+
+### What went well
+
+Once the issue was surfaced, the Air Drop functionality was quickly disabled.
+
+### What went wrong
+
+The issues took too long to surface.
+
+### Conclusion
+
+It is not trivial to coordinate different subsystems that handle receiving and locking of some tokens on a user's account in a way that do not interfere with each other.
+
+Either the subsystems need to tightly coordinate and carefully lock/unlock the proper amounts, or they should be fully independent and do not use the shared locking system. 
+
+Going forward, similar features can be fully tested on the Canary network before enabling them on Mainnet.

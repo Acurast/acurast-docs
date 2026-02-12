@@ -62,7 +62,6 @@ const sidebars = {
       ],
       collapsed: true,
     },
-
     {
       type: "category",
       label: "Acurast Protocol",
@@ -118,7 +117,7 @@ const sidebars = {
         {
           type: "doc",
           id: "wallets/wallets-airgap",
-          label: "AirGap (soon)",
+          label: "AirGap",
         },
       ],
       collapsed: true,
@@ -141,6 +140,14 @@ const sidebars = {
       collapsed: true,
     },
     "faq",
+    {
+      type: "category",
+      label: "Post-mortem",
+      items: [
+        "post-mortem/2026-01-27-airdrop",
+      ],
+      collapsed: true,
+    },
   ],
 };
 
