@@ -43,8 +43,6 @@ Any user using both the cACU to ACU conversion and the Air Drop claim features w
 
 ## Resolution
 
-[Explain how the incident was resolved, including any immediate fixes and longer-term solutions implemented.]
-
 At first, the Air Drop feature was disabled, then it was re-implemented to not use the [pallet-vesting](https://docs.rs/pallet-vesting/latest/pallet_vesting/) pallet. 
 Instead now the claimed amount is not right away sent to the user's account, but rather booked internally by the [pallet-acurast-token-claim](https://github.com/Acurast/acurast-substrate/tree/acurast-v0.23.14/pallets/token-claim) pallet and only released to the user's account when the `vest` extrinsic is called.
 
