@@ -90,9 +90,21 @@ const sidebars = {
       collapsed: false,
     },
     {
-      type: "doc",
-      id: "acurast-token",
-      label: "Acurast Token",
+      type: "category",
+      label: "Token",
+      items: [
+        {
+          type: "doc",
+          id: "acurast-token",
+          label: "Acurast Token",
+        },
+        {
+          type: "doc",
+          id: "token/claiming-acu",
+          label: "Claiming Vested ACU",
+        },
+      ],
+      collapsed: true,
     },
     {
       type: "category",
@@ -105,19 +117,19 @@ const sidebars = {
         },
         {
           type: "doc",
-          id: "wallets/wallets-subwallet",
-          label: "SubWallet",
+          id: "wallets/wallets-airgap",
+          label: "AirGap",
         },
         "wallets/wallets-talisman",
         {
           type: "doc",
-          id: "wallets/wallets-ledger",
-          label: "Ledger (soon)",
+          id: "wallets/wallets-subwallet",
+          label: "SubWallet",
         },
         {
           type: "doc",
-          id: "wallets/wallets-airgap",
-          label: "AirGap",
+          id: "wallets/wallets-ledger",
+          label: "Ledger (coming soon)",
         },
       ],
       collapsed: true,
@@ -142,7 +154,7 @@ const sidebars = {
     "faq",
     {
       type: "category",
-      label: "Post-mortem",
+      label: "Post-Mortems",
       items: [
         "post-mortem/2026-01-27-airdrop",
       ],
