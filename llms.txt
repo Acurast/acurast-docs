@@ -1,0 +1,55 @@
+# Acurast Documentation
+
+> Complete reference documentation for Acurast
+
+This file contains links to documentation sections following the llmstxt.org standard.
+
+## Table of Contents
+
+- [Acurast Orchestrator](https://docs.acurast.com/docs/acurast-orchestrator): import ThemedImage from "@theme/ThemedImage";
+- [Application Layer](https://docs.acurast.com/docs/acurast-protocol/architecture/application-layer): import ThemedImage from "@theme/ThemedImage";
+- [Overview](https://docs.acurast.com/docs/acurast-protocol/architecture/architecture): import ThemedImage from "@theme/ThemedImage";
+- [Consensus Layer](https://docs.acurast.com/docs/acurast-protocol/architecture/consensus-layer): import ThemedImage from "@theme/ThemedImage";
+- [End-to-End Deployment Execution](https://docs.acurast.com/docs/acurast-protocol/architecture/end-to-end): import ThemedImage from "@theme/ThemedImage";
+- [Execution Layer](https://docs.acurast.com/docs/acurast-protocol/architecture/execution-layer): import ThemedImage from "@theme/ThemedImage";
+- [Instances](https://docs.acurast.com/docs/acurast-protocol/architecture/instances): Acurast will bootstrap three distinct networks: (a) the Acurast Testnet, (b) the Acurast Canary, and (c) the Acurast Mainnet.
+- [Acurast Collator Onboarding](https://docs.acurast.com/docs/acurast-protocol/collator-onboarding): import ThemedImage from "@theme/ThemedImage";
+- [Node Setup](https://docs.acurast.com/docs/acurast-protocol/node-setup): import ThemedImage from "@theme/ThemedImage";
+- [Token](https://docs.acurast.com/docs/acurast-token): import ThemedImage from "@theme/ThemedImage";
+- [Audits](https://docs.acurast.com/docs/audits): Security is a top priority for Acurast. Regular security audits are conducted security to ensure the safety and reliability the Acurast protocol, i...
+- [Create Address](https://docs.acurast.com/docs/developers/create-address): import ThemedImage from "@theme/ThemedImage";
+- [First App Deployment (Hub)](https://docs.acurast.com/docs/developers/deploy-first-app-quest): import ThemedImage from "@theme/ThemedImage";
+- [First App Deployment](https://docs.acurast.com/docs/developers/deploy-first-app): import ThemedImage from "@theme/ThemedImage";
+- [Deployment Runtime Environment](https://docs.acurast.com/docs/developers/deployment-runtime-environment): The deployment's script running on Processors has access to the following a set of APIs.
+- [How to run an LLM on Acurast](https://docs.acurast.com/docs/developers/llm-on-acurast): import ThemedImage from "@theme/ThemedImage";
+- [Deployments On Demand](https://docs.acurast.com/docs/developers/on-demand-deployments): import ThemedImage from "@theme/ThemedImage";
+- [FAQ](https://docs.acurast.com/docs/faq): Acurast is redefining compute by utilizing billions of smartphones – no data centers required. This verifiable, scalable, and confidential compute ...
+- [From Canary To Mainnet - Overview](https://docs.acurast.com/docs/from-canary-to-mainnet/overview): :::warning Attention
+- [Transfers on Canary](https://docs.acurast.com/docs/from-canary-to-mainnet/token-transfers): :::info
+- [Post Mortem - 2025-11-04 - Acurast Canary chain stalled](https://docs.acurast.com/docs/incidents/post-mortem-20251104): 11.04.2025 at 2:30 GMT+2
+- [Ecosystems & Integrations](https://docs.acurast.com/docs/integrations): import ThemedImage from "@theme/ThemedImage";
+- [Real Decentralized Compute Network](https://docs.acurast.com/docs/introduction): Acurast is the Real Decentralized Compute Network — Scalable, Secure, and Powered by Phones.
+- [Networks](https://docs.acurast.com/docs/networks): A list of all related core infrastrucuture for each deployed Acurast network. More details on the functionalities of each network can be found in t...
+- [Post-mortem - Acurast Air Drop](https://docs.acurast.com/docs/post-mortem/2026-01-27-airdrop): import ThemedImage from "@theme/ThemedImage";
+- [Processor Lite and Core](https://docs.acurast.com/docs/processors/acurast-processors): import ThemedImage from "@theme/ThemedImage";
+- [Become an Acurast Compute Provider](https://docs.acurast.com/docs/processors/become-compute-provider): import ThemedImage from "@theme/ThemedImage";
+- [Benchmarks](https://docs.acurast.com/docs/processors/benchmarks): import ThemedImage from "@theme/ThemedImage";
+- [Run Multiple Processors (Farms)](https://docs.acurast.com/docs/processors/multiple-processors): import ThemedImage from "@theme/ThemedImage";
+- [Processor Rewards](https://docs.acurast.com/docs/processors/rewards): import ThemedImage from "@theme/ThemedImage";
+- [Roadmap](https://docs.acurast.com/docs/roadmap): import ThemedImage from "@theme/ThemedImage";
+- [How To Stake](https://docs.acurast.com/docs/staked-compute/how-to-stake): On the Staking page in the Acurast Hub, users can stake and have an overview over their Stakes and Delegations.
+- [Staking Mainnet vs. Canary](https://docs.acurast.com/docs/staked-compute/mainnet-vs-canary): Acurast operates two networks - Mainnet and Canary - each with different staking reward structures and purposes.
+- [Overview](https://docs.acurast.com/docs/staked-compute/overview): Acurast is building a decentralized compute network where anyone can contribute processing power using smartphones. To ensure this network stays re...
+- [Slashing](https://docs.acurast.com/docs/staked-compute/slashing): Slashing is a penalty mechanism designed to ensure committers keep their promise of providing consistent compute power over time. If a committer fa...
+- [Staking FAQ](https://docs.acurast.com/docs/staked-compute/staking-faq): You must unstake and wait for the cooldown to end, before you can migrate to mainnet or transfer processors to a different account. As the cooldown...
+- [Staking Glossary](https://docs.acurast.com/docs/staked-compute/staking-glossary): Redelegation can only be done if the current delegation is older than 7 days or if the stake of the chosen Committer is in cooldown.
+- [Staking Mechanics](https://docs.acurast.com/docs/staked-compute/staking-mechanics): import ThemedImage from "@theme/ThemedImage";
+- [Staked Compute](https://docs.acurast.com/docs/staked-compute): import { Redirect } from '@docusaurus/router';
+- [Claiming Vested ACU](https://docs.acurast.com/docs/token/claiming-acu): Some entities and individuals have received ACU tokens that are vested for a certain period of time, as outlined in the [token allocations](/tokeno...
+- [Tokenomics](https://docs.acurast.com/docs/tokenomics): import ThemedImage from "@theme/ThemedImage";
+- [Wallets](https://docs.acurast.com/docs/wallets/wallet-overview): import ThemedImage from "@theme/ThemedImage";
+- [AirGap Wallet](https://docs.acurast.com/docs/wallets/wallets-airgap): import ThemedImage from "@theme/ThemedImage";
+- [Ledger Hardware Wallet (coming soon)](https://docs.acurast.com/docs/wallets/wallets-ledger): :::caution Ledger Support Not Yet Available
+- [SubWallet](https://docs.acurast.com/docs/wallets/wallets-subwallet): import ThemedImage from "@theme/ThemedImage";
+- [Talisman](https://docs.acurast.com/docs/wallets/wallets-talisman): import ThemedImage from "@theme/ThemedImage";
+- [Whitepapers](https://docs.acurast.com/docs/whitepapers): **Published:** March 17, 2025
