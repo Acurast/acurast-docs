@@ -529,7 +529,7 @@ _STD_.webview.getDebugUrl(): string;
  * @callback WebViewCloseSuccess
  * @param {WebviewTab} tab the opened tab.
  */
-type WebViewNewTabSuccess = (WebViewTab) => void;
+type WebViewNewTabSuccess = (tab) => void;
 
 /**
  * @since 1.23.0 (Android)
@@ -537,7 +537,7 @@ type WebViewNewTabSuccess = (WebViewTab) => void;
  * @callback WebViewGetTabsSuccess
  * @param {WebViewTab[]} tabs the currently opened tabs.
  */
-type WebViewGetTabsSuccess = (WebViewTab[]) => void;
+type WebViewGetTabsSuccess = (tabs) => void;
 
 /**
  * @since 1.9.2 (Android)
@@ -594,8 +594,18 @@ type WebViewTabGetTrigger = () => Promise<'manual' | 'auto'>;
  * 
  * @function WebViewTabClose
  * Closes the WebView tab.
+ * @param {WebViewCloseOptions|undefined} options
  */
-type WebViewTabClose = () => Promise<void>;
+type WebViewTabClose = (options) => Promise<void>;
+
+/**
+ * @since 1.23.0 (Android)
+ * 
+ * @property {boolean|undefined} wholeTree whether to close the whole tree of tabs spawned by this tab or only the current one. If not provided, the default is false.
+ */
+type WebViewCloseOptions = {
+  wholeTree?: boolean;
+}
 
 /**
  * @since 1.23.0 (Android)
@@ -607,17 +617,38 @@ type WebViewTabClose = () => Promise<void>;
  * only if absolutely necessary, for example in preparation for taking a screenshot.
  * 
  * When no longer needed, the refresh loop should be closed with `stopRefreshLoop`.
- * @param {number|undefined} interval the interval of consecutive refreshes in milliseconds. If not provided, the default interval of 500 milliseconds is used.
+ * @param {WebViewStartRefreshLoopOptions|undefined} options
  */
-type WebViewStartRefreshLoop = (interval) => void;
+type WebViewStartRefreshLoop = (options) => void;
+
+/**
+ * @since 1.23.0 (Android)
+ * 
+ * @property {number|undefined} interval the interval of consecutive refreshes in milliseconds. If not provided, the default interval of 500 milliseconds is used.
+ * @property {boolean|undefined} wholeTree whether to refresh the whole tree of tabs spawned by this tab or only the current one. If not provided, the default is false.
+ */
+type WebViewStartRefreshLoopOptions = {
+  interval?: number;
+  wholeTree?: boolean;
+}
 
 /**
  * @since 1.23.0 (Android)
  * 
  * @function WebViewStopRefreshLoop
  * Stops the ongoing refresh loop for the WebView tab.
+ * @param {WebViewStopRefreshLoopOptions|undefined} options
  */
-type WebViewStopRefreshLoop = () => void;
+type WebViewStopRefreshLoop = (options) => void;
+
+/**
+ * @since 1.23.0 (Android)
+ * 
+ * @property {boolean|undefined} wholeTree whether to stop ongoing refresh loops for the whole tree of tabs spawned by this tab or only the current one. If not provided, the default is false.
+ */
+type WebViewStopRefreshLoopOptions = {
+  wholeTree?: boolean;
+}
 
 /**
  * @since 1.23.0 (Android)
