@@ -361,7 +361,7 @@ _STD_.p2p.peerIdFromPublicKey(publicKey): string;
 /**
  * @property {string[]} messageProtcols message protocols the node will support and use to send and receive messages.
  * @property {string[]} relays a list of public nodes that will serve as a proxy helping establish connections with nodes behind NATs and firewalls.
- * @property {number?} idleConnectionTimeout time in milliseconds after which idle connections will be closed, defaults to 15s if not provided.
+ * @property {number|undefined} idleConnectionTimeout time in milliseconds after which idle connections will be closed, defaults to 15s if not provided.
  */
 type P2PConfig = {
   messageProtocols: string[]
@@ -466,10 +466,10 @@ type P2PStreamClose = () => Promise<void>;
 ```
 
 ### **WebView**
-_Added in: <<TODO: add version, when released>> (Android)_
-
 ```javascript
 /**
+ * @since 1.23.0 (Android)
+ * 
  * Opens a new tab in the WebView.
  * @param {string} url the URL to open.
  * @param {WebViewNewTabSuccess} onSuccess the success callback.
@@ -478,55 +478,128 @@ _Added in: <<TODO: add version, when released>> (Android)_
 _STD_.webview.newTab(url, onSuccess, onError);
 
 /**
- * Closes all open WebView tabs.
- * @param {WebViewCloseSuccess} onSuccess the success callback.
+ * @since 1.9.2 (Android)
+ * 
+ * Closes all open WebView tabs, clears storage, cookies and eventual proxy settings.
+ * @param {WebViewVoidSuccess} onSuccess the success callback.
  * @param {WebViewError} onError the error callback.
  */
 _STD_.webview.close(onSuccess, onError);
 
 /**
+ * @since 1.23.0 (Android)
+ * 
+ * Gets an array of all currently open tabs.
+ * @param {WebViewGetTabsSuccess} onSuccess the success callback.
+ * @param {WebViewError} onError the error callback.
+ */
+_STD_.webview.getOpenTabs(onSuccess, onError);
+
+/**
+ * @since 1.23.0 (Android)
+ * 
+ * Configures the WebView to use a proxy server.
+ * @param {string} url the proxy URL.
+ * @param {WebViewProxyConfig|undefined} config additional proxy configuration, optional.
+ * @param {WebViewVoidSuccess} onSuccess the success callback.
+ * @param {WebViewError} onError the error callback.
+ */
+_STD_.webview.useProxy(url, config, onSuccess, onError);
+
+/**
+ * @since 1.23.0 (Android)
+ * 
+ * Resets the proxy configuration.
+ * @param {WebViewVoidSuccess} onSuccess the success callback.
+ * @param {WebViewError} onError the error callback.
+ */
+_STD_.webview.removeProxy(onSuccess, onError);
+
+/**
+ * @since 1.9.2 (Android)
+ * 
  * Returns the debug URL of the WebView.
  * @return {string} the debug URL.
  */
 _STD_.getDebugUrl(): string;
 
 /**
+ * @since 1.23.0 (Android)
+ * 
  * @callback WebViewCloseSuccess
  * @param {WebviewTab} tab the opened tab.
  */
-type WebViewNewTabSuccess = (tab) => void;
+type WebViewNewTabSuccess = (WebViewTab) => void;
 
 /**
+ * @since 1.23.0 (Android)
+ * 
+ * @callback WebViewGetTabsSuccess
+ * @param {WebViewTab[]} tabs the currently opened tabs.
+ */
+type WebViewGetTabsSuccess = (WebViewTab[]) => void;
+
+/**
+ * @since 1.9.2 (Android)
+ * 
  * @callback WebViewCloseSuccess
  */
-type WebViewCloseSuccess = () => void;
+type WebViewVoidSuccess = () => void;
 
 /**
+ * @since 1.9.2 (Android)
+ * 
  * @callback WebViewCloseSuccess
  * @param {string} error the error message.
  */
 type WebViewError = (error) => void;
 
 /**
+ * @since 1.23.0 (Android)
+ * 
  * @property {string} id the unique identifier of the WebView tab.
+ * @function getUrl returns the current URL of the WebView tab.
+ * @function getTrigger returns the trigger mode of the WebView tab.
  * @function close closes the WebView tab.
  * @function startRefreshLoop starts the refresh loop for the WebView tab.
  * @function stopRefreshLoop stops the ongoing refresh loop for the WebView tab.
  */
 type WebViewTab = {
   id: string
+  getUrl: WebViewTabGetUrl;
+  getTrigger: WebViewTabGetTrigger;
   close: WebViewTabClose;
   startRefreshLoop: WebViewStartRefreshLoop;
   stopRefreshLoop: WebViewStopRefreshLoop;
 };
 
 /**
+ * @since 1.23.0 (Android)
+ * 
+ * @function WebViewTabGetUrl
+ * Returns the current URL of the WebView tab.
+ */
+type WebViewTabGetUrl = () => Promise<string>;
+
+/**
+ * @since 1.23.0 (Android)
+ * 
+ * @function WebViewTabGetTrigger
+ * Returns the trigger mode of the WebView tab: 'manual' if opened via `webview.newTab` call, or 'auto' if opened automatically by one of the tabs.
+ */
+type WebViewTabGetTrigger = () => Promise<'manual' | 'auto'>;
+
+/**
+ * @since 1.23.0 (Android)
+ * 
  * @function WebViewTabClose
  * Closes the WebView tab.
  */
 type WebViewTabClose = () => Promise<void>;
 
 /**
+ * @since 1.23.0 (Android)
+ * 
  * @function WebViewStartRefreshLoop
  * Starts the refresh loop for the WebView tab.
  * 
@@ -539,10 +612,26 @@ type WebViewTabClose = () => Promise<void>;
 type WebViewStartRefreshLoop = (interval) => void;
 
 /**
+ * @since 1.23.0 (Android)
+ * 
  * @function WebViewStopRefreshLoop
  * Stops the ongoing refresh loop for the WebView tab.
  */
 type WebViewStopRefreshLoop = () => void;
+
+/**
+ * @since 1.23.0 (Android)
+ * 
+ * @property {string|undefined} username Proxy server username.
+ * @property {string|undefined} password Proxy server password.
+ * @property {boolean|undefined} fallback Whether to connect directly instead of using a proxy server in case of a failure. Defaults to false.
+ */
+type WebViewProxyConfig = {
+  username?: string;
+  password?: string;
+  fallback?: boolean;
+}
+
 ```
 
 ### **Substrate functions**
