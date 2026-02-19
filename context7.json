@@ -1,0 +1,8 @@
+{
+  "projectTitle": "Acurast",
+  "description": "Real Decentralized Compute Network powered by smartphones. Serverless deployments, confidential computing, and LLM workloads on mobile TEEs.",
+  "branch": "main",
+  "folders": ["docs"],
+  "excludeFolders": ["node_modules", ".github", "src", "plugins", "scripts"],
+  "excludeFiles": ["CHANGELOG.md"]
+}

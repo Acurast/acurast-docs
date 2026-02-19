@@ -168,17 +168,15 @@ const config = {
     [
       'docusaurus-plugin-llms',
       {
-        // Options here
         generateLLMsTxt: true,
         generateLLMsFullTxt: true,
         docsDir: 'docs',
         title: 'Acurast Documentation',
-        description: 'Complete reference documentation for Acurast',
+        description: 'Complete reference documentation for Acurast - the Real Decentralized Compute Network powered by smartphones.',
         includeBlog: false,
-
-        // Content cleaning options
         excludeImports: true,
         removeDuplicateHeadings: true,
+        rootContent: `Acurast is the Real Decentralized Compute Network — scalable, secure, and powered by smartphones. It uses Trusted Execution Environments (TEEs) on mobile devices to provide verifiable and confidential computation. Developers deploy serverless workloads (including LLMs) via the Acurast CLI. Compute Providers earn rewards by running a processor app on their phones. The network is secured by staked compute and the ACU token.`,
       },
     ], [
       "@docusaurus/plugin-client-redirects",
