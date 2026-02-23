@@ -28,9 +28,11 @@ Compute Providers who participate in [Staked Compute](/staked-compute/overview) 
   <p style={{marginTop: '4px', fontSize: '0.875rem', fontStyle: 'italic', color: '#6b7280'}}>Acurast Inflation Distribution</p>
 </div>
 
-### Deployment Execution Bonus
+### Deployment Execution Bonus (aka Busy Bonus)
 
-When a processor is detected executing a deployment during an epoch, it receives a bonus weight on the Benchmark Metrics that increases its scoring - and therefore its rewards - in both the Staked Compute Pool and the Compute Pool (Base Benchmarking Rewards) for that epoch. The deployment costs are paid as gas fees (i.e., transaction fees) by the developers.
+When a processor is detected executing a deployment during an epoch, based on the first successful heartbeat of that epoch, it receives a bonus weight of 10% on the Benchmark Metrics. This will increase the scoring - and therefore the rewards - in both the **Staked Compute Pool** and the **Compute Pool (Base Benchmarking Rewards)** for that epoch.
+
+The deployment costs for all deployments are paid by the developers and are burned after successful execution, creating a deflationary effect on the total supply.
 
 ### Cloud Rebellion
 
