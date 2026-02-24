@@ -128,6 +128,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "wallets/wallets-base",
+          label: "Base Wallet",
+        },
+        {
+          type: "doc",
           id: "wallets/wallets-ledger",
           label: "Ledger (coming soon)",
         },
