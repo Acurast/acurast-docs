@@ -1,0 +1,41 @@
+---
+title: Token Claim Pallet
+slug: /token/token-claim
+---
+
+The [`pallet-acurast-token-claim`](https://github.com/Acurast/acurast-substrate/tree/main/pallets/token-claim) pallet is used to distributed ACU tokens awarded to users via Air Drop campaigns and loot box rewards. The tokens are vested over a period of time that depends on the specific campaign.
+
+## How Vesting Works
+
+Vested tokens are not transferred to the recipient all at once. Instead, they unlock gradually over a fixed duration measured in blocks. The tokens remain on the funder account until explicitly claimed by the recipient. 
+At any point after the vesting period has started, the recipient can trigger a transfer of however many tokens have unlocked since their last claim.
+
+This means claiming is an ongoing process, each time a recipient calls claim, they receive only the portion that has vested since the last time they did so.
+
+## Claim Types
+
+Token distributions are organized into **claim types**. Each claim type represents a distinct distribution campaign and is associated with:
+
+- A **funder account** — the account from which tokens are transferred as they vest.
+- A **vesting duration** — the number of blocks over which the full allocation unlocks.
+
+A recipient may be eligible for multiple claim types. Each claim type is independent: its own vesting schedule starts when the recipient registers their claim on-chain.
+
+## The Claim Flow
+
+Claiming vested tokens happens in two stages:
+
+### 1. Registering a Claim
+
+To register a claim, the recipient submits a cryptographic proof on-chain. This proof was issued off-chain by the funder account to claim a specific amount of tokens under that specific claim type.
+
+Once the proof is accepted:
+- A vesting schedule is created on-chain for the recipient.
+- The starting block is recorded, and tokens begin unlocking from that point forward.
+- The claim cannot be registered again — it is one-time per claim type per recipient.
+
+### 2. Vesting (Unlocking Tokens)
+
+After registering a claim, the recipient can trigger a vest at any time. Each vest call calculates how many tokens have unlocked since the last vest and transfers that amount from the funder to the recipient's account.
+
+This can be done as often or as infrequently as the recipient chooses. Once all tokens have been transferred, the vesting schedule is removed.

@@ -103,6 +103,11 @@ const sidebars = {
           id: "token/claiming-acu",
           label: "Claiming Vested ACU",
         },
+        {
+          type: "doc",
+          id: "token/token-claim",
+          label: "Token Claim",
+        },
       ],
       collapsed: true,
     },
