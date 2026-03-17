@@ -77,6 +77,7 @@ const sidebars = {
             "acurast-protocol/architecture/execution-layer",
             "acurast-protocol/architecture/consensus-layer",
             "acurast-protocol/architecture/instances",
+            "acurast-protocol/architecture/deployment-pricing",
           ],
           collapsed: true,
         },
