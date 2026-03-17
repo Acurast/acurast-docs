@@ -16,10 +16,10 @@ This means claiming is an ongoing process, each time a recipient calls claim, th
 
 Token distributions are organized into **claim types**. Each claim type represents a distinct distribution campaign and is associated with:
 
-- A **funder account** — the account from which tokens are transferred as they vest.
-- A **vesting duration** — the number of blocks over which the full allocation unlocks.
+- A **funder account**: the account from which tokens are transferred as they vest.
+- A **vesting duration**: the number of blocks over which the full allocation unlocks.
 
-A recipient may be eligible for multiple claim types. Each claim type is independent: its own vesting schedule starts when the recipient registers their claim on-chain.
+A recipient may be eligible for multiple claim types. Each claim type is independent: its own vesting schedule starts when the recipient registers their claim on chain.
 
 ## The Claim Flow
 
@@ -27,12 +27,12 @@ Claiming vested tokens happens in two stages:
 
 ### 1. Registering a Claim
 
-To register a claim, the recipient submits a cryptographic proof on-chain. This proof was issued off-chain by the funder account to claim a specific amount of tokens under that specific claim type.
+To register a claim, the recipient submits a cryptographic proof on chain. This proof was issued off chain by the funder account to claim a specific amount of tokens under that specific claim type.
 
 Once the proof is accepted:
-- A vesting schedule is created on-chain for the recipient.
+- A vesting schedule is created on chain for the recipient.
 - The starting block is recorded, and tokens begin unlocking from that point forward.
-- The claim cannot be registered again — it is one-time per claim type per recipient.
+- The claim cannot be registered again, it is one time per claim type per recipient.
 
 ### 2. Vesting (Unlocking Tokens)
 
