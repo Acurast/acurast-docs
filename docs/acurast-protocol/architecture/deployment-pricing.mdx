@@ -25,7 +25,7 @@ where:
 
 The price was validated against the `deployment`'s declared reward: if the processor's calculated price exceeded the reward the developer had specified, the match was rejected.
 
-Matchers were paid immediately when the matching transaction was included on chain, before any processor had acknowledged or executed the `deployment`. Their reward was a percentage of the **unspent reward**, 
+Matchers were paid immediately when the matching transaction was included on chain, before any processor had acknowledged or executed the `deployment`. Their reward was a percentage of the unspent reward, 
 the portion of the developer's budget that remained after subtracting the sum of all processor prices. 
 A platform fee was deducted from the matcher's reward before the net amount was transferred.
 
@@ -63,8 +63,6 @@ where:
 
 The multiplier $m$ and the minimum price $p_{min}$ are protocol level parameters adjustable by governance without a runtime upgrade.
 
-### Budget Validation
-
 When the Acurast orchestrator matches a `deployment`, it computes the price for each candidate processor and checks that the price does not exceed the developer's declared reward per execution. 
 For `deployments` with multiple scheduled executions, the sum of all per execution prices across the entire schedule must also fit within the total budget locked by the developer at registration.
 
@@ -85,9 +83,3 @@ where:
 - **Processor** has their computed price per execution burned from the deployment budget each time they submit a valid report.
 
 Tying matcher payment to acknowledgment aligns the matcher's incentive with match quality, a match the processor rejects earns the matcher nothing.
-
-### Developer Perspective
-
-A developer registers a `deployment` with a reward that expresses the maximum they are willing to pay per execution. The total budget locked at registration is `reward × slots × execution_count`. 
-Setting the reward too low prevents matching, as no processor whose network derived price fits within the budget will be found. Setting it higher gives matchers a larger incentive to find and compete for the best match. 
-Any portion of the locked budget not spent on processor fees or matcher rewards is refunded when the `deployment` is deregistered.
