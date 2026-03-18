@@ -4,16 +4,16 @@ slug: /acurast-protocol/governance
 ---
 
 Acurast Mainnet governance is implemented through a combination of [`pallet-referenda`](https://docs.rs/pallet-referenda/latest/pallet_referenda/) and [`pallet-conviction-voting`](https://docs.rs/pallet-conviction-voting/latest/pallet_conviction_voting/). 
-Together they provide an on chain referendum system where token holders can vote on protocol changes, with voting power amplified by voluntarily locking tokens for longer periods.
+Together they provide an on chain referendum system where ACU holders can vote on protocol changes, with voting power amplified by voluntarily locking ACUs for longer periods.
 
 ## Overview
 
-Governance on Acurast Mainnet follows the OpenGov model: a referendum is created, a decision deposit is placed, and token holders vote during a fixed decision window.
+Governance on Acurast Mainnet follows the OpenGov model: a referendum is created, a decision deposit is placed, and ACU holders vote during a fixed decision window.
 A referendum passes when both an approval threshold and a support threshold are met simultaneously for a continuous confirmation period.
 
 Referenda are organized into tracks, where each track defines its own voting periods, deposit amounts, approval and support thresholds, and the set of origins allowed to submit to it. 
-Currently there is a single track (the root track) which gates all privileged protocol operations such as runtime upgrades and parameter changes. 
-In the future, additional tracks with more granular permission levels will be introduced, allowing any token holder to submit referenda for the appropriate scope of actions.
+Currently there is a single track (the Root track) which gates all privileged protocol operations such as runtime upgrades and parameter changes. 
+In the future, additional tracks with more granular permission levels will be introduced, allowing any ACU holder to submit referenda for the appropriate scope of actions.
 
 In the current configuration only council members can submit new referenda.
 
@@ -27,9 +27,12 @@ Every referendum goes through the following stages:
 4. **Confirming**: Once both thresholds are met, the referendum must remain passing for the track's confirmation period. If it drops below the thresholds during this window the confirmation period resets.
 5. **Enactment**: After confirmation the approved call is scheduled for execution after a minimum delay of the track's min enactment period.
 
+See the [Root Track Parameters](#root-track-parameters) section for the specific timelines of the Root track.
+
 ## Conviction Voting
 
-Token holders vote using [`pallet-conviction-voting`](https://docs.rs/pallet-conviction-voting/latest/pallet_conviction_voting/). Each vote is cast as *aye*, *nay*, or *abstain*, with an optional conviction level that multiplies voting power in exchange for a token lock after the referendum concludes.
+ACU holders vote using [`pallet-conviction-voting`](https://docs.rs/pallet-conviction-voting/latest/pallet_conviction_voting/). 
+Each vote is cast as *aye*, *nay*, or *abstain*, with an optional conviction level that multiplies voting power in exchange for a ACU lock after the referendum concludes.
 
 | Conviction | Vote multiplier | Lock duration |
 |------------|-----------------|---------------|
@@ -41,7 +44,8 @@ Token holders vote using [`pallet-conviction-voting`](https://docs.rs/pallet-con
 | 5×         | 5×              | 112 days      |
 | 6×         | 6×              | 224 days      |
 
-The lock is applied to the voting tokens only after the referendum ends and only for winning-side votes. An account can have at most 512 concurrent votes across all active referenda. Turnout is measured against the active token issuance.
+ACUs are locked immediately when a vote is cast. If the referendum ends and the vote was on the winning side with conviction > 0, the lock continues for the conviction period after the referendum ends. 
+For losing side votes the lock is released once the referendum concludes. Releasing the lock always requires an explicit `unlock` call. An account can have at most 512 concurrent votes across all active referenda. 
 
 ## Root Track Parameters
 
@@ -50,8 +54,6 @@ Acurast Mainnet has a single governance track, the root track (ID 0), which gate
 | Parameter            | Value   |
 |----------------------|---------|
 | Max deciding at once | 1       |
-| Submission deposit   | 4 ACU   |
-| Decision deposit     | 1 ACU   |
 | Prepare period       | 12 hours |
 | Decision period      | 48 hours |
 | Confirm period       | 6 hours  |
@@ -63,10 +65,10 @@ Acurast Mainnet has a single governance track, the root track (ID 0), which gate
 
 Passing the deciding stage requires two independent thresholds to be satisfied at the same time.
 
-**Approval** measures the share of *aye* votes out of all conviction-weighted votes cast (aye + nay). 
+**Approval** measures the share of *aye* votes out of all conviction weighted votes cast (aye + nay). 
 The root track uses a reciprocal curve: approval starts at 100% at the beginning of the decision period and decreases toward 50% as the decision period progresses, with the sharpest drop in the first few hours.
 
-**Support** measures the total raw token balance behind aye votes (pre-conviction) as a fraction of the active token issuance.
+**Support** measures the total raw ACU balance behind aye votes (pre-conviction) as a fraction of the active ACU issuance.
 The root track uses a linear curve: the required support starts at 50% at the beginning of the decision period and decreases linearly to 0% by the end. 
 
 Both thresholds must be satisfied simultaneously for the entire track's confirmation period before the referendum is approved.
@@ -75,5 +77,7 @@ Both thresholds must be satisfied simultaneously for the entire track's confirma
 
 Currently there are 2 ways a user can vote.
 
-- Through the [Acurast Hub Governance](https://hub.acurast.com/governance) page. When a referendum is ongoing, it will appear on the Hub's governance page and users will be able to cast a vote and, later on, unlock tokens from previous votes.
+- Through the [Acurast Hub Governance](https://hub.acurast.com/governance) page. When a referendum is ongoing, it will appear on the Hub's governance page and users will be able to cast a vote and, later on, unlock ACUs from previous votes.
 - Through the [Polkadot JS Web Application](https://polkadot.js.org/apps//?rpc=wss%3A%2F%2Fpublic-rpc.mainnet.acurast.com#/referenda).
+
+Once the vote is cast, it can be updated by voting again. This allows the user to adjust both the ACU amount and conviction parameter.
