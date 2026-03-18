@@ -67,7 +67,6 @@ const sidebars = {
       label: "Acurast Protocol",
       items: [
         "acurast-orchestrator",
-
         {
           type: "category",
           label: "Architecture",
@@ -86,6 +85,7 @@ const sidebars = {
         "networks",
         "audits",
         "whitepapers",
+        "acurast-protocol/governance",
       ],
       collapsed: false,
     },

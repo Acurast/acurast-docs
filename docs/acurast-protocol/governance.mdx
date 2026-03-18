@@ -1,0 +1,79 @@
+---
+title: Governance
+slug: /acurast-protocol/governance
+---
+
+Acurast Mainnet governance is implemented through a combination of [`pallet-referenda`](https://docs.rs/pallet-referenda/latest/pallet_referenda/) and [`pallet-conviction-voting`](https://docs.rs/pallet-conviction-voting/latest/pallet_conviction_voting/). 
+Together they provide an on chain referendum system where token holders can vote on protocol changes, with voting power amplified by voluntarily locking tokens for longer periods.
+
+## Overview
+
+Governance on Acurast Mainnet follows the OpenGov model: a referendum is created, a decision deposit is placed, and token holders vote during a fixed decision window.
+A referendum passes when both an approval threshold and a support threshold are met simultaneously for a continuous confirmation period.
+
+Referenda are organized into tracks, where each track defines its own voting periods, deposit amounts, approval and support thresholds, and the set of origins allowed to submit to it. 
+Currently there is a single track (the root track) which gates all privileged protocol operations such as runtime upgrades and parameter changes. 
+In the future, additional tracks with more granular permission levels will be introduced, allowing any token holder to submit referenda for the appropriate scope of actions.
+
+In the current configuration only council members can submit new referenda.
+
+## Referenda Lifecycle
+
+Every referendum goes through the following stages:
+
+1. **Submission**: A proposal is submitted and is placed in a queue for the selected track.
+2. **Preparing**: The referendum waits for the track's preparation period. During this time a decision deposit must be placed by any account, or the referendum will be discarded after the undeciding timeout period.
+3. **Deciding**: Voting is open for the track's decision period. The referendum is evaluated continuously against the approval and support thresholds of the track.
+4. **Confirming**: Once both thresholds are met, the referendum must remain passing for the track's confirmation period. If it drops below the thresholds during this window the confirmation period resets.
+5. **Enactment**: After confirmation the approved call is scheduled for execution after a minimum delay of the track's min enactment period.
+
+## Conviction Voting
+
+Token holders vote using [`pallet-conviction-voting`](https://docs.rs/pallet-conviction-voting/latest/pallet_conviction_voting/). Each vote is cast as *aye*, *nay*, or *abstain*, with an optional conviction level that multiplies voting power in exchange for a token lock after the referendum concludes.
+
+| Conviction | Vote multiplier | Lock duration |
+|------------|-----------------|---------------|
+| None       | 0.1×            | No lock       |
+| 1×         | 1×              | 7 days        |
+| 2×         | 2×              | 14 days       |
+| 3×         | 3×              | 28 days       |
+| 4×         | 4×              | 56 days       |
+| 5×         | 5×              | 112 days      |
+| 6×         | 6×              | 224 days      |
+
+The lock is applied to the voting tokens only after the referendum ends and only for winning-side votes. An account can have at most 512 concurrent votes across all active referenda. Turnout is measured against the active token issuance.
+
+## Root Track Parameters
+
+Acurast Mainnet has a single governance track, the root track (ID 0), which gates all privileged protocol operations such as runtime upgrades and parameter changes.
+
+| Parameter            | Value   |
+|----------------------|---------|
+| Max deciding at once | 1       |
+| Submission deposit   | 4 ACU   |
+| Decision deposit     | 1 ACU   |
+| Prepare period       | 12 hours |
+| Decision period      | 48 hours |
+| Confirm period       | 6 hours  |
+| Min enactment period | 2 hours  |
+| Undeciding timeout   | 14 days  |
+| Vote locking period  | 7 days   |
+
+## Approval and Support Thresholds
+
+Passing the deciding stage requires two independent thresholds to be satisfied at the same time.
+
+**Approval** measures the share of *aye* votes out of all conviction-weighted votes cast (aye + nay). 
+The root track uses a reciprocal curve: approval starts at 100% at the beginning of the decision period and decreases toward 50% as the decision period progresses, with the sharpest drop in the first few hours.
+
+**Support** measures the total raw token balance behind aye votes (pre-conviction) as a fraction of the active token issuance.
+The root track uses a linear curve: the required support starts at 50% at the beginning of the decision period and decreases linearly to 0% by the end. 
+
+Both thresholds must be satisfied simultaneously for the entire track's confirmation period before the referendum is approved.
+
+## How to Vote
+
+Currently there are 2 ways a user can vote.
+
+- Through the [Acurast Hub Governance](https://hub.acurast.com/governance) page. When a referendum is ongoing, it will appear on the Hub's governance page and users will be able to cast a vote and, later on, unlock tokens from previous votes.
+- Through the [Polkadot JS Web Application](https://polkadot.js.org/apps//?rpc=wss%3A%2F%2Fpublic-rpc.mainnet.acurast.com#/referenda).
