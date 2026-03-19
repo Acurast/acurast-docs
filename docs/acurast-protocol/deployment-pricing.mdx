@@ -1,13 +1,13 @@
 ---
 title: Deployment Pricing
-slug: /acurast-protocol/architecture/deployment-pricing
+slug: /acurast-protocol/deployment-pricing
 ---
 
-The pricing model for `deployment` execution has evolved over time. This page describes how pricing worked in the original system and how it works in the proposed new system.
+The pricing model for `deployment` execution has evolved over time. This page describes how pricing worked in the legacy system and how it works in the proposed new system.
 
-## Original Pricing System
+## Legacy Pricing System
 
-In the original system, each processor independently advertised their price as part of their advertisement on the Acurast marketplace. A processor's advertisement included three pricing components:
+In the legacy system, each processor independently advertised their price as part of their advertisement on the Acurast marketplace. A processor's advertisement included three pricing components:
 
 - **Base fee per execution**: a fixed amount charged per execution slot, regardless of duration or resource use.
 - **Fee per millisecond**: an amount charged per millisecond of execution duration.
@@ -57,7 +57,7 @@ $$\text{price} = \max\left(m \times p_{ms} \times d,\ p_{min}\right)$$
 
 where: 
 
-- $m$ is the global price multiplier (a fixed point number, e.g. 1.1)
+- $m$ is the global price multiplier, this will start as a fixed point number adaptable by governance, and will eventually move to a curve based on the actual usage of the network
 - $d$ is the execution duration in milliseconds as declared in the `deployment` schedule
 - $p_{min}$ is the global minimum price per execution
 
@@ -83,3 +83,10 @@ where:
 - **Processor** has their computed price per execution burned from the deployment budget each time they submit a valid report.
 
 Tying matcher payment to acknowledgment aligns the matcher's incentive with match quality, a match the processor rejects earns the matcher nothing.
+
+## Motivation for the change
+
+The legacy pricing model placed the burden of price discovery entirely on processors. 
+Each manager had to independently choose and update the advertised rates for every managed processor, which in practice meant prices rarely changed at all as most processor managers did not engage with the system.
+
+The new system removes per processor price configuration entirely. Prices are derived automatically from each processor's on chain benchmark contribution, which is already tracked by the protocol.
