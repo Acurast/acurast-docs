@@ -1,0 +1,92 @@
+---
+title: Deployment Pricing
+slug: /acurast-protocol/deployment-pricing
+---
+
+The pricing model for `deployment` execution has evolved over time. This page describes how pricing worked in the legacy system and how it works in the proposed new system.
+
+## Legacy Pricing System
+
+In the legacy system, each processor independently advertised their price as part of their advertisement on the Acurast marketplace. A processor's advertisement included three pricing components:
+
+- **Base fee per execution**: a fixed amount charged per execution slot, regardless of duration or resource use.
+- **Fee per millisecond**: an amount charged per millisecond of execution duration.
+
+When a matcher proposed a match between a `deployment` and a processor, the protocol calculated the processor's fee for one execution as:
+
+$$\text{price} = \max(f_{ms},\ f_{ms}^{min}) \times d + f_{base}$$
+
+where: 
+
+- $f_{ms}$ is the processor's advertised fee per millisecond 
+- $f_{ms}^{min}$ is the global minimum fee per millisecond
+- $d$ is the execution duration in milliseconds
+- $f_{base}$ is the base fee per execution
+
+The price was validated against the `deployment`'s declared reward: if the processor's calculated price exceeded the reward the developer had specified, the match was rejected.
+
+Matchers were paid immediately when the matching transaction was included on chain, before any processor had acknowledged or executed the `deployment`. Their reward was a percentage of the unspent reward, 
+the portion of the developer's budget that remained after subtracting the sum of all processor prices. 
+A platform fee was deducted from the matcher's reward before the net amount was transferred.
+
+## New Dynamic Pricing System
+
+The new system replaces processor advertised pricing with **network derived pricing**. 
+Instead of each processor declaring their own rates, a processor's price is computed from their contribution to the benchmark rewards as tracked by the Acurast compute pallet.
+
+### Price Per Execution
+
+A processor's price per execution is derived through the following:
+
+**Reward contribution per millisecond:**
+
+The compute pallet tracks each processor's `reward_contribution` per epoch (a fixed number of blocks, approximately 90 minutes). 
+This represents the total reward the processor contributes to the benchmark rewards. The price per millisecond is obtained by dividing `reward_contribution` by the epoch length and block time:
+
+$$p_{ms} = \frac{R_{epoch}}{N_{epoch} \times D_{slot}}$$
+
+where: 
+
+- $R_{epoch}$ is the processor's reward contribution per epoch
+- $N_{epoch}$ is the epoch length in blocks (900)
+- $D_{slot}$ is the block time in milliseconds (6000 ms)
+
+**Price per execution:**
+
+$$\text{price} = \max\left(m \times p_{ms} \times d,\ p_{min}\right)$$
+
+where: 
+
+- $m$ is the global price multiplier, this will start as a fixed point number adaptable by governance, and will eventually move to a curve based on the actual usage of the network
+- $d$ is the execution duration in milliseconds as declared in the `deployment` schedule
+- $p_{min}$ is the global minimum price per execution
+
+The multiplier $m$ and the minimum price $p_{min}$ are protocol level parameters adjustable by governance without a runtime upgrade.
+
+When the Acurast orchestrator matches a `deployment`, it computes the price for each candidate processor and checks that the price does not exceed the developer's declared reward per execution. 
+For `deployments` with multiple scheduled executions, the sum of all per execution prices across the entire schedule must also fit within the total budget locked by the developer at registration.
+
+### Matcher Incentive
+
+Matchers are paid on **processor acknowledgment**, not on matching. When a processor acknowledges an assignment, the protocol calculates the price difference for that assignment:
+
+$$\Delta = r - \text{price}$$
+
+where: 
+
+- $r$ is the developer's declared reward per execution 
+- $\text{price}$ is the processor's computed price per execution 
+
+10% of this difference, multiplied by the number of executions in the assignment, is paid to the matcher. A platform fee of 30% is deducted from the matcher's share before transfer. The result is:
+
+- **Matcher** receives a percentage of the price difference. once the processor acknowledges.
+- **Processor** has their computed price per execution burned from the deployment budget each time they submit a valid report.
+
+Tying matcher payment to acknowledgment aligns the matcher's incentive with match quality, a match the processor rejects earns the matcher nothing.
+
+## Motivation for the change
+
+The legacy pricing model placed the burden of price discovery entirely on processors. 
+Each manager had to independently choose and update the advertised rates for every managed processor, which in practice meant prices rarely changed at all as most processor managers did not engage with the pricing mechanism.
+
+The new system removes per processor price configuration entirely. Prices are derived automatically from each processor's on chain benchmark contribution, which is already tracked by the protocol.

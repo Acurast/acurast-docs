@@ -86,6 +86,7 @@ const sidebars = {
         "audits",
         "whitepapers",
         "acurast-protocol/governance",
+        "acurast-protocol/deployment-pricing",
       ],
       collapsed: false,
     },
