@@ -665,6 +665,22 @@ type WebViewProxyConfig = {
 
 ```
 
+### **Network**
+
+```javascript
+/**
+ * @since 1.24.0 (Android), 1.8.0 (iOS)
+ *
+ * Whitelists one or more hostnames for outbound network access. The runtime
+ * resolves each hostname via DNS and verifies that the host has published a
+ * `_acu.<host>` TXT record with the value `v=<hash>`, where `<hash>` is
+ * `base64(sha256(deployment_source || host))`. Connections to non-whitelisted
+ * hosts are rate-limited.
+ * @param {string|string[]} hosts The hostname or array of hostnames to whitelist.
+ */
+_STD_.network.whitelist(hosts);
+```
+
 ### **Substrate functions**
 
 ```javascript
