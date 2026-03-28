@@ -29,6 +29,21 @@ const sidebars = {
         "developers/llm-on-acurast",
         "developers/deployment-runtime-environment",
         "developers/on-demand-deployments",
+        {
+          type: "category",
+          label: "Tools",
+          items: [
+            {
+              type: "category",
+              label: "Indexers",
+              items: [
+                "developers/tools/indexers/subquery",
+              ],
+              collapsed: false,
+            },
+          ],
+          collapsed: false,
+        },
       ],
       collapsed: true,
     },
