@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "docusaurus": "docusaurus",
+    "docusaurus": "docusaurus start",
     "start": "npm run process-predefined-methods && docusaurus start",
     "build": "npm run process-predefined-methods && docusaurus build",
     "swizzle": "docusaurus swizzle",

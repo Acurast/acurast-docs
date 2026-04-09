@@ -1,0 +1,764 @@
+---
+title: Deploy Agent (EVM)
+slug: /developers/deploy-agent
+---
+
+The Acurast Deploy Agent enables deploying jobs to Acurast processors directly from EVM chains. It provides an HTTP API that accepts job specifications and handles the deployment to the Acurast network, with payment secured through an on-chain escrow contract.
+
+This approach is ideal for dApps that want to programmatically deploy Acurast jobs from their smart contracts or backends without directly interacting with the Acurast parachain.
+
+## Supported ETH chains
+
+**Ethereum (Base)**
+
+Chain Id: 8453
+
+[Escrow contract `0x3DE12e9622542e0e32079C2146CacaF40F7e093F`](https://basescan.org/address/0x3DE12e9622542e0e32079C2146CacaF40F7e093F)
+
+
+## Overview
+
+The deployment flow works as follows:
+
+1. **Deposit** - User deposits tokens (ETH, USDC, etc.) to the `DepositEscrow` contract on a supported EVM chain
+2. **Sign** - User signs an EIP-712 authorization linking their deposit to a job deployment request
+3. **Deploy** - User submits the job specification to the Deploy Agent's HTTP API with the signed authorization
+4. **Execute** - The agent verifies the deposit, deploys the job to Acurast, and acknowledges the deposit (releasing funds)
+
+If the agent fails to process the job, the user can withdraw their deposit from the escrow contract.
+
+## Deploying a Job
+
+### Step 1: Make a Deposit
+
+First, deposit tokens to the `DepositEscrow` contract on a supported chain. The deposit amount should cover the total job reward based on the agent's pricing.
+
+```bash
+# Usage: npx tsx deposit.ts <agentOwner> <tokenAddress> <amount> [chainId]
+# Requires ETHEREUM_PRIVATE_KEY env var (depositor's private key)
+
+# Deposit 0.01 ETH to agent owner on Base mainnet
+npx tsx deposit.ts 0xAgentOwnerAddress ETH 0.01 8453
+
+# Or deposit USDC
+npx tsx deposit.ts 0xAgentOwnerAddress 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913 1.5 8453
+```
+
+Note the `Deposit ID` returned from the script output (from the on-chain event):
+
+```text
+Depositing from: 0x147b33c5B12767B3ABEE547212af27b1398CE517
+Chain: Base (8453)
+Agent recipient: 0x147b33c5B12767B3ABEE547212af27b1398CE517
+Token ETH accepted: true
+ETH balance: 0.99896747391901895 ETH
+Depositing 0.01 ETH...
+Transaction hash: 0xc2157b0b08d0f773ace2cbaf1092423877db85fd88f038712264ad7500796abf
+Deposit ID: 1
+```
+
+### Step 2: Generate X-PAYMENT Header and Submit
+
+Use the helper script to sign an EIP-712 payment authorization with your depositor wallet, then submit the deployment request:
+
+```bash
+# Usage: npx tsx sign-payment.ts <depositId> <currency> <value> [chainId]
+# Requires ETHEREUM_PRIVATE_KEY env var (the depositor's private key)
+
+# Generate X-PAYMENT header (value in wei for ETH)
+X_PAYMENT=$(npx tsx sign-payment.ts 1 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE 10000000000000000 8453)
+
+# Submit deploy request
+curl -X POST https://deploy-agent.acu.run/deploy \
+  -H "Content-Type: application/json" \
+  -H "X-PAYMENT: $X_PAYMENT" \
+  -d '{
+    "chainId": 8453,
+    "jobSpec": {
+      "script": "ipfs://QmZ9mvN4RFCqSqivB2LF3VF1qgrDGTW393PJezbdPy7nH2",
+      "allowedSources": null,
+      "allowOnlyVerifiedSources": true,
+      "schedule": {
+        "startTime": 1777593600000,
+        "endTime": 1777651200000,
+        "duration": 3600000,
+        "interval": 3600001,
+        "maxStartDelay": 10000
+      },
+      "memory": 0,
+      "networkRequests": 0,
+      "storage": 0,
+      "requiredModules": [],
+      "assignmentStrategy": "Single",
+      "slots": 1,
+      "reward": 77136800000,
+      "minReputation": 0,
+      "runtime": "NodeJS"
+    }
+  }'
+```
+
+**Success Response (200):**
+
+```json
+{
+  "success": true,
+  "depositId": "1",
+  "chainId": 8453,
+  "acurastJobHash": "0x1234567890abcdef...",
+  "message": "Job deployed and acknowledged"
+}
+```
+
+Your job is now deployed! After a few blocks, you can view the deployment in the Acurast Explorer at:
+`https://hub.acurast.com/explorer/extrinsic/<acurastJobHash>`
+
+## Listing Deployments
+
+Query all deployments processed by the agent:
+
+```bash
+curl https://deploy-agent.acu.run/deployments
+```
+
+**Response:**
+
+```json
+{
+  "count": 2,
+  "deployments": [
+    {
+      "depositId": "0",
+      "acurastJobHash": "0x1234...",
+      "timestamp": 1234567890,
+      "status": "acknowledged"
+    },
+    {
+      "depositId": "1",
+      "acurastJobHash": "0x5678...",
+      "timestamp": 1234567900,
+      "status": "pending"
+    }
+  ]
+}
+```
+
+## Getting a Specific Deployment
+
+Query a specific deployment by deposit ID:
+
+```bash
+curl https://deploy-agent.acu.run/deployments/1
+```
+
+**Response:**
+
+```json
+{
+  "depositId": "1",
+  "acurastJobHash": "0x1234...",
+  "timestamp": 1234567890,
+  "status": "acknowledged"
+}
+```
+
+## Refund Process
+
+If the agent fails to process your job, you can withdraw your deposit from the escrow contract. This is only possible if the deposit hasn't been acknowledged yet.
+
+```bash
+# Usage: npx tsx withdraw.ts <depositId> [chainId]
+# Requires ETHEREUM_PRIVATE_KEY env var (depositor's private key)
+# Only works if deposit hasn't been acknowledged
+
+npx tsx withdraw.ts 1 8453
+```
+
+**Example output:**
+
+```text
+Withdrawing as: 0x147b33c5B12767B3ABEE547212af27b1398CE517
+Chain: Base (8453)
+Deposit ID: 1
+
+Deposit Info:
+  Token: ETH (0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)
+  Amount: 0.01 ETH
+  Depositor: 0x147b33c5B12767B3ABEE547212af27b1398CE517
+  Agent Owner: 0x147b33c5B12767B3ABEE547212af27b1398CE517
+  Acknowledged: false
+
+Withdrawing...
+Transaction hash: 0x...
+Transaction confirmed in block: 12345678
+
+Successfully withdrawn: 0.01 ETH
+```
+
+## Payment Requirements
+
+Before making a deposit, you can query the agent's payment requirements to understand supported chains, tokens, and pricing:
+
+```bash
+curl https://deploy-agent.acu.run/payment-requirements
+```
+
+This returns the supported chains, accepted tokens, and the agent's pricing multipliers for calculating required deposits.
+
+## JobSpec Reference
+
+The `jobSpec` object follows the standard Acurast job registration format:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `script` | string | IPFS hash or inline script code |
+| `allowedSources` | string[] \| null | Processor whitelist (null = any) |
+| `allowOnlyVerifiedSources` | boolean | Require attested processors |
+| `schedule.startTime` | number | Job start time (Unix ms) |
+| `schedule.endTime` | number | Job end time (Unix ms) |
+| `schedule.duration` | number | Execution duration (ms) |
+| `schedule.interval` | number | Execution interval (ms) |
+| `schedule.maxStartDelay` | number | Max acceptable start delay (ms) |
+| `memory` | number | Max memory bytes (0 = default) |
+| `networkRequests` | number | Max network requests (0 = default) |
+| `storage` | number | Max storage bytes (0 = default) |
+| `requiredModules` | number[] | Required modules (e.g., LLM) |
+| `assignmentStrategy` | string | "Single" or "Competing" |
+| `slots` | number | Number of processor slots |
+| `reward` | number | Reward per execution (picoACU) |
+| `minReputation` | number | Min processor reputation (0-1000000) |
+| `runtime` | string | "NodeJS", "NodeJSWithBundle", or "Shell" |
+
+## Helper Scripts
+
+The following TypeScript scripts can be used standalone. Save them to your project directory and run with `npx tsx <script>.ts`.
+
+**Prerequisites:**
+```bash
+npm install ethers dotenv
+```
+
+Create a `.env` file with your private key:
+```
+ETHEREUM_PRIVATE_KEY=0x...
+```
+
+### deposit.ts
+
+Deposit tokens to the DepositEscrow contract.
+
+```typescript
+#!/usr/bin/env npx tsx
+/**
+ * Deposit to DepositEscrow contract
+ * Usage: npx tsx deposit.ts <agentOwner> <tokenAddress> <amount> [chainId]
+ *
+ * Examples:
+ *   npx tsx deposit.ts 0x... ETH 0.01 8453
+ *   npx tsx deposit.ts 0x... 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913 1.5 8453
+ */
+
+import { ethers } from 'ethers';
+import 'dotenv/config';
+
+const NATIVE_ETH = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
+
+// Network configuration
+const NETWORKS: Record<number, { name: string; rpcUrl: string; depositEscrow: string; blockExplorer: string }> = {
+  8453: {
+    name: 'Base',
+    rpcUrl: 'https://mainnet.base.org',
+    depositEscrow: '0x3DE12e9622542e0e32079C2146CacaF40F7e093F',
+    blockExplorer: 'https://basescan.org',
+  },
+};
+
+const ERC20_ABI = [
+  'function balanceOf(address) view returns (uint256)',
+  'function decimals() view returns (uint8)',
+  'function allowance(address owner, address spender) view returns (uint256)',
+  'function approve(address spender, uint256 amount) returns (bool)',
+];
+
+const ESCROW_ABI = [
+  'function recipients(address) view returns (address)',
+  'function acceptedTokens(address, address) view returns (bool)',
+  'function deposit(address agentOwner, address token, uint256 amount) returns (uint256)',
+  'function depositETH(address agentOwner) payable returns (uint256)',
+  'event Deposited(uint256 indexed depositId, address indexed depositor, address indexed agentOwner, address token, uint256 amount)',
+];
+
+async function main() {
+  const [agentOwner, tokenArg, amountStr, chainIdArg] = process.argv.slice(2);
+
+  if (!agentOwner || !tokenArg || !amountStr) {
+    console.error('Usage: npx tsx deposit.ts <agentOwner> <tokenAddress> <amount> [chainId]');
+    console.error('');
+    console.error('Examples:');
+    console.error('  npx tsx deposit.ts 0x... ETH 0.01 8453');
+    console.error('  npx tsx deposit.ts 0x... 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913 1.5 8453');
+    process.exit(1);
+  }
+
+  if (!ethers.isAddress(agentOwner)) {
+    console.error(`Error: Invalid agent owner address: ${agentOwner}`);
+    process.exit(1);
+  }
+
+  const privateKey = process.env.ETHEREUM_PRIVATE_KEY;
+  if (!privateKey) {
+    console.error('Error: ETHEREUM_PRIVATE_KEY environment variable required');
+    process.exit(1);
+  }
+
+  const chainId = chainIdArg ? parseInt(chainIdArg) : 8453;
+  const network = NETWORKS[chainId];
+  if (!network) {
+    console.error(`Error: No escrow contract configured for chain ${chainId}`);
+    process.exit(1);
+  }
+
+  const tokenAddress = tokenArg.toUpperCase() === 'ETH' ? NATIVE_ETH : tokenArg;
+
+  const provider = new ethers.JsonRpcProvider(network.rpcUrl);
+  const wallet = new ethers.Wallet(privateKey, provider);
+  console.log('Depositing from:', wallet.address);
+  console.log('Chain:', network.name, `(${chainId})`);
+
+  const escrow = new ethers.Contract(network.depositEscrow, ESCROW_ABI, wallet);
+
+  const recipient = await escrow.recipients(agentOwner);
+  if (recipient === ethers.ZeroAddress) {
+    console.error(`Agent owner ${agentOwner} is not configured!`);
+    process.exit(1);
+  }
+  console.log('Agent recipient:', recipient);
+
+  const isAccepted = await escrow.acceptedTokens(agentOwner, tokenAddress);
+  const label = tokenAddress === NATIVE_ETH ? 'ETH' : tokenAddress;
+  console.log(`Token ${label} accepted: ${isAccepted}`);
+  if (!isAccepted) {
+    console.error(`Error: Token ${label} is not accepted by this agent owner`);
+    process.exit(1);
+  }
+
+  let tx: ethers.TransactionResponse;
+
+  if (tokenAddress === NATIVE_ETH) {
+    const amount = ethers.parseEther(amountStr);
+    const balance = await provider.getBalance(wallet.address);
+    console.log(`ETH balance: ${ethers.formatEther(balance)} ETH`);
+    if (balance < amount) {
+      console.error(`Insufficient ETH balance. Have: ${ethers.formatEther(balance)}, Need: ${amountStr}`);
+      process.exit(1);
+    }
+
+    console.log(`Depositing ${amountStr} ETH...`);
+    const iface = new ethers.Interface(ESCROW_ABI);
+    const data = iface.encodeFunctionData('depositETH', [agentOwner]);
+    tx = await wallet.sendTransaction({
+      to: network.depositEscrow,
+      data,
+      value: amount,
+    });
+  } else {
+    const token = new ethers.Contract(tokenAddress, ERC20_ABI, wallet);
+    const decimals = await token.decimals();
+    const amount = ethers.parseUnits(amountStr, decimals);
+
+    const balance = await token.balanceOf(wallet.address);
+    if (balance < amount) {
+      console.error(`Insufficient balance. Have: ${ethers.formatUnits(balance, decimals)}, Need: ${amountStr}`);
+      process.exit(1);
+    }
+
+    const allowance = await token.allowance(wallet.address, network.depositEscrow);
+    if (allowance < amount) {
+      console.log('Approving token spend...');
+      const approveTx = await token.approve(network.depositEscrow, amount);
+      await approveTx.wait();
+      console.log('Approved');
+    }
+
+    console.log(`Depositing ${amountStr} tokens...`);
+    tx = await escrow.deposit(agentOwner, tokenAddress, amount);
+  }
+
+  console.log('Transaction hash:', tx.hash);
+  const receipt = await tx.wait();
+
+  const iface = new ethers.Interface(ESCROW_ABI);
+  for (const log of receipt?.logs || []) {
+    try {
+      const parsed = iface.parseLog({ topics: log.topics as string[], data: log.data });
+      if (parsed?.name === 'Deposited') {
+        console.log('Deposit ID:', parsed.args[0].toString());
+        break;
+      }
+    } catch { }
+  }
+}
+
+main().catch((error) => {
+  console.error('Error:', error.message);
+  process.exit(1);
+});
+```
+
+### sign-payment.ts
+
+Generate an X-PAYMENT header for deploy requests.
+
+```typescript
+#!/usr/bin/env npx tsx
+/**
+ * Generate X-PAYMENT header for deploy requests
+ * Usage: npx tsx sign-payment.ts <depositId> <currency> <value> [chainId]
+ *
+ * Example:
+ *   npx tsx sign-payment.ts 1 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE 10000000000000000 8453
+ */
+
+import { ethers } from 'ethers';
+import 'dotenv/config';
+
+// Network configuration
+const NETWORKS: Record<number, { depositEscrow: string }> = {
+  8453: { depositEscrow: '0x3DE12e9622542e0e32079C2146CacaF40F7e093F' },
+};
+
+const PAYMENT_AUTH_DOMAIN_NAME = 'AcurastDeployAgent';
+const PAYMENT_AUTH_DOMAIN_VERSION = '1';
+
+const PAYMENT_AUTH_TYPES = {
+  PaymentAuthorization: [
+    { name: 'depositId', type: 'uint256' },
+    { name: 'currency', type: 'address' },
+    { name: 'value', type: 'uint256' },
+  ],
+};
+
+async function main() {
+  const [depositId, currency, value, chainIdArg] = process.argv.slice(2);
+
+  if (!depositId || !currency || !value) {
+    console.error('Usage: npx tsx sign-payment.ts <depositId> <currency> <value> [chainId]');
+    console.error('Example: npx tsx sign-payment.ts 1 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE 10000000000000000 8453');
+    process.exit(1);
+  }
+
+  const privateKey = process.env.ETHEREUM_PRIVATE_KEY;
+  if (!privateKey) {
+    console.error('Error: ETHEREUM_PRIVATE_KEY environment variable required');
+    process.exit(1);
+  }
+
+  const chainId = chainIdArg ? parseInt(chainIdArg) : 8453;
+  const network = NETWORKS[chainId];
+  if (!network) {
+    console.error(`Error: No escrow contract configured for chain ${chainId}`);
+    process.exit(1);
+  }
+
+  const wallet = new ethers.Wallet(privateKey);
+
+  const domain = {
+    name: PAYMENT_AUTH_DOMAIN_NAME,
+    version: PAYMENT_AUTH_DOMAIN_VERSION,
+    chainId,
+    verifyingContract: network.depositEscrow,
+  };
+
+  const payload = { depositId, currency, value };
+  const typedValue = {
+    depositId: BigInt(depositId),
+    currency,
+    value: BigInt(value),
+  };
+
+  const signature = await wallet.signTypedData(domain, PAYMENT_AUTH_TYPES, typedValue);
+  const xPayment = Buffer.from(JSON.stringify({ payload, signature })).toString('base64');
+
+  console.log(xPayment);
+}
+
+main().catch((error) => {
+  console.error('Error:', error.message);
+  process.exit(1);
+});
+```
+
+### withdraw.ts
+
+Withdraw a deposit from the DepositEscrow contract (only if not yet acknowledged).
+
+```typescript
+#!/usr/bin/env npx tsx
+/**
+ * Withdraw from DepositEscrow contract
+ * Usage: npx tsx withdraw.ts <depositId> [chainId]
+ *
+ * Examples:
+ *   npx tsx withdraw.ts 1 8453
+ */
+
+import { ethers } from 'ethers';
+import 'dotenv/config';
+
+const NATIVE_ETH = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
+
+// Network configuration
+const NETWORKS: Record<number, { name: string; rpcUrl: string; depositEscrow: string }> = {
+  8453: {
+    name: 'Base',
+    rpcUrl: 'https://mainnet.base.org',
+    depositEscrow: '0x3DE12e9622542e0e32079C2146CacaF40F7e093F',
+  },
+};
+
+const ESCROW_ABI = [
+  'function getDeposit(uint256 depositId) view returns (address token, uint256 amount, bool acknowledged, address depositor, address agentOwner)',
+  'function withdraw(uint256 depositId)',
+  'event Withdrawn(uint256 indexed depositId, address indexed depositor, uint256 amount)',
+];
+
+const ERC20_ABI = [
+  'function symbol() view returns (string)',
+  'function decimals() view returns (uint8)',
+];
+
+async function main() {
+  const [depositIdArg, chainIdArg] = process.argv.slice(2);
+
+  if (!depositIdArg) {
+    console.error('Usage: npx tsx withdraw.ts <depositId> [chainId]');
+    console.error('Example: npx tsx withdraw.ts 1 8453');
+    process.exit(1);
+  }
+
+  const depositId = BigInt(depositIdArg);
+
+  const privateKey = process.env.ETHEREUM_PRIVATE_KEY;
+  if (!privateKey) {
+    console.error('Error: ETHEREUM_PRIVATE_KEY environment variable required');
+    process.exit(1);
+  }
+
+  const chainId = chainIdArg ? parseInt(chainIdArg) : 8453;
+  const network = NETWORKS[chainId];
+  if (!network) {
+    console.error(`Error: No escrow contract configured for chain ${chainId}`);
+    process.exit(1);
+  }
+
+  const provider = new ethers.JsonRpcProvider(network.rpcUrl);
+  const wallet = new ethers.Wallet(privateKey, provider);
+  console.log('Withdrawing as:', wallet.address);
+  console.log('Chain:', network.name, `(${chainId})`);
+  console.log('Deposit ID:', depositId.toString());
+  console.log('');
+
+  const escrow = new ethers.Contract(network.depositEscrow, ESCROW_ABI, wallet);
+
+  const [token, amount, acknowledged, depositor, agentOwner] = await escrow.getDeposit(depositId);
+
+  if (amount === 0n) {
+    console.error('Error: Deposit does not exist');
+    process.exit(1);
+  }
+
+  let tokenSymbol: string;
+  let tokenDecimals: number;
+  if (token === NATIVE_ETH) {
+    tokenSymbol = 'ETH';
+    tokenDecimals = 18;
+  } else {
+    const tokenContract = new ethers.Contract(token, ERC20_ABI, provider);
+    tokenSymbol = await tokenContract.symbol();
+    tokenDecimals = await tokenContract.decimals();
+  }
+
+  console.log('Deposit Info:');
+  console.log('  Token:', tokenSymbol, `(${token})`);
+  console.log('  Amount:', ethers.formatUnits(amount, tokenDecimals), tokenSymbol);
+  console.log('  Depositor:', depositor);
+  console.log('  Agent Owner:', agentOwner);
+  console.log('  Acknowledged:', acknowledged);
+  console.log('');
+
+  if (depositor.toLowerCase() !== wallet.address.toLowerCase()) {
+    console.error('Error: Only the depositor can withdraw');
+    console.error(`  Your address: ${wallet.address}`);
+    console.error(`  Depositor: ${depositor}`);
+    process.exit(1);
+  }
+
+  if (acknowledged) {
+    console.error('Error: Deposit has already been acknowledged and cannot be withdrawn');
+    process.exit(1);
+  }
+
+  console.log('Withdrawing...');
+  const tx = await escrow.withdraw(depositId);
+  console.log('Transaction hash:', tx.hash);
+
+  const receipt = await tx.wait();
+  console.log('Transaction confirmed in block:', receipt?.blockNumber);
+
+  const iface = new ethers.Interface(ESCROW_ABI);
+  for (const log of receipt?.logs || []) {
+    try {
+      const parsed = iface.parseLog({ topics: log.topics as string[], data: log.data });
+      if (parsed?.name === 'Withdrawn') {
+        console.log('');
+        console.log('Successfully withdrawn:', ethers.formatUnits(parsed.args.amount, tokenDecimals), tokenSymbol);
+        break;
+      }
+    } catch { }
+  }
+}
+
+main().catch((error) => {
+  console.error('Error:', error.message);
+  process.exit(1);
+});
+```
+
+### submit-job.ts
+
+Submit a job directly to the AcurastDeploy contract (alternative on-chain path).
+
+```typescript
+#!/usr/bin/env npx tsx
+/**
+ * Submit a job to AcurastDeploy contract after making a deposit.
+ * Usage: npx tsx submit-job.ts <depositId> [chainId]
+ *
+ * Example:
+ *   npx tsx submit-job.ts 1 8453
+ */
+
+import { ethers } from 'ethers';
+import 'dotenv/config';
+
+// Network configuration
+const NETWORKS: Record<number, { name: string; rpcUrl: string; acurastDeploy: string; blockExplorer: string }> = {
+  8453: {
+    name: 'Base',
+    rpcUrl: 'https://mainnet.base.org',
+    acurastDeploy: '', // Not yet deployed on mainnet
+    blockExplorer: 'https://basescan.org',
+  },
+  84532: {
+    name: 'Base Sepolia',
+    rpcUrl: 'https://base-sepolia-rpc.publicnode.com',
+    acurastDeploy: '0xFaB8110a35513338151CC0Db9C653C18E36dB522',
+    blockExplorer: 'https://sepolia.basescan.org',
+  },
+};
+
+const ACURAST_DEPLOY_ABI = [
+  `function submitJob(
+    uint256 depositId,
+    uint8 action,
+    tuple(
+      bytes script,
+      address[] allowedSources,
+      bool allowOnlyVerifiedSources,
+      tuple(uint64 startTime, uint64 endTime, uint64 duration, uint64 interval, uint64 maxStartDelay) schedule,
+      uint32 memory_,
+      uint32 networkRequests,
+      uint32 storage_,
+      uint8[] requiredModules,
+      uint8 assignmentStrategy,
+      tuple(address source, uint64 startDelay)[] instantMatch,
+      uint8 slots,
+      uint128 reward,
+      uint128 minReputation,
+      tuple(tuple(uint32 platform, uint32 buildNumber)[] min) processorVersion,
+      uint8 runtime
+    ) jobSpec
+  ) external`,
+];
+
+enum Action { Deploy = 0 }
+enum AssignmentStrategy { Single = 0, Competing = 1 }
+enum Runtime { NodeJS = 0, NodeJSWithBundle = 1, Shell = 2 }
+
+async function main() {
+  const [depositId, chainIdArg] = process.argv.slice(2);
+
+  if (!depositId) {
+    console.error('Usage: npx tsx submit-job.ts <depositId> [chainId]');
+    console.error('Example: npx tsx submit-job.ts 1 84532');
+    process.exit(1);
+  }
+
+  const privateKey = process.env.ETHEREUM_PRIVATE_KEY;
+  if (!privateKey) {
+    console.error('Error: ETHEREUM_PRIVATE_KEY environment variable required');
+    process.exit(1);
+  }
+
+  const chainId = chainIdArg ? parseInt(chainIdArg) : 84532;
+  const network = NETWORKS[chainId];
+  if (!network || !network.acurastDeploy) {
+    console.error(`Error: AcurastDeploy not configured for chain ${chainId}`);
+    process.exit(1);
+  }
+
+  const provider = new ethers.JsonRpcProvider(network.rpcUrl);
+  const wallet = new ethers.Wallet(privateKey, provider);
+
+  console.log(`Network: ${network.name} (${chainId})`);
+  console.log(`Wallet: ${wallet.address}`);
+  console.log(`Deposit ID: ${depositId}`);
+
+  const acurastDeploy = new ethers.Contract(network.acurastDeploy, ACURAST_DEPLOY_ABI, wallet);
+
+  const script = `
+console.log("Hello from Acurast!");
+console.log("Timestamp:", Date.now());
+`;
+
+  const now = Date.now();
+  const startTime = now + 5 * 60 * 1000;
+  const endTime = startTime + 60 * 1000;
+
+  const jobSpec = {
+    script: ethers.toUtf8Bytes(script),
+    allowedSources: [],
+    allowOnlyVerifiedSources: false,
+    schedule: { startTime, endTime, duration: 30000, interval: 60000, maxStartDelay: 10000 },
+    memory_: 100_000_000,
+    networkRequests: 10,
+    storage_: 1_000_000,
+    requiredModules: [],
+    assignmentStrategy: AssignmentStrategy.Competing,
+    instantMatch: [],
+    slots: 1,
+    reward: 100_000_000_000n,
+    minReputation: 0,
+    processorVersion: { min: [] },
+    runtime: Runtime.NodeJS,
+  };
+
+  console.log('\nSubmitting job...');
+
+  try {
+    const tx = await acurastDeploy.submitJob(depositId, Action.Deploy, jobSpec);
+    console.log(`Transaction: ${tx.hash}`);
+    const receipt = await tx.wait();
+    console.log(`Confirmed in block ${receipt.blockNumber}`);
+    console.log(`View: ${network.blockExplorer}/tx/${tx.hash}`);
+  } catch (error: any) {
+    console.error('Error:', error.reason || error.message);
+    process.exit(1);
+  }
+}
+
+main().catch((error) => {
+  console.error('Error:', error.message);
+  process.exit(1);
+});
+```
