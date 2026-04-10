@@ -19,3 +19,21 @@ A non exhaustive list of wallets supporting Acurast:
 
 \* Recommended wallets
 
+## Wallet compatibility
+
+Acurast accounts can be created and managed across several wallets, but moving an account from one wallet to another isn't always straightforward. Different wallets use different cryptographic methods to derive accounts from a secret (mnemonic), which means importing the same seed phrase into a different wallet will often produce a *different* Acurast account rather than restoring the original one.
+
+The matrix below shows which wallet-to-wallet transitions will successfully reproduce the same Acurast account. A ✓ means the account can be imported from one wallet into another and result in the same address; a ✗ means the resulting account will differ. Some combinations involving AirGap work only when a specific derivation path is set — see the footnotes for details.
+
+| **From ↓ / To →** | Acurast Lite | SubWallet | Talisman | MetaMask | AirGap |
+|---|---|---|---|---|---|
+| **Acurast Lite** | — | ✗ | ✗ | ✗ | ✗ |
+| **SubWallet** | ✗ | — | ✓ | ✗ | ✓¹ |
+| **Talisman** | ✗ | ✓ | — | ✗ | ✓² |
+| **MetaMask** | ✗ | ✗ | ✗ | — | ✗ |
+| **AirGap** | ✗ | ✗ | ✓³ | ✗ | — |
+
+¹ SubWallet → AirGap: Set derivation path in AirGap to `/m`
+² Talisman → AirGap: Set derivation path in AirGap to `/m`
+³ AirGap → Talisman: Set derivation path in Talisman to `//44//434//0/0/0`
+
