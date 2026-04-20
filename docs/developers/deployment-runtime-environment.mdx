@@ -678,12 +678,16 @@ type WebViewProxyConfig = {
  *    `v=base64(sha256(deployment_source || host))`, then resolves the hostname
  *    to one or more IP addresses (A/AAAA).
  * 2. **Reverse DNS + TXT** — for each resolved IP, performs a PTR lookup and
- *    verifies that `_acu.<ptr_host>` carries a TXT record
+ *    verifies that `_acu.<host>` carries a TXT record
  *    `v=base64(sha256(deployment_source || host))`.
+ * 
+ * Where `deployment_source` is the raw 32-byte Substrate Account ID of the deployment's owner
+ * and `host` is the bare hostname (no scheme, port, or path, e.g. `example.com`).
  *
  * Both steps must pass for an IP to be added to the whitelist.
  * Connections to non-whitelisted hosts are rate-limited.
- * @param {string|string[]} hosts The hostname or array of hostnames to whitelist.
+ *
+ * @param {string|string[]} hosts The hostname or array of hostnames to whitelist. Must be bare hostnames without scheme, port, or path.
  */
 _STD_.network.whitelist(hosts);
 ```
