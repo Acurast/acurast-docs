@@ -692,6 +692,49 @@ type WebViewProxyConfig = {
 _STD_.network.whitelist(hosts);
 ```
 
+Example scripts for computing the verification hash:
+
+#### Node.js
+```javascript
+// npm install @polkadot/util-crypto
+
+const { createHash } = require('crypto');
+const { decodeAddress } = require('@polkadot/util-crypto');
+
+function verificationHash(source, host) {
+    // Decode hex Account ID directly, or convert SS58 address to raw bytes
+    const sourceBytes = source.length === 64
+        ? Buffer.from(source, 'hex')
+        : Buffer.from(decodeAddress(source));
+    // SHA-256 over concatenation of source bytes and UTF-8 encoded host
+    const digest = createHash('sha256')
+        .update(sourceBytes)
+        .update(host)
+        .digest();
+    // Return the hash as a base64 string
+    return digest.toString('base64');
+}
+```
+
+#### Python
+```python
+# pip install substrate-interface
+
+import hashlib
+import base64
+
+from substrateinterface.utils.ss58 import ss58_decode
+
+
+def verification_hash(source: str, host: str) -> str:
+    # Decode hex Account ID directly, or convert SS58 address to raw bytes
+    source_bytes = bytes.fromhex(source) if len(source) == 64 else bytes.fromhex(ss58_decode(source))
+    # SHA-256 over concatenation of source bytes and UTF-8 encoded host
+    digest = hashlib.sha256(source_bytes + host.encode()).digest()
+    # Return the hash as a base64 string
+    return base64.b64encode(digest).decode()
+```
+
 ### **Substrate functions**
 
 ```javascript
