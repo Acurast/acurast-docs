@@ -30,6 +30,8 @@ const sidebars = {
         "developers/deployment-runtime-environment",
         "developers/on-demand-deployments",
         "developers/deploy-agent",
+        "developers/acurast-cli",
+        "developers/devtools",
       ],
       collapsed: true,
     },

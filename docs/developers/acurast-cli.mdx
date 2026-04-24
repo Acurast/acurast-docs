@@ -1,0 +1,256 @@
+---
+title: Acurast CLI
+slug: /developers/acurast-cli
+---
+
+## Introduction
+
+The Acurast CLI is a command-line tool to deploy and manage apps on the Acurast Cloud.
+
+## Installation
+
+Install the Acurast CLI globally using npm:
+
+```bash
+npm install -g @acurast/cli
+```
+
+## Quick Start
+
+```bash
+# Create a new project from a template
+acurast new my-project
+
+# Initialize configuration (creates acurast.json and .env)
+acurast init
+
+# Deploy to Acurast Cloud
+acurast deploy
+```
+
+## Commands
+
+| Command | Description |
+| --- | --- |
+| `new <project-name>` | Create a new Acurast project from a template |
+| `deploy [project]` | Deploy the current project to the Acurast platform |
+| `estimate-fee [project]` | Estimate the fee for the current project |
+| `deployments [arg]` | List, view, and manage deployments |
+| `live [project]` | Run your project on a live-code-processor in real time |
+| `init` | Create an `acurast.json` and `.env` file |
+| `devtools <deployment-id>` | Request a DevTools view key and open the DevTools URL |
+| `open` | Open Acurast resources in your browser |
+| `help [command]` | Display help for a command |
+
+### Options
+
+- `-v`, `--version` — Output the version number
+- `-h`, `--help` — Display help for a command
+
+## Configuration
+
+Running `acurast init` creates two files:
+
+### acurast.json
+
+This file defines your deployment parameters. Example:
+
+```json
+{
+  "projects": {
+    "example": {
+      "projectName": "example",
+      "fileUrl": "dist/bundle.js",
+      "network": "mainnet",
+      "onlyAttestedDevices": true,
+      "enableDevtools": false,
+      "assignmentStrategy": {
+        "type": "Single"
+      },
+      "execution": {
+        "type": "onetime",
+        "maxExecutionTimeInMs": 10000
+      },
+      "maxAllowedStartDelayInMs": 10000,
+      "usageLimit": {
+        "maxMemory": 0,
+        "maxNetworkRequests": 0,
+        "maxStorage": 0
+      },
+      "numberOfReplicas": 64,
+      "requiredModules": [],
+      "minProcessorReputation": 0,
+      "maxCostPerExecution": 100000000000,
+      "includeEnvironmentVariables": [],
+      "processorWhitelist": [],
+      "mutability": "Immutable",
+      "reuseKeysFrom": null
+    }
+  }
+}
+```
+
+#### Configuration Fields
+
+| Field | Description |
+| --- | --- |
+| `projectName` | The name of the project |
+| `fileUrl` | Path to the bundled file including all dependencies (e.g., `dist/bundle.js`) |
+| `network` | Network for deployment (e.g., `mainnet`, `canary`) |
+| `onlyAttestedDevices` | Only allow attested devices to run the app |
+| `enableDevtools` | Enable [DevTools](/developers/devtools) for the deployment. Defaults to `false` |
+| `startAt` | Start time — either `{ msFromNow: number }` or `{ timestamp: number }` |
+| `assignmentStrategy` | `"Single"` (one set of processors) or `"Competing"` (new processors per execution) |
+| `execution` | `"onetime"` or `"interval"` with `intervalInMs`, `numberOfExecutions`, and `maxExecutionTimeInMs` |
+| `maxAllowedStartDelayInMs` | Maximum allowed start delay in milliseconds |
+| `usageLimit` | Limits for `maxMemory`, `maxNetworkRequests`, and `maxStorage` (in bytes) |
+| `numberOfReplicas` | How many processors run the deployment in parallel |
+| `requiredModules` | Modules the processor must support (e.g., `["DataEncryption"]`) |
+| `minProcessorReputation` | Minimum required processor reputation |
+| `maxCostPerExecution` | Maximum cost per execution in the smallest denomination of ACU |
+| `includeEnvironmentVariables` | Environment variables from `.env` to pass to the deployment |
+| `processorWhitelist` | Whitelist of processor addresses |
+| `minProcessorVersions` | Minimum processor versions (`android`, `ios`) |
+| `mutability` | `"Immutable"` (default) or `"Mutable"` — controls whether the deployment can be modified after creation |
+| `reuseKeysFrom` | Reuse keys from a previous mutable deployment. Format: `["Acurast", "address", deploymentId]` |
+
+### .env
+
+Stores secrets and environment variables:
+
+```text
+ACURAST_MNEMONIC=abandon abandon about ...
+# ACURAST_IPFS_URL=https://api.pinata.cloud
+# ACURAST_IPFS_API_KEY=eyJhb...
+# ACURAST_RPC=wss://...
+```
+
+| Variable | Required | Description |
+| --- | --- | --- |
+| `ACURAST_MNEMONIC` | Yes | Mnemonic for the deployer account. Must have ACU (or cACU on canary). Claim cACU on the [faucet](https://faucet.acurast.com) |
+| `ACURAST_IPFS_URL` | No | IPFS gateway URL (e.g., `https://api.pinata.cloud`) |
+| `ACURAST_IPFS_API_KEY` | No | API key for the IPFS gateway. [Register here](https://pinata.cloud/) |
+| `ACURAST_RPC` | No | Custom RPC URL |
+
+## Environment Variables
+
+You can pass encrypted environment variables to your deployments. They are encrypted during deployment and only decrypted on the processor at runtime.
+
+**1. Add variables to `.env`:**
+
+```text
+API_KEY=your-api-key
+```
+
+**2. Reference them in `acurast.json`:**
+
+```json
+{
+  "includeEnvironmentVariables": ["API_KEY"]
+}
+```
+
+**3. Access them in your code:**
+
+```typescript
+const API_KEY = _STD_.env[API_KEY];
+```
+
+For interval-based deployments, you can update environment variables between executions:
+
+```bash
+acurast deployments <id> --update-env-vars
+```
+
+## Deployment Management
+
+### Listing and Viewing
+
+```bash
+# List all deployments
+acurast deployments ls
+
+# List deployments on canary network
+acurast deployments ls --network canary
+
+# View a specific deployment
+acurast deployments <id>
+```
+
+### Cleanup
+
+```bash
+# Clean up old, finished deployments and return unused funds
+acurast deployments --cleanup
+
+# Clean up a specific deployment
+acurast deployments <id> --cleanup
+```
+
+### Updating Mutable Deployments
+
+Deployments created with `"mutability": "Mutable"` can be updated after creation.
+
+#### Update Script
+
+```bash
+acurast deployments update script <deployment-id> <script-ipfs> [--dry-run] [--force]
+```
+
+Example:
+
+```bash
+acurast deployments update script \
+  "Acurast:5CiPPse...DjL:123456" \
+  "ipfs://QmNewScriptHash"
+```
+
+#### Transfer Editor Permissions
+
+```bash
+acurast deployments update editor <deployment-id> <new-editor-address> [--dry-run] [--force]
+```
+
+### Deployment ID Format
+
+Deployment IDs follow the format `origin:address:number`:
+
+- **origin** — The chain name (currently `"Acurast"`)
+- **address** — The deployer's AccountId32 address
+- **number** — Sequential deployment number
+
+Example: `"Acurast:5CiPPseXPECbkjWCa6MnjNokrgYjMqmKndv2rSnekmSK2DjL:123456"`
+
+Find your deployment IDs by running `acurast deployments ls`.
+
+## Live Code
+
+The Live Code feature lets you run your code on a dedicated processor in real time, with immediate feedback including `console.log` output and errors.
+
+### Setup
+
+```bash
+acurast live --setup
+```
+
+During setup, choose the duration and follow the CLI instructions. After the deployment starts (approximately 5 minutes), run:
+
+```bash
+acurast live
+```
+
+This executes your project on the live processor using the configuration from `acurast init`.
+
+## Key Reuse
+
+The `reuseKeysFrom` field lets you maintain the same cryptographic keys across deployments. The referenced deployment must be mutable.
+
+```json
+{
+  "reuseKeysFrom": [
+    "Acurast",
+    "5CiPPseXPECbkjWCa6MnjNokrgYjMqmKndv2rSnekmSK2DjL",
+    123456
+  ]
+}
+```
