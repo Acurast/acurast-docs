@@ -1,0 +1,55 @@
+---
+title: Environment Variables
+slug: /developers/build/environment-variables
+---
+
+You can pass encrypted environment variables to your Acurast deployments. They are encrypted at deployment time and only decrypted when the code runs on a processor. Useful for API keys and other secrets.
+
+## Setup
+
+**1. Add variables to your local `.env` file:**
+
+```text
+API_KEY=your-api-key
+```
+
+**2. Reference them in `acurast.json`:**
+
+```json
+{
+  "projects": {
+    "my-project": {
+      "includeEnvironmentVariables": ["API_KEY"]
+    }
+  }
+}
+```
+
+See the [Deployment Config reference](/developers/build/deployment-config) for all config fields.
+
+**3. Access them in your deployment code:**
+
+```typescript
+const API_KEY = _STD_.env.API_KEY;
+```
+
+On `acurast deploy`, the listed variables are encrypted and attached to the deployment automatically.
+
+## Rotating variables between executions
+
+For interval-based deployments with multiple executions, you can update environment variables between runs. Edit `.env` and then:
+
+```bash
+acurast deployments <id> --update-env-vars
+```
+
+This is useful for rotating API keys on a schedule without redeploying the script.
+
+## Programmatic access (SDK)
+
+When using the [SDK](/developers/tools/sdk), the same workflow is available via `setEnvVars` and `JobEnvironmentService` from `@acurast/sdk/chain`.
+
+## See also
+
+- [Runtime Environment](/developers/build/runtime-environment) — the full `_STD_` API available to scripts
+- [CLI reference](/developers/tools/cli)

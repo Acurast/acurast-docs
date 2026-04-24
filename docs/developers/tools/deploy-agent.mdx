@@ -1,7 +1,13 @@
 ---
 title: Deploy Agent (x402)
-slug: /developers/deploy-agent
+slug: /developers/tools/deploy-agent
 ---
+
+:::tip Which tool should I use?
+- **[CLI](/developers/tools/cli)** — interactive local workflow with ACU.
+- **[SDK](/developers/tools/sdk)** — programmatic deploys from TypeScript/JavaScript with ACU.
+- **Deploy Agent** — pay with USDC on Base via x402. Best for AI agents and services without ACU accounts.
+:::
 
 The Acurast Deploy Agent lets developers deploy computational jobs to the Acurast decentralized processor network directly from EVM chains (starting with USDC on Base).
 Via the deploy agent's HTTP API a simple [x402](https://docs.cdp.coinbase.com/x402/core-concepts/how-it-works) payment together with a job specification will trigger the deployment for you.
@@ -297,7 +303,7 @@ Example response:
 ## Full job specification
 
 :::tip Generate job specification
-The easiest way to craft a job specification as JSON is using the [Acurast CLI](/developers/deploy-first-app) with the extra argument `--only-upload` to just output the IPFS URL:
+The easiest way to craft a job specification as JSON is using the [Acurast CLI](/developers/tools/cli) with the extra argument `--only-upload` to just output the IPFS URL:
 
 ```shell
 acurast deploy --only-upload

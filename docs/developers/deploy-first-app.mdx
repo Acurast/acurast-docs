@@ -41,28 +41,13 @@ You can either clone those repositories, or set up a blank Acurast starter proje
 
 - Basic knowledge of Node.js and the Command Line
 
+:::tip Other ways to deploy
+This tutorial uses the [CLI](/developers/tools/cli) — the interactive path. You can also deploy programmatically with the [SDK](/developers/tools/sdk), or pay with USDC on Base via the [Deploy Agent](/developers/tools/deploy-agent).
+:::
+
 ## Setting up the Project
 
-### Project Structure
-
-The structure of a project looks exactly like a normal Node.js project:
-
-```
-├── dist
-│   └── bundle.js
-├── LICENSE
-├── README.md
-├── acurast.json
-├── package-lock.json
-├── package.json
-├── src
-│   └── index.ts
-├── .env
-├── tsconfig.json
-└── webpack.config.js
-```
-
-There is only one file that is specific to Acurast: `acurast.json`. This file configures the deployment and is covered later in the tutorial.
+The structure of a project looks exactly like a normal Node.js project, with one extra file: `acurast.json` — this configures the deployment and is covered below. See the [Deployment Config reference](/developers/build/deployment-config) for all fields.
 
 ### Writing the code
 
@@ -204,51 +189,7 @@ No package.json file found. This is unusual. Are you sure you are in the right d
 You can deploy your app using 'acurast deploy'
 ```
 
-During the setup process, default values are set for most of the parameters, and they should work well for this example. You can always open the `acurast.json` file and change the configuration there. In the [CLI Docs](https://github.com/Acurast/acurast-cli?tab=readme-ov-file#configuration-details) you will find more information about the possible configurations.
-
-These are the files that were generated:
-
-acurast.json:
-
-```json
-{
-  "projects": {
-    "tutorial": {
-      "projectName": "tutorial",
-      "fileUrl": "dist/bundle.js",
-      "network": "canary",
-      "onlyAttestedDevices": true,
-      "assignmentStrategy": {
-        "type": "Single"
-      },
-      "execution": {
-        "type": "onetime",
-        "maxExecutionTimeInMs": 3600000
-      },
-      "maxAllowedStartDelayInMs": 10000,
-      "usageLimit": {
-        "maxMemory": 0,
-        "maxNetworkRequests": 0,
-        "maxStorage": 0
-      },
-      "numberOfReplicas": 1,
-      "requiredModules": [],
-      "minProcessorReputation": 0,
-      "maxCostPerExecution": 1000000000,
-      "includeEnvironmentVariables": [],
-      "processorWhitelist": []
-    }
-  }
-}
-```
-
-.env:
-
-```text
-ACURAST_MNEMONIC=bounce crack ostrich put entry comic wage all tilt nature rebel position
-# ACURAST_IPFS_URL=
-# ACURAST_IPFS_API_KEY=
-```
+The defaults work well for this example. For all available fields and meanings, see the [Deployment Config reference](/developers/build/deployment-config).
 
 ### Getting ready for Deployment
 
@@ -296,7 +237,7 @@ There will be 1 executions with a cost of 0.001 cACU each.
 Congratulations, your deployment is now being registered in the network and executed soon! Check the CLI for more information about the deployment process.
 
 :::tip Deploy using Deploy Agent (x402)
-You can use our [Deploy Agent](/developers/deploy-agent) to deploy jobs using USDC on EVM base instead.
+You can use our [Deploy Agent](/developers/tools/deploy-agent) to deploy jobs using USDC on EVM base instead.
 :::
 
 ## Verifying the Deployment
@@ -305,75 +246,12 @@ If you followed this tutorial, then your app will be available at `https://<your
 
 Success! You've successfully deployed your first application on Acurast!
 
-## Bonus: Working with Secret Environment Variables
+## Next steps
 
-You can use secret environment variables in Acurast depoyments. The environment variables that are encrypted during deployment and only decrypted when the code is run on the processor. This is useful for storing sensitive information like API keys.
+- **[Environment Variables](/developers/build/environment-variables)** — pass encrypted secrets (API keys, tokens) to your deployment.
+- **[Runtime Environment](/developers/build/runtime-environment)** — what's available to your script on the processor.
+- **[Deployment Config](/developers/build/deployment-config)** — full `acurast.json` reference.
+- **[Example Apps](/developers/getting-started/examples)** — more projects to clone and learn from.
+- **[CLI reference](/developers/tools/cli)** — deployment management, live code, key reuse.
 
-To use environment variables in your project, you first need to add them to the `.env` file. For example, let's say you have an API key that you want to keep secret. You can add it to the `.env` file like this:
-
-```text
-# .env
-
-API_KEY=your-api-key
-```
-
-To configure which of your deployments make use of the environment variables, edit the `acurast.json` file and add all the environment variables to include in the deployment to the `includeEnvironmentVariables` array.
-
-```json
-{
-  "projects": {
-    "tutorial": {
-      "projectName": "tutorial",
-      "fileUrl": "dist/bundle.js",
-      "network": "canary",
-      "onlyAttestedDevices": true,
-      "assignmentStrategy": {
-        "type": "Single"
-      },
-      "execution": {
-        "type": "onetime",
-        "maxExecutionTimeInMs": 60000
-      },
-      "maxAllowedStartDelayInMs": 10000,
-      "usageLimit": {
-        "maxMemory": 0,
-        "maxNetworkRequests": 0,
-        "maxStorage": 0
-      },
-      "numberOfReplicas": 1,
-      "requiredModules": [],
-      "minProcessorReputation": 0,
-      "maxCostPerExecution": 1000000000,
-      "includeEnvironmentVariables": ["API_KEY"],
-      "processorWhitelist": []
-    }
-  }
-}
-```
-
-Then, in your code, you can access the environment variables like this:
-
-```typescript
-const API_KEY = _STD_.env[API_KEY];
-```
-
-When you run `acurast deploy`, the environment variables will now automatically be added to your deployment.
-
-If you run an interval based deployment with multiple executions, then you can even update the environment variables between executions. This is useful if you want to rotate your API keys regularly. To do that, simply update the `.env` file and run `acurast deployments <id> -e`. This will update the environment variables for the deployment with the given ID.
-
-## Conclusion
-
-Congratulations! You've successfully deployed your first application on Acurast! For more advanced features and detailed documentation, refer to [Acurast CLI Documentation](https://github.com/Acurast/acurast-cli/blob/main/README.md). Also make sure to join the Telegram or Discord to be part of the community!
-
-## More Examples
-
-For more inspiration, check out the [Acurast Examples](https://github.com/Acurast/acurast-example-apps) with examples showing various features:
-
-- [app-env-vars](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-env-vars)
-- [external-dependencies](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-external-dependencies)
-- [fetch from API](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-fetch)
-- [heic to png](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-heic-to-png)
-- [puppeteer](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-puppeteer)
-- [telegram-bot](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-telegram-bot)
-- [wasm](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-wasm)
-- [webserver](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-webserver)
+Join the [Telegram](https://t.me/acurastnetwork) or [Discord](https://discord.gg/wqgC6b6aKe) to be part of the community!

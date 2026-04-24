@@ -1,7 +1,13 @@
 ---
 title: Acurast CLI
-slug: /developers/acurast-cli
+slug: /developers/tools/cli
 ---
+
+:::tip Which tool should I use?
+- **CLI** — interactive local workflow: `new` / `init` / `deploy` / `live`. Best for getting started and day-to-day deployments.
+- **[SDK](/developers/tools/sdk)** — programmatic deploys from your own TypeScript/JavaScript code (CI, backends, custom flows).
+- **[Deploy Agent](/developers/tools/deploy-agent)** — pay with USDC on Base via x402. Best for AI agents and services without ACU accounts.
+:::
 
 ## Introduction
 
@@ -98,7 +104,7 @@ This file defines your deployment parameters. Example:
 | `fileUrl` | Path to the bundled file including all dependencies (e.g., `dist/bundle.js`) |
 | `network` | Network for deployment (e.g., `mainnet`, `canary`) |
 | `onlyAttestedDevices` | Only allow attested devices to run the app |
-| `enableDevtools` | Enable [DevTools](/developers/devtools) for the deployment. Defaults to `false` |
+| `enableDevtools` | Enable [DevTools](/developers/tools/devtools) for the deployment. Defaults to `false` |
 | `startAt` | Start time — either `{ msFromNow: number }` or `{ timestamp: number }` |
 | `assignmentStrategy` | `"Single"` (one set of processors) or `"Competing"` (new processors per execution) |
 | `execution` | `"onetime"` or `"interval"` with `intervalInMs`, `numberOfExecutions`, and `maxExecutionTimeInMs` |

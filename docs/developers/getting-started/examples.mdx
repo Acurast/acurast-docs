@@ -1,0 +1,27 @@
+---
+title: Example Apps
+slug: /developers/getting-started/examples
+---
+
+Ready-to-clone example projects showing various features of the Acurast Cloud. Full source in the [acurast-example-apps](https://github.com/Acurast/acurast-example-apps) repository.
+
+| Example | What it shows |
+| --- | --- |
+| [app-webserver](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-webserver) | Express server exposed over `acu.run` via localtunnel — the canonical first app |
+| [app-fetch](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-fetch) | Fetching data from an external API on a schedule |
+| [app-env-vars](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-env-vars) | Reading encrypted environment variables (API keys, secrets) |
+| [app-external-dependencies](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-external-dependencies) | Bundling npm dependencies into a deployment |
+| [app-heic-to-png](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-heic-to-png) | Image conversion workload |
+| [app-puppeteer](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-puppeteer) | Headless browser automation |
+| [app-telegram-bot](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-telegram-bot) | Long-running Telegram bot |
+| [app-wasm](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-wasm) | Running WebAssembly modules inside a deployment |
+
+## Scaffold a new project
+
+The Acurast CLI can create a blank starter project for you:
+
+```bash
+npx @acurast/cli new <project-name>
+```
+
+See **[First App Deployment](/developers/deploy-first-app)** for the full walkthrough.

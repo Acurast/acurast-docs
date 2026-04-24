@@ -24,16 +24,42 @@ const sidebars = {
     {
       type: "category",
       label: "Developers",
+      collapsed: false,
       items: [
-        "developers/deploy-first-app",
-        "developers/llm-on-acurast",
-        "developers/deployment-runtime-environment",
-        "developers/on-demand-deployments",
-        "developers/deploy-agent",
-        "developers/acurast-cli",
-        "developers/devtools",
+        {
+          type: "category",
+          label: "Getting Started",
+          collapsed: false,
+          items: [
+            "developers/getting-started/quickstart",
+            "developers/deploy-first-app",
+            "developers/getting-started/examples",
+          ],
+        },
+        {
+          type: "category",
+          label: "Build",
+          collapsed: true,
+          items: [
+            "developers/build/deployment-config",
+            "developers/build/environment-variables",
+            "developers/build/runtime-environment",
+            "developers/build/on-demand-deployments",
+            "developers/build/llm-on-acurast",
+          ],
+        },
+        {
+          type: "category",
+          label: "Tools",
+          collapsed: true,
+          items: [
+            "developers/tools/cli",
+            "developers/tools/sdk",
+            "developers/tools/devtools",
+            "developers/tools/deploy-agent",
+          ],
+        },
       ],
-      collapsed: true,
     },
     {
       type: "category",

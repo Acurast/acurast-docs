@@ -231,12 +231,36 @@ const config = {
             from: "/acurast-protocol/modules/enterprise",
           },
           {
-            to: "/developers/deployment-runtime-environment",
+            to: "/developers/build/runtime-environment",
             from: "/developers/job-runtime-environment",
           },
           {
-            to: "/developers/on-demand-deployments",
+            to: "/developers/build/runtime-environment",
+            from: "/developers/deployment-runtime-environment",
+          },
+          {
+            to: "/developers/build/on-demand-deployments",
             from: "/developers/on-demand-jobs",
+          },
+          {
+            to: "/developers/build/on-demand-deployments",
+            from: "/developers/on-demand-deployments",
+          },
+          {
+            to: "/developers/build/llm-on-acurast",
+            from: "/developers/llm-on-acurast",
+          },
+          {
+            to: "/developers/tools/cli",
+            from: "/developers/acurast-cli",
+          },
+          {
+            to: "/developers/tools/devtools",
+            from: "/developers/devtools",
+          },
+          {
+            to: "/developers/tools/deploy-agent",
+            from: "/developers/deploy-agent",
           },
           {
             to: "/developers/deploy-first-app",
