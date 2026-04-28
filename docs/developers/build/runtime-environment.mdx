@@ -665,6 +665,76 @@ type WebViewProxyConfig = {
 
 ```
 
+### **Network**
+
+```javascript
+/**
+ * @since 1.24.0 (Android), 1.8.0 (iOS)
+ *
+ * Whitelists one or more hostnames for outbound network access. The runtime
+ * performs the following verification steps for each hostname:
+ *
+ * 1. **Forward DNS + TXT** — verifies that `_acu.<host>` carries a TXT record
+ *    `v=base64(sha256(deployment_source || host))`, then resolves the hostname
+ *    to one or more IP addresses (A/AAAA).
+ * 2. **Reverse DNS + TXT** — for each resolved IP, performs a PTR lookup and
+ *    verifies that `_acu.<host>` carries a TXT record
+ *    `v=base64(sha256(deployment_source || host))`.
+ * 
+ * Where `deployment_source` is the raw 32-byte Substrate Account ID of the deployment's owner
+ * and `host` is the bare hostname (no scheme, port, or path, e.g. `example.com`).
+ *
+ * Both steps must pass for an IP to be added to the whitelist.
+ * Connections to non-whitelisted hosts are rate-limited.
+ *
+ * @param {string|string[]} hosts The hostname or array of hostnames to whitelist. Must be bare hostnames without scheme, port, or path.
+ */
+_STD_.network.whitelist(hosts);
+```
+
+Example scripts for computing the verification hash:
+
+#### Node.js
+```javascript
+// npm install @polkadot/util-crypto
+
+const { createHash } = require('crypto');
+const { decodeAddress } = require('@polkadot/util-crypto');
+
+function verificationHash(source, host) {
+    // Decode hex Account ID directly, or convert SS58 address to raw bytes
+    const sourceBytes = source.length === 64
+        ? Buffer.from(source, 'hex')
+        : Buffer.from(decodeAddress(source));
+    // SHA-256 over concatenation of source bytes and UTF-8 encoded host
+    const digest = createHash('sha256')
+        .update(sourceBytes)
+        .update(host)
+        .digest();
+    // Return the hash as a base64 string
+    return digest.toString('base64');
+}
+```
+
+#### Python
+```python
+# pip install substrate-interface
+
+import hashlib
+import base64
+
+from substrateinterface.utils.ss58 import ss58_decode
+
+
+def verification_hash(source: str, host: str) -> str:
+    # Decode hex Account ID directly, or convert SS58 address to raw bytes
+    source_bytes = bytes.fromhex(source) if len(source) == 64 else bytes.fromhex(ss58_decode(source))
+    # SHA-256 over concatenation of source bytes and UTF-8 encoded host
+    digest = hashlib.sha256(source_bytes + host.encode()).digest()
+    # Return the hash as a base64 string
+    return base64.b64encode(digest).decode()
+```
+
 ### **Substrate functions**
 
 ```javascript
