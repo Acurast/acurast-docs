@@ -1,0 +1,721 @@
+---
+title: Cargo Runtime Environment (Preview)
+slug: /developers/build/cargo-runtime-environment
+toc_max_heading_level: 4
+---
+
+Deployments in the Cargo runtime run as native binaries inside a Linux distro image on the processor, isolated via PRoot. Standard system environment variables are available directly. Host services - deployment metadata, cryptographic signing, and browser control - are accessed through an RPC API using JSON-RPC 2.0 over an abstract Unix domain socket.
+
+## Distro Image
+
+Each Cargo deployment must specify a Linux distro image in its manifest, along with the SHA256 hash of the image for verification. The processor downloads and extracts the image before running the deployment.
+
+```json title=manifest.json
+{
+  "version": "1",
+  "entrypoint": "example.sh",
+  "image": {
+    "url": "https://example.com/distro.tar.xz",
+    "sha256": "abc123..."
+  }
+}
+```
+
+Supported distro images can be found in the [Termux proot-distro](https://github.com/termux/proot-distro) repository.
+
+## Environment Variables
+
+Env vars declared in your deployment config are injected as standard system environment variables. See [Environment Variables](/developers/build/environment-variables) for how to declare them.
+
+```rust
+let api_key = std::env::var("API_KEY").unwrap();
+```
+
+## RPC API
+
+The processor injects a `BRIDGE_SOCKET` environment variable at runtime containing the name of an abstract Unix socket. To call a host API, open a new socket connection, send a single [JSON-RPC 2.0](https://www.jsonrpc.org/specification) request line, and read back the response line. Each connection carries exactly one request/response exchange.
+
+```
+socket address:  \0<BRIDGE_SOCKET>   (abstract namespace - null-byte prefix)
+protocol:        JSON-RPC 2.0, newline-delimited, one call per connection
+```
+
+---
+
+### Processor
+
+#### `processor_version`
+
+Returns the version of the processor runtime.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "processor_version",
+  "params": [],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "version": string
+  },
+  "id": string
+}
+```
+
+---
+
+### Deployment
+
+#### `deployment_id`
+
+Returns the identifier of the active deployment.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "deployment_id",
+  "params": [],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "id": string,
+    "origin": {
+      "kind": string,
+      "source": string  // hex
+    }
+  },
+  "id": string
+}
+```
+
+---
+
+#### `deployment_ipfsHash`
+
+Returns the IPFS CID of the deployment app.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "deployment_ipfsHash",
+  "params": [],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "ipfsHash": string
+  },
+  "id": string
+}
+```
+
+---
+
+#### `deployment_slot`
+
+Returns the execution slot index assigned to this processor, or `null` if no slot is assigned.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "deployment_slot",
+  "params": [],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "slot": number | null
+  },
+  "id": string
+}
+```
+
+---
+
+#### `deployment_publicKeys`
+
+Returns the signing public keys of this processor for the active deployment, keyed by curve. Only curves for which a key exists are included.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "deployment_publicKeys",
+  "params": [],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "publicKeys": {
+      "p256"?: string,       // hex
+      "secp256k1"?: string,  // hex
+      "ed25519"?: string     // hex
+    }
+  },
+  "id": string
+}
+```
+
+---
+
+#### `deployment_encryptionKeys`
+
+Returns the ECDH encryption public keys of this processor for the active deployment. Supported curves: `p256`, `secp256k1`.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "deployment_encryptionKeys",
+  "params": [],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "encryptionKeys": {
+      "p256"?: string,      // hex
+      "secp256k1"?: string  // hex
+    }
+  },
+  "id": string
+}
+```
+
+---
+
+#### `deployment_assignedProcessors`
+
+Returns all processors assigned to this deployment, keyed by their SS58 address, along with their public keys per curve.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "deployment_assignedProcessors",
+  "params": [],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "processors": {
+      [ss58: string]: {
+        "p256"?: string,          // hex, signing key
+        "secp256k1"?: string,     // hex, signing key
+        "ed25519"?: string,       // hex, signing key
+        "encP256"?: string,       // hex, encryption key
+        "encSecp256k1"?: string   // hex, encryption key
+      }
+    }
+  },
+  "id": string
+}
+```
+
+---
+
+### Signer
+
+Supported curves: `"p256"`, `"secp256k1"`, `"ed25519"`. Encryption and decryption support `"p256"` and `"secp256k1"` only.
+
+#### `signer_publicKey`
+
+Returns the public key for the given curve. Pass `derivationPath` for HD key derivation (supported on `secp256k1`).
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "signer_publicKey",
+  "params": [{
+    "curve": "p256" | "secp256k1" | "ed25519",
+    "derivationPath"?: string
+  }],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "publicKey": string,       // hex
+    "derivationPath"?: string  // present only if requested
+  },
+  "id": string
+}
+```
+
+---
+
+#### `signer_sign`
+
+Signs a hex-encoded byte string with the given curve key. Pass `derivationPath` for HD signing.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "signer_sign",
+  "params": [{
+    "curve": "p256" | "secp256k1" | "ed25519",
+    "bytes": string,           // hex
+    "derivationPath"?: string
+  }],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "bytes": string  // hex
+  },
+  "id": string
+}
+```
+
+---
+
+#### `signer_encrypt`
+
+Encrypts bytes using ECDH key agreement with the receiver's public key. Supported curves: `p256`, `secp256k1`.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "signer_encrypt",
+  "params": [{
+    "curve": "p256" | "secp256k1",
+    "publicKey": string,  // hex, receiver's public key
+    "salt": string,       // hex
+    "bytes": string       // hex, plaintext
+  }],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "bytes": string  // hex, ciphertext
+  },
+  "id": string
+}
+```
+
+---
+
+#### `signer_decrypt`
+
+Decrypts bytes using ECDH key agreement with the sender's public key. Supported curves: `p256`, `secp256k1`.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "signer_decrypt",
+  "params": [{
+    "curve": "p256" | "secp256k1",
+    "publicKey": string,  // hex, sender's public key
+    "salt": string,       // hex
+    "bytes": string       // hex, ciphertext
+  }],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "bytes": string  // hex, plaintext
+  },
+  "id": string
+}
+```
+
+---
+
+### Browser
+
+These methods control an embedded WebView on the processor device and are only available on Android processors.
+
+#### `browser_debugUrl`
+
+Returns the Chrome DevTools remote debugging URL for the WebView.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "browser_debugUrl",
+  "params": [],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "url": string
+  },
+  "id": string
+}
+```
+
+---
+
+#### `browser_newTab`
+
+Opens a new tab in the WebView and returns its ID.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "browser_newTab",
+  "params": [{ "url": string }],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "id": number
+  },
+  "id": string
+}
+```
+
+---
+
+#### `browser_closeTab`
+
+Closes a tab by ID. Set `wholeTree` to `true` to also close all tabs spawned by this tab.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "browser_closeTab",
+  "params": [{
+    "id": number,
+    "wholeTree"?: boolean  // default: false
+  }],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {},
+  "id": string
+}
+```
+
+---
+
+#### `browser_openTabs`
+
+Returns a list of currently open tab IDs.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "browser_openTabs",
+  "params": [],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "tabs": Array<number | null>
+  },
+  "id": string
+}
+```
+
+---
+
+#### `browser_currentUrl`
+
+Returns the current URL of a tab, or `null` if it has not loaded yet.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "browser_currentUrl",
+  "params": [{ "id"?: number }],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "url": string | null
+  },
+  "id": string
+}
+```
+
+---
+
+#### `browser_loadCause`
+
+Returns why the tab last loaded: `"manual"` (opened via `browser_newTab`) or `"auto"` (opened by a tab autonomously), or `null` if not yet loaded.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "browser_loadCause",
+  "params": [{ "id"?: number }],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "cause": "manual" | "auto" | null
+  },
+  "id": string
+}
+```
+
+---
+
+#### `browser_startRefreshLoop`
+
+Starts a periodic refresh loop for a tab. Stop with `browser_stopRefreshLoop` when no longer needed.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "browser_startRefreshLoop",
+  "params": [{
+    "id"?: number,
+    "interval"?: number,   // ms, default: 500
+    "wholeTree"?: boolean  // default: false
+  }],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {},
+  "id": string
+}
+```
+
+---
+
+#### `browser_stopRefreshLoop`
+
+Stops the refresh loop for a tab.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "browser_stopRefreshLoop",
+  "params": [{
+    "id"?: number,
+    "wholeTree"?: boolean  // default: false
+  }],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {},
+  "id": string
+}
+```
+
+---
+
+#### `browser_useProxy`
+
+Configures the WebView to route traffic through a proxy server.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "browser_useProxy",
+  "params": [{
+    "url": string,
+    "config"?: {
+      "username"?: string,
+      "password"?: string,
+      "fallback"?: boolean  // default: false — connect directly if proxy fails
+    }
+  }],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {},
+  "id": string
+}
+```
+
+---
+
+#### `browser_removeProxy`
+
+Removes the current proxy configuration from the WebView.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "browser_removeProxy",
+  "params": [],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {},
+  "id": string
+}
+```
+
+---
+
+#### `browser_close`
+
+Closes all open tabs and destroys the WebView, clearing storage, cookies, and proxy settings.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "browser_close",
+  "params": [],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {},
+  "id": string
+}
+```
+
+---
+
+## Examples
+
+The examples below call `processor_version` to show how to connect to the bridge and make a request in different languages.
+
+### Node.js
+
+```js
+const net = require('net');
+
+const client = net.createConnection('\0' + process.env.BRIDGE_SOCKET);
+const request = JSON.stringify({
+  jsonrpc: '2.0',
+  method: 'processor_version',
+  params: [],
+  id: '1',
+});
+
+client.write(request + '\n');
+client.once('data', (data) => {
+  const response = JSON.parse(data.toString());
+  console.log(response);
+  
+  client.end();
+});
+```
+
+### Python
+
+```python
+import json, os, socket
+
+request = json.dumps({ 
+    'jsonrpc': '2.0',
+    'method': 'processor_version',
+    'params': [],
+    'id': '1'
+})
+
+with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
+    s.connect('\0' + os.environ['BRIDGE_SOCKET'])
+    s.sendall((request + '\n').encode())
+    response = json.loads(s.recv(65536))
+    
+    print(response)
+```
+
+### Rust
+
+```rust
+use std::io::{BufRead, BufReader, Write};
+use std::os::linux::net::SocketAddrExt;
+use std::os::unix::net::{SocketAddr, UnixStream};
+
+fn main() {
+    let socket = std::env::var("BRIDGE_SOCKET").unwrap();
+    let addr = SocketAddr::from_abstract_name(socket.as_bytes()).unwrap();
+    let mut stream = UnixStream::connect_addr(&addr).unwrap();
+    
+    let request = serde_json::json!({
+        "jsonrpc": "2.0",
+        "method": "processor_version",
+        "params": [],
+        "id": "1"
+    }).to_string();
+    stream.write_all(format!("{request}\n").as_bytes()).unwrap();
+    
+    let mut response = String::new();
+    BufReader::new(&stream).read_line(&mut response).unwrap();
+    
+    let value: serde_json::Value = serde_json::from_str(&response).unwrap();
+    println!("{}", value);
+}
+```
