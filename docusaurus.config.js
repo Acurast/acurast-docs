@@ -231,12 +231,16 @@ const config = {
             from: "/acurast-protocol/modules/enterprise",
           },
           {
-            to: "/developers/build/runtime-environment",
+            to: "/developers/build/nodejs-runtime-environment",
             from: "/developers/job-runtime-environment",
           },
           {
-            to: "/developers/build/runtime-environment",
+            to: "/developers/build/nodejs-runtime-environment",
             from: "/developers/deployment-runtime-environment",
+          },
+          {
+            to: "/developers/build/nodejs-runtime-environment",
+            from: "/developers/build/runtime-environment",
           },
           {
             to: "/developers/build/on-demand-deployments",
