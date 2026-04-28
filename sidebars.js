@@ -19,12 +19,8 @@ const sidebars = {
       type: "category",
       label: "Developers",
       collapsed: false,
+      link: { type: "doc", id: "developers/hub" },
       items: [
-        {
-          type: "doc",
-          id: "developers/hub",
-          label: "Start Here",
-        },
         {
           type: "category",
           label: "Getting Started",
@@ -86,12 +82,8 @@ const sidebars = {
       type: "category",
       label: "Compute Providers",
       collapsed: true,
+      link: { type: "doc", id: "processors/hub" },
       items: [
-        {
-          type: "doc",
-          id: "processors/hub",
-          label: "Start Here",
-        },
         {
           type: "doc",
           id: "processors/become-compute-provider",
@@ -107,12 +99,8 @@ const sidebars = {
       type: "category",
       label: "Token Holders",
       collapsed: true,
+      link: { type: "doc", id: "token-holders/hub" },
       items: [
-        {
-          type: "doc",
-          id: "token-holders/hub",
-          label: "Start Here",
-        },
         {
           type: "category",
           label: "Wallets",
@@ -174,14 +162,10 @@ const sidebars = {
     },
     {
       type: "category",
-      label: "Investors",
+      label: "Discover Acurast",
       collapsed: true,
+      link: { type: "doc", id: "investors/hub" },
       items: [
-        {
-          type: "doc",
-          id: "investors/hub",
-          label: "Start Here",
-        },
         "investors/acurast-token",
         "investors/tokenomics",
         "investors/roadmap",
@@ -208,18 +192,22 @@ const sidebars = {
       label: "Protocol & Reference",
       collapsed: true,
       items: [
-        "acurast-orchestrator",
         {
           type: "category",
           label: "Architecture",
           collapsed: true,
+          link: { type: "doc", id: "acurast-protocol/architecture/architecture" },
           items: [
-            "acurast-protocol/architecture/architecture",
             "acurast-protocol/architecture/end-to-end",
             "acurast-protocol/architecture/application-layer",
             "acurast-protocol/architecture/execution-layer",
             "acurast-protocol/architecture/consensus-layer",
             "acurast-protocol/architecture/instances",
+            {
+              type: "link",
+              label: "Matcher",
+              href: "/acurast-protocol/architecture/architecture#matcher",
+            },
           ],
         },
         "acurast-protocol/node-setup",
@@ -249,14 +237,6 @@ const sidebars = {
       ],
     },
     "faq",
-    {
-      type: "category",
-      label: "Post-Mortems",
-      collapsed: true,
-      items: [
-        "post-mortem/2026-01-27-airdrop",
-      ],
-    },
   ],
 };
 
