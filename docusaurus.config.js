@@ -114,8 +114,8 @@ const config = {
                 to: "/developers",
               },
               {
-                label: "Processors",
-                to: "acurast-processors",
+                label: "Compute Providers",
+                to: "/processors",
               },
               {
                 label: "Integrations",
@@ -183,9 +183,12 @@ const config = {
       {
         redirects: [
           {
-            to: "/acurast-processors",
+            to: "/processors/acurast-processors",
             from: "/acurast-transmitters",
           },
+          { to: "/processors/acurast-processors", from: "/acurast-processors" },
+          { to: "/processors/benchmarks", from: "/acurast-processors/benchmarks" },
+          { to: "/processors/multiple-processors", from: "/acurast-processors/multiple-processors" },
           {
             to: "/developers/deploy-first-app",
             from: "/acurast-protocol/interoperability/enterprise",
@@ -323,6 +326,8 @@ const config = {
           { to: "/token-holders/staking/staking-glossary", from: "/staked-compute/staking-glossary" },
           { to: "/acurast-protocol/from-canary-to-mainnet/overview", from: "/from-canary-to-mainnet/overview" },
           { to: "/acurast-protocol/from-canary-to-mainnet/token-transfers", from: "/from-canary-to-mainnet/token-transfers" },
+          { to: "/acurast-protocol/architecture/architecture", from: "/acurast-orchestrator" },
+          { to: "/acurast-protocol/architecture/architecture", from: "/acurast-matcher" },
         ],
       },
     ],

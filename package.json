@@ -6,6 +6,7 @@
     "docusaurus": "docusaurus start",
     "start": "npm run process-predefined-methods && docusaurus start",
     "build": "npm run process-predefined-methods && docusaurus build",
+    "check-links": "node scripts/check-links.js",
     "swizzle": "docusaurus swizzle",
     "deploy": "npm run process-predefined-methods && docusaurus deploy",
     "clear": "docusaurus clear",

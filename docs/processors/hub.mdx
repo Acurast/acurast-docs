@@ -10,15 +10,139 @@ Run the Acurast Processor app on a supported smartphone and contribute to a glob
 ## Start here
 
 - **[Become a Compute Provider](/processors/become-compute-provider)** — install the app, register, go live.
-- **[Supported Hardware](/acurast-processors)** — recommended phones and minimum specs.
+- **[Supported Hardware](/processors/acurast-processors)** — recommended phones and minimum specs.
 
 ## Operate
 
-- **[Multi-Processor Setup](/acurast-Processors/multiple-processors)** — run several phones from one account.
+- **[Multi-Processor Setup](/processors/multiple-processors)** — run several phones from one account.
 - **[Rewards](/processors/rewards)** — how payouts work, what you earn, when.
-- **[Benchmarks](/acurast-processors/benchmarks)** — performance comparisons across devices.
+- **[Benchmarks](/processors/benchmarks)** — performance comparisons across devices.
 
 ## Related
 
 - Want to stake on providers instead of running hardware? See **[Stake & Delegate](/token-holders/staking/overview)**.
-- Curious how the network matches workloads to your phone? See **[Protocol Architecture](/acurast-protocol/architecture/architecture)**.
+- Curious how the network matches workloads to your phone? See **[Matcher](/acurast-protocol/architecture/architecture#matcher)**.
+
+## FAQ
+
+### How can you provide compute with your phone on Acurast?
+
+Get started as a [Processor](/processors/acurast-processors) on Acurast and provide compute to receive rewards, either with Lite or Core:
+
+#### **Acurast Processor Lite**
+
+Lite is more flexible, can be installed on your everyday phone and activated to provide compute when it's feasible for you. [How to onboard ↗](https://youtu.be/2Pxw2u0pZ_E?si=jHPCk82QI5I7rOKA)
+
+Install the Acurast Processor Lite application on Android or iOS to get started.
+
+[**Google Play ↗**](https://play.google.com/store/apps/details?id=com.acurast.attested.executor.sbs.canary)  
+[**Apple App Store ↗**](https://apps.apple.com/kh/app/acurast-processor/id6517361921)
+
+#### **Acurast Processor Core**
+
+Core is meant for dedicated phones with the only purpose of providing compute to Acurast, completely locked down. [How to onboard ↗](https://www.youtube.com/watch?v=uLpBRUnmiPY)
+
+**[Acurast Hub ↗](https://hub.acurast.com/)**
+
+### What is the difference between Acurast Processor Core and Lite?
+
+Acurast Processor Core is meant for dedicated phones, completely locked down, and intended only to provide compute to Acurast.
+
+Whereas Lite is more flexible, can be installed on your everyday phone and activated to provide compute when it's feasible for you.
+
+If you have a phone that you don't need any more for anything else, go with Core.
+
+**[Learn more about Acurast Processors ↗](/processors/acurast-processors)**
+
+### What Android and iOS version are required?
+
+The Android version required is Android 12 or higher, while the iPhone must be a 6s or later.
+
+**[Check the list of recommended phones ↗](https://docs.google.com/spreadsheets/d/1ZvzmMVey4CM2tuif_zJfWiIxH1qkgA-l7BNJMw4vh54/edit?gid=1844886586#gid=1844886586)**
+
+### Is there a difference in rewards between Acurast Processor Core and Lite?
+
+As long as your phone is connected to the internet, and the Processor application app is running, you get a reward. You can increase the rewards by staking your ACU tokens, see [Staked Compute](/token-holders/staking/overview).
+
+Typically, Acurast Core scores 15-20% better in the benchmark tests, which will result in higher Base Benchmark Rewards and more Compute that can be committed in Staking.
+
+Read more about the [Rewards here](/processors/rewards).
+
+### I'm already running other Processors. Can I manage them all with one account?
+
+Yes, most likely, you've connected a wallet to the Acurast Hub; follow these steps:
+
+- Go to the Acurast Hub and select "Add New Device" to create a new QR code
+- Install Acurast Processor Lite from Google Play or the Apple App Store on the phone
+- Open Lite and select "Connect to Hub"
+- Scan the QR code
+- Complete the setup process, Lite is now connected to the Hub
+
+### How can I tell how many heartbeats a processor has had?
+
+The device heartbeats every 30 minutes. Scanning the blockchain allows you to look for all heartbeats, but that would take some time. To track the recent performance of your Processors, you can use the [Acurast Monitoring Bot](https://t.me/AcurastBot) on Telegram.
+
+### Do I still get rewards if my Processor is missing heartbeats?
+
+**[Benchmark rewards](/processors/rewards)** are distributed if one of 3 heartbeats of an epoch (roughly 90 minutes) was received on chain. This means your device can miss some heartbeats without missing out on rewards.
+
+### Do I need to factory reset my phone?
+
+You only need to factory reset your phone if you are onboarding a Core device. However, for Processor Lite, you can use your everyday device without factory resetting it.
+
+Learn more about the differences between **[Core and Lite ↗](/processors/acurast-processors)**
+
+For step-by-step instructions on getting started, see the **[Compute Provider onboarding guide ↗](/processors/become-compute-provider)**.
+
+### Why is my balance decreasing sometimes?
+
+Your balance may decrease slightly due to transaction fees when your Processor interacts with the Acurast network. Whenever the Processor reports to the chain (heartbeats, deployment acknowledgements, execution reports), minimal gas fees have to be paid, which can result in a decreasing balance. These fees are typically minimal, usually around 0.01 ACU per transaction.
+
+### How do I install Acurast Processor Lite?
+
+Acurast Lite can be installed within minutes. The Acurast Processor Lite application can run on Android or iOS.
+
+**[Follow the step-by-step installation guide ↗](/processors/become-compute-provider#for-processor-lite)**
+
+### Android: Why do I need to set up an "Android Work" profile?
+
+Android Work profiles are a built-in feature of Android, typically used by organizations to separate work apps and data from personal apps on the same device. This creates a secure, isolated container managed by an enterprise or organization.
+
+The Acurast Processor Lite leverages this proven Android feature to create a secure, isolated environment for providing compute. The Work profile acts as a second profile completely independent from your private profile. By keeping your private profile separate from the one that provides compute, you'll get the best security and have no impact on your privacy.
+
+### Android: Who manages the "Android Work" profile?
+
+You do. You're in complete control. Your device is connected to the decentralized Acurast protocol (Acurast Canary) and controlled by you. In no way do any individuals have access to your phone to install other applications in that work profile or make changes to it.
+
+**Important Note:** During setup, you may see standard Android messages like "Your device isn't private" or "Your IT admin may see your data...". These are default warnings that appear whenever a work profile is created. In the case of Acurast, you remain in complete control - these are simply standard messages Android displays for all work profile setups.
+
+### Android: How do I uninstall Acurast Processor Lite?
+
+Because Lite uses the Android work profile, you'll have to remove it completely to uninstall the app from your device.
+
+If you have set up Lite with "Get Started" without a connection to your Acurast Hub, make sure that you backup your secret before removing the app; otherwise, you will lose access to your cACU.
+
+Uninstalling Processor Lite:
+
+1. Open the "Settings" with the cog on the top right on the Acurast Processor application (make sure you can see the compute status)
+2. Click "Uninstall" and "Continue"
+3. The Processor app in the work profile has been removed, you can now uninstall the lite app from your private profile and the work profile should be removed too (might be subject to Android version).
+
+### How do I install Acurast Processor Core?
+
+Acurast Processor Core is designed for dedicated Android phones. Follow the detailed installation instructions to get started.
+
+**[Follow the step-by-step installation guide ↗](/processors/become-compute-provider#for-processor-core)**
+
+### How to add Acurast Processor Core with NFC?
+
+A short video by a community member onboard a device with a broken screen and an NFC.
+
+**[NFC Onboarding ↗](https://youtu.be/lbAYV1kmV6o?si=_IbU5RfXYdlp5p-w)**
+
+### The "Add New Device" QR code is not showing?
+
+When this happens, you can do two things:
+
+- Disconnect and connect your wallet to the Hub.
+- Use another browser.
