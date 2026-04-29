@@ -9,7 +9,6 @@ const defaults = {
   baseUrl: "http://localhost:3000",
   sitemap: path.join(__dirname, "main-sitemap.xml"),
   currentSitemap: path.join(__dirname, "..", "build", "sitemap.xml"),
-  buildDir: path.join(__dirname, "..", "build"),
   timeout: 10000,
   concurrency: 8,
   maxRedirects: 8,
@@ -23,7 +22,6 @@ function parseArgs(args) {
     if (arg === "--base-url") options.baseUrl = args[++index];
     else if (arg === "--sitemap") options.sitemap = args[++index];
     else if (arg === "--current-sitemap") options.currentSitemap = args[++index];
-    else if (arg === "--build-dir") options.buildDir = args[++index];
     else if (arg === "--timeout") options.timeout = Number(args[++index]);
     else if (arg === "--concurrency") options.concurrency = Number(args[++index]);
     else if (arg === "--help" || arg === "-h") {
@@ -37,7 +35,6 @@ function parseArgs(args) {
   options.baseUrl = options.baseUrl.replace(/\/+$/, "");
   options.sitemap = path.resolve(options.sitemap);
   options.currentSitemap = path.resolve(options.currentSitemap);
-  options.buildDir = path.resolve(options.buildDir);
   return options;
 }
 
@@ -53,8 +50,6 @@ Options:
   --current-sitemap <path>
                          Current build sitemap used to validate final routes
                          (default: build/sitemap.xml)
-  --build-dir <path>     Current build directory used to resolve static
-                         Docusaurus redirect pages (default: build)
   --timeout <ms>         Request timeout in milliseconds (default: ${defaults.timeout})
   --concurrency <n>      Number of parallel checks (default: ${defaults.concurrency})
   -h, --help             Show this help text
@@ -71,14 +66,6 @@ function routePath(inputUrl) {
   let route = decodeURI(url.pathname);
   if (route.length > 1) route = route.replace(/\/+$/, "");
   return route || "/";
-}
-
-function localUrlForRoute(route, baseUrl) {
-  const url = new URL(baseUrl);
-  url.pathname = route;
-  url.search = "";
-  url.hash = "";
-  return url.href;
 }
 
 function routesFromSitemap(sitemapPath) {
@@ -141,37 +128,6 @@ function getClientRedirect(html, currentUrl) {
   return null;
 }
 
-function htmlFileForRoute(route, buildDir) {
-  if (route === "/") return path.join(buildDir, "index.html");
-  return path.join(buildDir, route.replace(/^\/+/, ""), "index.html");
-}
-
-function getStaticRedirectRoute(route, buildDir) {
-  const file = htmlFileForRoute(route, buildDir);
-  if (!fs.existsSync(file)) return null;
-
-  const html = fs.readFileSync(file, "utf8");
-  const target = getClientRedirect(html, `https://docs.acurast.com${route}`);
-  return target ? routePath(target) : null;
-}
-
-function resolveStaticRedirectRoute(route, options) {
-  const chain = [route];
-  let currentRoute = route;
-
-  for (let redirectCount = 0; redirectCount <= options.maxRedirects; redirectCount += 1) {
-    const targetRoute = getStaticRedirectRoute(currentRoute, options.buildDir);
-    if (!targetRoute) return { route: currentRoute, chain };
-    if (chain.includes(targetRoute)) {
-      return { route: targetRoute, chain: [...chain, targetRoute], loop: true };
-    }
-    currentRoute = targetRoute;
-    chain.push(currentRoute);
-  }
-
-  return { route: currentRoute, chain, tooManyRedirects: true };
-}
-
 function isPageNotFound(html) {
   if (!html) return false;
 
@@ -225,30 +181,10 @@ async function resolveUrl(url, options, validRoutes) {
       return { ok: true, chain };
     }
 
-    const staticRedirect = resolveStaticRedirectRoute(finalRoute, options);
-    if (staticRedirect.loop) {
-      return { ok: false, reason: `Static redirect loop: ${staticRedirect.chain.join(" -> ")}`, chain };
-    }
-    if (staticRedirect.tooManyRedirects) {
-      return { ok: false, reason: `Too many static redirects (${options.maxRedirects})`, chain };
-    }
-    if (validRoutes.has(staticRedirect.route)) {
-      return {
-        ok: true,
-        chain: [
-          ...chain,
-          ...staticRedirect.chain.slice(1).map((route) => localUrlForRoute(route, options.baseUrl)),
-        ],
-      };
-    }
-
     return {
       ok: false,
-      reason: `Route is not in current build sitemap: ${staticRedirect.route}`,
-      chain: [
-        ...chain,
-        ...staticRedirect.chain.slice(1).map((route) => localUrlForRoute(route, options.baseUrl)),
-      ],
+      reason: `Localhost did not resolve to a current route: ${finalRoute}`,
+      chain,
     };
   }
 
