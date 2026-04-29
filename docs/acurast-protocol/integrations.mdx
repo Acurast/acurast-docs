@@ -1,0 +1,106 @@
+---
+title: Ecosystems & Integrations
+slug: /acurast-protocol/integrations
+---
+
+import ThemedImage from "@theme/ThemedImage";
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
+# Supported Ecosystems & Integrations
+
+Acurast is built with interoperability at its core and is able to support various Web3 ecosystems and has multiple ways of being integrated within various environments such as EVM, WASM, Substrate and others.
+
+## Supported Ecosystems
+
+Acurast supports ecosystems that have an active developer community and smart contract environments.
+
+|                                                                                                           | Network                   | Environment      | [Level 1 Integration ↗](#level-1) | [Level 2 Integration ↗](#level-2) |
+| --------------------------------------------------------------------------------------------------------- | ------------------------- | ---------------- | --------------------------------- | --------------------------------- |
+| ![Aleph Zero](/img/A0-symbol_dark.svg "Aleph Zero") **Aleph Zero**                                        | In Development            | WASM             | ✅                                | ❌ \*                             |
+| ![Arbitrum](/img/arbitrum_symbol.svg "Arbitrum") **Arbitrum**                                             | Mainnet, Goerli           | EVM              | ✅                                | ❌ \*                             |
+| ![Astar](/img/astar_symbol.svg "Astar") **Astar**                                                         | Mainnet, Shibuya, zKatana | WASM, EVM, zKEVM | ✅                                | ❌ \*                             |
+| ![Base](/img/base_symbol.svg "Base") **Base**                                                             | Mainnet, Goerli           | EVM              | ✅                                | ❌ \*                             |
+| ![Binance Smart Chain](/img/binance-smart-chain_symbol.svg "Binance Smart Chain") **Binance Smart Chain** | Mainnet, Testnet          | EVM              | ✅                                | ❌ \*                             |
+| ![BoB](/img/bob_symbol.svg "Binance Smart Chain") **BoB**                                                 | Testnet                   | EVM              | ✅                                | ❌ \*                             |
+| ![Ethereumn](/img/ethereum_symbol.svg "Ethereum") **Ethereum**                                            | Mainnet                   | EVM              | ✅                                | ❌ \*                             |
+| ![Monad](/img/monad_symbol.svg "Monad") **Monad**                                                         | Testnet                   | EVM              | ✅                                | ❌ \*                             |
+| ![Moonbeam](/img/moonbeam_symbol.svg "Moonbeam") **Moonbeam**                                             | Mainnet, Moonbase         | EVM              | ✅                                | ❌ \*                             |
+| ![Optimism](/img/optimism_symbol.svg "Optimism") **Optimism**                                             | Mainnet, Goerli           | EVM              | ✅                                | ❌ \*                             |
+| ![Pendulum](/img/pendulum_symbol.svg "Pendulum") **Pendulum**                                             | Testnet                   | EVM              | ✅                                | ❌                                |
+| ![Polygon](/img/polygon_symbol.svg "Polygon") **Polygon**                                                 | Mainnet, Mumbai           | EVM              | ✅                                | ❌ \*                             |
+| ![Peaq](/img/peaq_symbol.svg "Peaq") **Peaq**                                                             | krest                     | EVM              | ✅                                | ❌ \*                             |
+| ![Tezos](/img/tezos_symbol.svg "Tezos") **Tezos**                                                         | Mainnet, Ghostnet         | Tezos            | ✅                                | ✅                                |
+| ![aeternity](/img/aeternity_symbol.svg "aeternity") **æternity**                                          | In Development            | æternity         | ✅                                | ❌ \*                             |
+
+_\* In Development_
+
+Support for additional ecosystems are added on a regular basis.
+
+:::info
+
+Are you considering an Acurast integration for your ecosystem and have questions?
+
+Reach out to us on [hi@acurast.com](mailto:hi@acurast.com), on [Discord](https://discord.gg/wqgC6b6aKe) or [Telegram](https://t.me/acurastnetwork).
+
+:::
+
+<div class="padding-vert--md"></div>
+
+## Integration Levels
+
+### Level 1
+
+With a _Level 1_ integration, the Acurast Protocol is capable to accept Deployments for the given destination ecosystem e.g., Ethereum smart contract. Developers are creating their Deployment requests through the Acurast Hub directly on the Acurast Protocol, funding the rewards with Acurast Tokens. Processors are capable of interacting with the destination directly, signing transactions and injecting them.
+
+A simplified representation of the Level 1 flow:
+
+<div class="padding-vert--lg"></div>
+
+<ThemedImage
+  alt="Level 1 Flow"
+  sources={{
+    light: useBaseUrl("/img/acurast-level-1-flow_light.svg"),
+    dark: useBaseUrl("/img/acurast-level-1-flow_dark.svg"),
+  }}
+/>
+
+<div class="padding-vert--lg"></div>
+
+**Key takeaways:**
+
+- Processors can interact with the destination and submit their output
+- Developers create Acurast Deployments through the Acurast Hub directly on the Acurast Protocol which requires an Acurast Wallet and Acurast Tokens
+- Developers need to fund transaction fees of the Processors with the asset of the destination ecosystem
+
+### Level 2
+
+A _Level 2_ integration provides a much improved developer experience and streamlined onboarding. An Acurast Proxy contract is deployed in the destination ecosystem that establishes a bi-directional cross-chain communication channel with Acurast Hyperdrive to the Acurast Protocol. Users e.g. on Ethereum can connect with their Ethereum wallet to the Acurast Hub and create a Deployment by interacting with the Proxy contract and rewarding Processors in the native currency. The created request is forwarded to the Acurast Protocol where that matches with eligible Processors that in turn then provide their output to the destination.
+
+A simplified representation of the Level 2 flow:
+
+<div class="padding-vert--lg"></div>
+
+<ThemedImage
+  alt="Level 1 Flow"
+  sources={{
+    light: useBaseUrl("/img/acurast-level-2-flow_light.svg"),
+    dark: useBaseUrl("/img/acurast-level-2-flow_dark.svg"),
+  }}
+/>
+
+<div class="padding-vert--lg"></div>
+
+**Key takeaways:**
+
+- Developers create Acurast Deployments through the Acurast Hub with a wallet from their ecosystem e.g., Metamask for Ethereum
+- Rewards and transaction fees are provided in a native asset e.g., ETH
+- Acurast Hyperdrive is used for cross-chain communication
+
+## Integrations
+
+Support for Acurast in a Web3 ecosystem can be achieved through various integration approaches:
+
+- EVM
+- Substrate
+- Substrate with WASM
+- Tezos

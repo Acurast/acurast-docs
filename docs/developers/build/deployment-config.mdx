@@ -1,0 +1,93 @@
+---
+title: Deployment Config (acurast.json)
+slug: /developers/build/deployment-config
+---
+
+Every Acurast project has an `acurast.json` file that describes how the deployment should run: which script to execute, which network to target, how many processors, how long, and under which limits. This page is the full field reference.
+
+You can create it interactively with `acurast init` — see the **[CLI docs](/developers/tools/cli)** for the command walkthrough.
+
+## Example
+
+```json
+{
+  "projects": {
+    "example": {
+      "projectName": "example",
+      "fileUrl": "dist/bundle.js",
+      "network": "mainnet",
+      "onlyAttestedDevices": true,
+      "enableDevtools": false,
+      "assignmentStrategy": {
+        "type": "Single"
+      },
+      "execution": {
+        "type": "onetime",
+        "maxExecutionTimeInMs": 10000
+      },
+      "maxAllowedStartDelayInMs": 10000,
+      "usageLimit": {
+        "maxMemory": 0,
+        "maxNetworkRequests": 0,
+        "maxStorage": 0
+      },
+      "numberOfReplicas": 64,
+      "requiredModules": [],
+      "minProcessorReputation": 0,
+      "maxCostPerExecution": 100000000000,
+      "includeEnvironmentVariables": [],
+      "processorWhitelist": [],
+      "mutability": "Immutable",
+      "reuseKeysFrom": null
+    }
+  }
+}
+```
+
+## Fields
+
+| Field | Description |
+| --- | --- |
+| `projectName` | The name of the project |
+| `fileUrl` | Path to the bundled file including all dependencies (e.g., `dist/bundle.js`) |
+| `network` | Network for deployment (e.g., `mainnet`, `canary`) |
+| `onlyAttestedDevices` | Only allow attested devices to run the app |
+| `enableDevtools` | Enable [DevTools](/developers/tools/devtools) for the deployment. Defaults to `false` |
+| `startAt` | Start time — either `{ msFromNow: number }` or `{ timestamp: number }` |
+| `assignmentStrategy` | `"Single"` (one set of processors) or `"Competing"` (new processors per execution) |
+| `execution` | `"onetime"` or `"interval"` with `intervalInMs`, `numberOfExecutions`, and `maxExecutionTimeInMs` |
+| `maxAllowedStartDelayInMs` | Maximum allowed start delay in milliseconds |
+| `usageLimit` | Limits for `maxMemory`, `maxNetworkRequests`, and `maxStorage` (in bytes) |
+| `numberOfReplicas` | How many processors run the deployment in parallel |
+| `requiredModules` | Modules the processor must support (e.g., `["DataEncryption"]`) |
+| `minProcessorReputation` | Minimum required processor reputation |
+| `maxCostPerExecution` | Maximum cost per execution in the smallest denomination of ACU |
+| `includeEnvironmentVariables` | Environment variables from `.env` to pass to the deployment. See [Environment Variables](/developers/build/environment-variables) |
+| `processorWhitelist` | Whitelist of processor addresses |
+| `minProcessorVersions` | Minimum processor versions (`android`, `ios`) |
+| `mutability` | `"Immutable"` (default) or `"Mutable"` — controls whether the deployment can be modified after creation |
+| `reuseKeysFrom` | Reuse keys from a previous mutable deployment. Format: `["Acurast", "address", deploymentId]` |
+
+## `.env`
+
+Secrets and environment variables for the CLI/SDK (not to be confused with deployment-runtime env vars — see [Environment Variables](/developers/build/environment-variables)).
+
+```text
+ACURAST_MNEMONIC=abandon abandon about ...
+# ACURAST_IPFS_URL=https://api.pinata.cloud
+# ACURAST_IPFS_API_KEY=eyJhb...
+# ACURAST_RPC=wss://...
+```
+
+| Variable | Required | Description |
+| --- | --- | --- |
+| `ACURAST_MNEMONIC` | Yes | Mnemonic for the deployer account. Must have ACU (or cACU on canary). Claim cACU on the [faucet](https://faucet.acurast.com) |
+| `ACURAST_IPFS_URL` | No | IPFS gateway URL (e.g., `https://api.pinata.cloud`) |
+| `ACURAST_IPFS_API_KEY` | No | API key for the IPFS gateway. [Register here](https://pinata.cloud/) |
+| `ACURAST_RPC` | No | Custom RPC URL |
+
+## See also
+
+- [CLI reference](/developers/tools/cli) — commands that consume this config
+- [Runtime Environment](/developers/build/runtime-environment) — what's available to your script when it runs
+- [Environment Variables](/developers/build/environment-variables) — passing encrypted secrets to your deployment

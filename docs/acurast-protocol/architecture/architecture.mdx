@@ -23,7 +23,7 @@ Acurast's cloud architecture transforms the way applications are designed and de
 
 ### Consensus Layer
 
-The consensus layer is the permissionless foundation of Acurast, where the Orchestrator matches developer's deployments to processors, as outlined in the End-to-End flow (_c.f.,_ [End-to-End Deployment Execution](/acurast-protocol/architecture/end-to-end) ). The second core part of the consensus layer is the reputation engine (_c.f.,_ ), which as sures that the reputation scores of processors are correctly updated and incentivize honest behavior.
+The consensus layer is the permissionless foundation of Acurast, where the Matcher pairs developer's deployments with processors, as outlined in the End-to-End flow (_c.f.,_ [End-to-End Deployment Execution](/acurast-protocol/architecture/end-to-end) ). The second core part of the consensus layer is the reputation engine (_c.f.,_ ), which as sures that the reputation scores of processors are correctly updated and incentivize honest behavior.
 
 ### Execution Layer
 
@@ -32,6 +32,26 @@ The Execution Layer has two significant components. The first one is composed of
 ### Application Layer
 
 The third layer is the application layer, where Web2 or Web3 applications run (\cf Sec.~\ref{sec:application_layer}). Although a host of DeFi protocols already make use of Acurast, Acurast will infuse the development of a wide range of use cases that were previously not possible to implement in a confidential and decentralized manner.
+
+## Matcher
+
+The Acurast Matcher is a centerpiece of the consensus layer, combining the matching (i.e., the scheduling of deployments and enabling the liquid matching) of the Processor's computational resources and Developers. The Matcher plays an essential role in the definition, agreement, and enforcement of value exchange between processors and developers.
+
+The Matcher is where the liquid matching engine pairs the advertised processor resources with the defined requirements of the developers. The Matcher natively supports various price-finding mechanisms (e.g., auctions and advertisements), making Developer Experience (DevEx) highly accessible and seamless.
+
+Every agreement between processor and developer is specified in an entity called deployment. The deployment specifies (i) a set of instructions that are executed on the processor, (ii) its scheduling parameters, and (iii) the destination configuration (i.e., where the output is further processed or persisted).
+
+### Compute Costs & Rewards
+
+When scheduling a deployment, the developer defines the compute cost for the execution. The cost can be defined in native cACU/ACU tokens. This mechanism allows for deterministic financial planning of executions for developers.
+
+:::info
+
+**All compute costs are paid as gas (transaction) fees. There is no direct reward flow from developers to processors.**
+
+:::
+
+Instead, processors earn rewards through the **[staking pools](/token-holders/staking/overview)**. When processors execute deployments, they receive a [Deployment Execution Bonus](/processors/rewards#deployment-execution-bonus): a bonus weight on their Benchmark Metrics that increases their scoring—and therefore their share of rewards—in both the Staked Compute Pool and the Compute Pool (Base Benchmarking Rewards) for that epoch. This mechanism ensures processors are incentivized to execute deployments and burn gas fees.
 
 ## Implementation
 

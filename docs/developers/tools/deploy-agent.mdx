@@ -1,0 +1,360 @@
+---
+title: Deploy Agent (x402)
+slug: /developers/tools/deploy-agent
+---
+
+:::tip Which tool should I use?
+- **[CLI](/developers/tools/cli)** — interactive local workflow with ACU.
+- **[SDK](/developers/tools/sdk)** — programmatic deploys from TypeScript/JavaScript with ACU.
+- **Deploy Agent** — pay with USDC on Base via x402. Best for AI agents and services without ACU accounts.
+:::
+
+The Acurast Deploy Agent lets developers deploy computational jobs to the Acurast decentralized processor network directly from EVM chains (starting with USDC on Base).
+Via the deploy agent's HTTP API a simple [x402](https://docs.cdp.coinbase.com/x402/core-concepts/how-it-works) payment together with a job specification will trigger the deployment for you.
+
+This approach is ideal for:
+
+- **AI agents** using [agentic wallets](https://docs.cdp.coinbase.com/agentic-wallet/welcome) to deploy Acurast jobs from LLM clients
+- **Backend services** that need to programmatically deploy Acurast jobs without interacting with the Acurast parachain or managing ACU accounts
+
+Both approaches are outlined below.
+
+## Supported Chains
+
+| Chain | Chain ID | Token |
+| ----- | -------- | ----- |
+| Base  | 8453     | USDC  |
+
+## Use via LLM
+
+```shell
+npx skills add coinbase/agentic-wallet-skills
+```
+
+Recommended skills are at least:
+
+```txt
+◆  Select skills to install (space to toggle)
+│  ◼ authenticate-wallet (Sign in to the wallet. Use when you or the user want to l...)
+│  ◼ fund (Add money to the wallet. Use when you or the user want to...)
+│  ◻ monetize-service
+│  ◼ pay-for-service (Make a paid API request to an x402 endpoint with automati...)
+│  ◻ query-onchain-data
+│  ◼ search-for-service (Search and browse the x402 bazaar marketplace for paid AP...)
+│  ◻ send-usdc
+│  ◻ trade
+│  ◼ x402 (Search for new services and make paid API requests using ...)
+```
+
+Choose your LLM client and whether to install globally. For example:
+
+```txt
+│   ○ Augment (.augment/skills)
+│   ○ IBM Bob (.bob/skills)
+│ ❯ ● Claude Code (.claude/skills)
+│   ○ OpenClaw (skills)
+│   ○ CodeBuddy (.codebuddy/skills)
+│   ○ Command Code (.commandcode/skills)
+│   ○ Continue (.continue/skills)
+│   ○ Cortex Code (.cortex/skills)
+```
+
+```txt
+◆  Installation scope
+│  ○ Project
+│  ● Global (Install in home directory (available across all projects))
+```
+
+```txt
+◆  Installation method
+│  ● Symlink (Recommended) (Single source of truth, easy updates)
+│  ○ Copy to all agents
+```
+
+And proceed with installation.
+
+Read more about [skills](https://docs.cdp.coinbase.com/agentic-wallet/skills/overview).
+
+After restarting your LLM client, you can set up your wallet and fund it _from within your LLM client_ using
+
+```
+/fund
+```
+
+Then, deploy a job via
+
+```
+/pay-for-service deploy.acu.run
+```
+
+<details>
+<summary>A typical flow to deploy a job on Acurast</summary>
+
+```
+❯ /pay-for-service                                                                                                                                                                                                                                 
+                                                                                                                                                                                                                                                   
+⏺ I'll check the wallet status first to make sure it's authenticated and ready for paid requests.                                                                                                                                                  
+                                                                                                                                                                                                                                                   
+⏺ Bash(npx awal@2.0.3 status)                                                                                                                                                                                                                      
+  ⎿  Wallet Server                                                                                                                                                                                                                                 
+     ✓ Running (PID: 33552)                                                                                                                                                                                                                        
+     … +4 lines (ctrl+o to expand)                                                                                                                                                                                                                 
+                                                                                                                                                                                                                                                   
+⏺ The wallet is authenticated and ready.                                                                                                                                                                                                           
+                                                                                                                                                                                                                                                   
+  To make a paid API request, I need to know which endpoint you want to call. Do you have a specific x402 service URL you'd like to use?                                                                                                           
+                                                                                                                                                                                                                                                   
+  If not, I can help you search the bazaar marketplace for available paid services using the /search-for-service skill. What kind of service or API are you looking for?                                                                           
+                                                                                                                                                                                                                                                   
+❯ /pay-for-service deploy.acu.run                                                                                                                                                                                                                  
+                                                                                                                                                                                                                                                   
+⏺ I see you want to use the deploy.acu.run service. Let me first check what endpoints and API documentation are available for this service.                                                                                                        
+                                                                                                                                                                                                                                                   
+⏺ Bash(npx awal@2.0.3 x402 pay https://deploy.acu.run --json)                                                                                                                                                                                      
+  ⎿  {                                                                                                                                                                                                                                             
+       "status": 200,                                                                                                                                                                                                                              
+       "statusText": "OK",                                                                                                                                                                                                                         
+     … +5 lines (ctrl+o to expand)                                                                                                                                                                                                                 
+                                                                                                                                                                                                                                                   
+⏺ The root endpoint doesn't require payment. Let me check if there's documentation or an OpenAPI spec available.                                                                                                                                   
+                                                                                                                                                                                                                                                   
+⏺ Fetch(https://deploy.acu.run)                                                                                                                                                                                                                    
+  ⎿  Received 4 bytes (200 OK)                                                                                                                                                                                                                     
+                                                                                                                                                                                                                                                   
+⏺ Let me check if there's documentation in the current repository about this deploy agent service.                                                                                                                                                 
+                                                                                                                                                                                                                                                   
+⏺ Read 1 file (ctrl+o to expand)                                                                                                                                                                                                                   
+                                                                                                                                                                                                                                                   
+⏺ I found the documentation. The Acurast Deploy Agent at deploy.acu.run is an x402 service for deploying jobs to the Acurast decentralized cloud.                                                                                                  
+                                                                                                                                                                                                                                                   
+  Service Details                                                                                                                                                                                                                                  
+  ┌──────────┬────────────────────────────────────────────┐                                                                                                                                                                                        
+  │  Field   │                   Value                    │                                                                                                                                                                                        
+  ├──────────┼────────────────────────────────────────────┤                                                                                                                                                                                        
+  │ Endpoint │ https://deploy.acu.run/deploy              │                                                                                                                                                                                        
+  ├──────────┼────────────────────────────────────────────┤                                                                                                                                                                                        
+  │ Method   │ POST                                       │                                                                                                                                                                                        
+  ├──────────┼────────────────────────────────────────────┤                                                                                                                                                                                        
+  │ Network  │ Base (chain 8453)                          │                                                                                                                                                                                        
+  ├──────────┼────────────────────────────────────────────┤                                                                                                                                                                                        
+  │ Payment  │ USDC (dynamic pricing based on job reward) │                                                                                                                                                                                        
+  └──────────┴────────────────────────────────────────────┘                                                                                                                                                                                        
+  Required Parameters                                                                                                                                                                                                                              
+  ┌────────┬────────┬────────────────────────────────────────────────────────┐                                                                                                                                                                     
+  │ Field  │  Type  │                      Description                       │                                                                                                                                                                     
+  ├────────┼────────┼────────────────────────────────────────────────────────┤                                                                                                                                                                     
+  │ script │ string │ IPFS hash of the script (e.g., ipfs://Qm...)           │                                                                                                                                                                     
+  ├────────┼────────┼────────────────────────────────────────────────────────┤                                                                                                                                                                     
+  │ reward │ number │ Reward per execution in picoACU (1 ACU = 10¹² picoACU) │                                                                                                                                                                     
+  └────────┴────────┴────────────────────────────────────────────────────────┘                                                                                                                                                                     
+  Optional Parameters                                                                                                                                                                                                                              
+                                                                                                                                                                                                                                                   
+  - schedule - Job schedule (start/end times, interval, duration)                                                                                                                                                                                  
+  - slots - Number of processor slots (default: 1)                                                                                                                                                                                                 
+  - runtime - NodeJS, NodeJSWithBundle, or Shell                                                                                                                                                                                                   
+  - assignmentStrategy - Single or Competing                                                                                                                                                                                                       
+  - allowOnlyVerifiedSources - Only verified processors (default: true)                                                                                                                                                                            
+                                                                                                                                                                                                                                                   
+  ---                                                                                                                                                                                                                                              
+  Would you like me to deploy a job? If so, please provide:                                                                                                                                                                                        
+  1. IPFS script hash (e.g., ipfs://QmZ9mvN4RFCqSqivB2LF3VF1qgrDGTW393PJezbdPy7nH2)                                                                                                                                                                
+  2. Reward amount in ACU (e.g., 0.0771 ACU)                                          
+                                                                                                                                                                    
+❯ deploy ipfs://QmZ9mvN4RFCqSqivB2LF3VF1qgrDGTW393PJezbdPy7nH2 with 0.0771 ACU reward                                                                               
+                                                                                                                                                                    
+⏺ I'll deploy that script with 0.0771 ACU reward (77,100,000,000 picoACU).                                                                                          
+                                                                                                                                                                    
+⏺ Bash(npx awal@2.0.3 x402 pay https://deploy.acu.run/deploy -X POST -d '{"script": "ipfs://QmZ9mvN4RFCqSqivB2LF3VF1qgrDGTW393PJezbdPy7nH2", "reward": 77100000000}'
+       --…)                                                                                                                                                         
+  ⎿  {                                                                                                                                                              
+       "status": 200,                                                                                                                                               
+       "statusText": "OK",                                                                                                                                          
+     … +22 lines (ctrl+o to expand)                                                                                                                                 
+                                                                                                                                                                    
+⏺ Deployment successful!                                                                                                                                            
+  ┌────────────┬───────────────────────────────────────────────────────────────────────────────────────────────────────────────┐                                    
+  │   Field    │                                                     Value                                                     │                                    
+  ├────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────────┤                                    
+  │ Job Hash   │ 0xe8c81b116fb4412571c1edcd8764e35db4a96507b599c86baf51746c55aecc25                                            │                                    
+  ├────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────────┤                                    
+  │ Explorer   │ https://hub.acurast.com/explorer/extrinsic/0xe8c81b116fb4412571c1edcd8764e35db4a96507b599c86baf51746c55aecc25 │                                    
+  ├────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────────┤                                    
+  │ Payment TX │ 0x88053... on Base (chain 8453)                                                                               │                                    
+  ├────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────────┤                                    
+  │ Payer      │ 0xceA0d23336f285f9d85d6b0c3DE7103eAEB168F9                                                                    │                                    
+  └────────────┴───────────────────────────────────────────────────────────────────────────────────────────────────────────────┘                                    
+  Your job has been deployed to the Acurast decentralized cloud with a reward of 0.0771 ACU per execution.
+```
+</details>
+
+
+## Programmatically deploy
+
+This approach uses Coinbase's `awal` tool directly, instead of via the LLM. This is a deterministic approach for dApps and backends.
+
+1. **Set up a [Coinbase Agentic Wallet](https://docs.cdp.coinbase.com/agentic-wallet/quickstart)**
+
+2. **Fund your agentic wallet**, then validate with:
+
+   ```shell
+   npx awal balance
+   ```
+
+   Example output:
+   ```
+   Base
+   ────────────────────────
+   USDC    $20.21
+   ETH     0.0008
+   WETH    0.0008
+   ```
+
+<details>
+<summary>3. OPTIONAL: Query accepted tokens and pricing before deploying</summary>
+
+You can query the deploy agent to see accepted tokens and the job's price before making a payment:
+
+```shell
+curl "https://deploy.acu.run/deploy" -X POST -H "Content-Type: application/json" -i -d '{
+    "script": "ipfs://QmZ9mvN4RFCqSqivB2LF3VF1qgrDGTW393PJezbdPy7nH2",
+    "allowedSources": null,
+    "allowOnlyVerifiedSources": true,
+    "schedule": {
+        "startTime": 1777593600000,
+        "endTime": 1777651200000,
+        "duration": 3600000,
+        "interval": 3600001,
+        "maxStartDelay": 10000
+    },
+    "memory": 0,
+    "networkRequests": 0,
+    "storage": 0,
+    "requiredModules": [],
+    "assignmentStrategy": "Single",
+    "slots": 1,
+    "reward": 77136800000,
+    "minReputation": 0,
+    "runtime": "NodeJS"
+}' | sed -n 's/^payment-required: //Ip' | tr -d '\r' | base64 -d | jq
+```
+
+Example response:
+
+```json
+{
+  "x402Version": 2,
+  "error": "Payment required",
+  "resource": {
+    "url": "http://deploy.acu.run/deploy",
+    "description": "Deploy Acurast job",
+    "mimeType": "application/json"
+  },
+  "accepts": [
+    {
+      "scheme": "exact",
+      "network": "eip155:8453",
+      "amount": "79000",
+      "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "payTo": "0x9b442C40DAaC631F74de4094F2998E4aC016098A",
+      "maxTimeoutSeconds": 300,
+      "extra": {
+        "name": "USD Coin",
+        "version": "2"
+      }
+    }
+  ],
+  "extensions": ...
+}
+```
+
+</details>
+
+4. **Deploy using the agentic wallet**
+
+   See [First App Deployment](/developers/deploy-first-app) to learn how to upload your script and receive an IPFS URL using the Acurast CLI.
+
+   ```shell
+   npx awal@latest x402 pay "https://deploy.acu.run/deploy" -X POST -d '{
+       "script": "ipfs://QmZ9mvN4RFCqSqivB2LF3VF1qgrDGTW393PJezbdPy7nH2",
+       "reward": 77136800000
+   }'
+   ```
+
+    The agent handles deployment to the Acurast network once an x402 [facilitator](https://docs.cdp.coinbase.com/x402/core-concepts/facilitator) confirms the payment was successful.
+
+    Example response:
+
+    ```
+    Response:
+    {
+        "success": true,
+        "paymentTxHash": "x402-1776088198704",
+        "payer": "unknown",
+        "chainId": 8453,
+        "acurastJobHash": "0xfe16aa9be55907284cf7eafaabfc9b41e6d7caa19a55d7b518146551783a1b83",
+        "explorerLink": "https://hub.acurast.com/explorer/extrinsic/0xfe16aa9be55907284cf7eafaabfc9b41e6d7caa19a55d7b518146551783a1b83",
+        "message": "Job deployed successfully"
+    }
+    ```
+
+    The deploy agent has deployed the job under [`5H3ChM1QgrYyGwzmyQ1QkdFCJxzakjWsbQN5tSGP8dkn2VCR`](https://hub.acurast.com/explorer/address/5H3ChM1QgrYyGwzmyQ1QkdFCJxzakjWsbQN5tSGP8dkn2VCR).
+
+
+## Full job specification
+
+:::tip Generate job specification
+The easiest way to craft a job specification as JSON is using the [Acurast CLI](/developers/tools/cli) with the extra argument `--only-upload` to just output the IPFS URL:
+
+```shell
+acurast deploy --only-upload
+```
+
+:::
+
+You can provide a complete job specification for more control:
+
+```shell
+npx awal@latest x402 pay "https://deploy.acu.run/deploy" -X POST -d '{
+    "script": "ipfs://QmZ9mvN4RFCqSqivB2LF3VF1qgrDGTW393PJezbdPy7nH2",
+    "allowedSources": null,
+    "allowOnlyVerifiedSources": true,
+    "schedule": {
+        "startTime": 1777593600000,
+        "endTime": 1777651200000,
+        "duration": 3600000,
+        "interval": 3600001,
+        "maxStartDelay": 10000
+    },
+    "memory": 0,
+    "networkRequests": 0,
+    "storage": 0,
+    "requiredModules": [],
+    "assignmentStrategy": "Single",
+    "slots": 1,
+    "reward": 77136800000,
+    "minReputation": 0,
+    "runtime": "NodeJS"
+}'
+```
+
+The `jobSpec` object follows the standard Acurast job registration format:
+
+| Field                      | Type             | Description                                           |
+| -------------------------- | ---------------- | ----------------------------------------------------- |
+| `script`                   | string           | **REQUIRED** IPFS hash or inline script code          |
+| `allowedSources`           | string[] \| null | Processor whitelist (null = any)         |
+| `allowOnlyVerifiedSources` | boolean          | Require attested processors              |
+| `schedule.startTime`       | number           | Job start time (Unix ms)                 |
+| `schedule.endTime`         | number           | Job end time (Unix ms)                   |
+| `schedule.duration`        | number           | Execution duration (ms)                  |
+| `schedule.interval`        | number           | Execution interval (ms)                  |
+| `schedule.maxStartDelay`   | number           | Max acceptable start delay (ms)          |
+| `memory`                   | number           | Max memory bytes (0 = default)           |
+| `networkRequests`          | number           | Max network requests (0 = default)       |
+| `storage`                  | number           | Max storage bytes (0 = default)          |
+| `requiredModules`          | number[]         | Required modules (e.g., LLM)             |
+| `assignmentStrategy`       | string           | "Single" or "Competing"                  |
+| `slots`                    | number           | Number of processor slots                |
+| `reward`                   | number           | **REQUIRED** Reward per execution (picoACU)           |
+| `minReputation`            | number           | Min processor reputation (0-1000000)     |
+| `runtime`                  | string           | "NodeJS", "NodeJSWithBundle", or "Shell" |

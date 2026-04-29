@@ -1,0 +1,1334 @@
+---
+title: Deployment Runtime Environment
+slug: /developers/build/runtime-environment
+---
+
+The deployment's script running on Processors has access to the following a set of APIs.
+
+## **Top level functions**
+
+```javascript
+/**
+ * Prints the given message to the console.
+ * @param {string} message the message to print.
+ */
+function print(message);
+
+/**
+ * Performs an HTTP GET request.
+ * @param {string} url the url to connect to.
+ * @param {Record<string, string>} headers the request's headers, for example: { 'Accept': 'application/json' }.
+ * @param {HttpSuccess} success the success callback function.
+ * @param {HttpError} error the error callback function.
+ */
+function httpGET(url, headers, success, error);
+
+/**
+ * Performs an HTTP GET request.
+ * @param {string} url the url to connect to.
+ * @param {string} body a string representing the request's body.
+ * @param {Record<string, string>} headers the request's headers, for example: { 'Content-Type': 'application/json' }.
+ * @param {HttpSuccess} success the success callback function.
+ * @param {HttpError} error the error callback function.
+ */
+function httpPOST(url, body, headers, success, error);
+
+/**
+ * @callback HttpSuccess
+ * @param {string} payload the http request response payload as text.
+ * @param {string} certificate a hex string representing the server certificate.
+ */
+type HttpSuccess = (payload, certificate) => void;
+
+/**
+ * @callback HttpError
+ * @param {string} message an error message.
+ */
+type HttpError = (message) => void;
+
+/**
+ * Reads value from the environment.
+ * @param {string} key The key used to get the value from the environment.
+ * @return {string} The string value for the given key or undefined.
+ */
+function environment(key);
+```
+
+## **The \_STD\_ object**
+
+At the top level, a `_STD_` object is defined. This object exposes additional functionalities.
+
+### **Random**
+
+```javascript
+/**
+ * Generates random bytes.
+ * @return {string} Hex string representing random bytes.
+ */
+_STD_.random.generateSecureRandomHex();
+```
+
+### **Environment Variables**
+
+```javascript
+/**
+ * Environment object populated with the environment variables defined during deployment creation.
+ * For example, to access a variable defined with the "MY_KEY" key do: _STD_.env["MY_KEY"].
+ */
+_STD_.env;
+```
+
+### **App Info**
+
+```javascript
+/**
+ * The processor app version as a string.
+ *
+ * Example: "1.9.2-canary"
+ */
+_STD_.app_info.version;
+```
+
+### **Deployment Info**
+
+```javascript
+/**
+ * @return {DeploymentId} Object representing a deployment id.
+ *
+ * Example:
+ * {
+ *  origin: {
+ *    kind: "Acurast",
+ *    source: "2273f64ccf6e9dc13aedf111ca19da030909374f18c6a958b8e5c64927dc7b4f"
+ *  },
+ *  id: "3510"
+ * }
+ */
+_STD_.job.getId();
+
+type DeploymentId = { origin: { kind: string, source: string }, id: string };
+
+/**
+ * @return {number} The slot number of this deployment.
+ */
+_STD_.job.getSlot();
+
+/**
+ * @return {PublicKeys} Object containing the deployment specific public keys.
+ *
+ * Example:
+ * {
+ *  p256: "03aa8fa2bfe5a5d6789637c3b82b322b617f8c19e29a4b7d3eede17a2583312891",
+ *  secp256k1: "02fcf1a928bab608989a0218831efd585d1e771669756e1033c60cff4bef6f28e5",
+ *  ed25519: "7ce9f9b96a0f898ad109a594ab2c30a1682e7e6425910427c9390fdf16b11dd6"
+ * }
+ */
+_STD_.job.getPublicKeys();
+
+type PublicKeys = { p256: string, secp256k1: string, ed25519: string };
+```
+
+### **Device Info**
+
+```javascript
+/**
+ * Get the main account public key.
+ *
+ * @since 1.9.2 (version code 58)
+ *
+ * @return {string} Hex string representing the main account public key.
+ */
+_STD_.device.getPublicKey();
+
+/**
+ * Get the main account address.
+ *
+ * @since 1.9.2 (version code 58)
+ *
+ * @return {string} String representing the main account address.
+ */
+_STD_.device.getAddress();
+```
+
+### **Signers**
+
+```javascript
+/**
+ * Signs the given payload with the secp256r1 key generated for the current deployment.
+ *
+ * @since 1.9.2 (version code 58)
+ *
+ * @param {string} payload Hex string representing the bytes to sign.
+ * @return {string} Hex string representing the signature.
+ */
+_STD_.signers.secp256r1.sign(payload);
+
+/**
+ * Encrypts the given payload with the secp256r1 key generated for the current deployment.
+ *
+ * @since 1.9.2 (version code 58)
+ *
+ * @param {string} publicKey Hex string representing the receiver's public key.
+ * @param {string} salt Hex string representing the salt used for encryption.
+ * @param {string} payload Hex string representing the bytes to encrypt.
+ * @return {string} Hex string representing the encrypted payload.
+ */
+_STD_.signers.secp256r1.encrypt(publicKey, salt, payload);
+
+/**
+ * Decrypts the given payload with the secp256r1 key generated for the current deployment.
+ *
+ * @since 1.9.2 (version code 58)
+ *
+ * @param {string} publicKey Hex string representing the sender's public key.
+ * @param {string} salt Hex string representing the salt used for encryption.
+ * @param {string} payload Hex string representing the bytes to decrypt.
+ * @return {string} Hex string representing the decrypted payload.
+ */
+_STD_.signers.secp256r1.decrypt(publicKey, salt, payload);
+
+/**
+ * Signs the given payload with the secp256k1 key generated for the current deployment.
+ *
+ * @since 1.9.2 (version code 58)
+ *
+ * @param {string} payload Hex string representing the bytes to sign.
+ * @return {string} Hex string representing the signature.
+ */
+_STD_.signers.secp256k1.sign(payload);
+
+/**
+ * Encrypts the given payload with the secp256k1 key generated for the current deployment.
+ *
+ * @since 1.9.2 (version code 58)
+ *
+ * @param {string} publicKey Hex string representing the receiver's public key.
+ * @param {string} salt Hex string representing the salt used for encryption.
+ * @param {string} payload Hex string representing the bytes to encrypt.
+ * @return {string} Hex string representing the encrypted payload.
+ */
+_STD_.signers.secp256k1.encrypt(publicKey, salt, payload);
+
+/**
+ * Decrypts the given payload with the secp256k1 key generated for the current deployment.
+ *
+ * @since 1.9.2 (version code 58)
+ * 
+ * @param {string} publicKey Hex string representing the sender's public key.
+ * @param {string} salt Hex string representing the salt used for encryption.
+ * @param {string} payload Hex string representing the bytes to decrypt.
+ * @return {string} Hex string representing the decrypted payload.
+ */
+_STD_.signers.secp256k1.decrypt(publicKey, salt, payload);
+
+/**
+ * Signs the given payload with the ed25519 key generated for the current deployment.
+ *
+ * @since 1.9.2 (version code 58)
+ *
+ * @param {string} payload Hex string representing the bytes to sign.
+ * @return {string} Hex string representing the signature.
+ */
+_STD_.signers.ed25519.sign(payload);
+```
+
+### **Websocket**
+
+```javascript
+/**
+ * @param {string | string[]} url to the acurast websocket service.
+ * @param {WsSuccess} success the success callback.
+ * @param {WsError} error the error callback.
+ */
+_STD_.ws.open(url, success, error);
+
+/**
+ * @param {WsSuccess} success the success callback.
+ * @param {WsError} error the error callback.
+ */
+_STD_.ws.close(success, error);
+
+/**
+ * @param {WsHandler} handler the handler called on every incoming message.
+ */
+_STD_.ws.registerPayloadHandler(handler);
+
+/**
+ * @param {string} recipient the public key in hex format of the recipient.
+ * @param {string} payload the payload to send as a hex string.
+ * @param {WsSuccess} success the success callback.
+ * @param {WsError} error the error callback.
+ */
+_STD_.ws.send(recipient, payload, success, error);
+
+/**
+ * @callback WsSuccess
+ */
+type WsSuccess = () => void;
+
+/**
+ * @callback WsError
+ * @param {string} message an error message.
+ */
+type WsError = (message) => void;
+
+/**
+ * @callback WsHandler
+ * @param {WsPayload} payload the payload message.
+ */
+type WsHandler = (payload) => void;
+
+type WsPayload = { sender: string, recipient: string, payload: string };
+```
+
+### **P2P**
+
+```javascript
+/**
+ * @param {P2PConfig} config the node configuration.
+ * @param {P2PSuccess} success the success callback.
+ * @param {P2PError} error the error callback.
+ */
+_STD_.p2p.start(config, success, error);
+
+/**
+ * @param {P2PSuccess} success the success callback.
+ * @param {P2PError} error the error callback.
+ */
+_STD_.p2p.close(success, error);
+
+/**
+ * @param {P2PMessageListener} listener the listener called on each incoming message.
+ */
+_STD_.p2p.onMessage(listener);
+
+/**
+ * @param {P2PPeer} receiver the peer who should receive the message.
+ * @param {string} protocol the ID of the message protocol that should be used to transmit the message.
+ * @param {string} bytes the payload to send as a hex string.
+ * @param {P2PSuccess} success the success callback.
+ * @param {P2PError} error the error callback.
+ */
+_STD_.p2p.request(receiver, protocol, bytes, success, error);
+
+/**
+ * @param {P2PMessage} request the request to which this message responds.
+ * @param {string} bytes the payload to send as a hex string.
+ * @param {P2PSuccess} success the success callback.
+ * @param {P2PError} error the error callback.
+ */
+_STD_.p2p.respond(request, bytes, success, error);
+
+/**
+ * @param {string} peer the address or peer ID of the target peer to establish a connection with.
+ * @param {P2PConnectOptions|undefined} options an optional configuration of this call.
+ * @param {P2PSuccess} success the success callback.
+ * @param {P2PError} error the error callback.
+ */
+_STD_.p2p.connect(peer, options, success, error);
+
+/**
+ * @param {string} peer the address or peer ID of the target peer whose connection should be terminated.
+ * @param {P2PSuccess} success the success callback.
+ * @param {P2PError} error the error callback.
+ */
+_STD_.p2p.disconnect(peer, success, error);
+
+/**
+ * @param {string} peer the address or peer ID of the target peer to which the stream will be opened.
+ * @param {string} protocol the protocol to be used for the stream.
+ * @param {P2PStreamSuccess} success the success callback.
+ * @param {P2PError} error the error callback.
+ */
+_STD_.p2p.openOutgoingStream(peer, protocol, success, error);
+
+/**
+ * @param {P2PStreamListener} listener the listener called on each incoming stream.
+ */
+_STD_.p2p.onIncomingStream(listener);
+
+/**
+ * @param {P2PConnectedRelayListener} listener the listener called whenever a relay is connected.
+ */
+_STD_.p2p.onRelayConnected(listener);
+
+/**
+ * @param {string} publicKey the public key from which the peer ID should be generated.
+ * @return {string} the peer ID.
+ */
+_STD_.p2p.peerIdFromPublicKey(publicKey): string;
+
+/**
+ * @property {string[]} messageProtcols message protocols the node will support and use to send and receive messages.
+ * @property {string[]} relays a list of public nodes that will serve as a proxy helping establish connections with nodes behind NATs and firewalls.
+ * @property {number|undefined} idleConnectionTimeout time in milliseconds after which idle connections will be closed, defaults to 15s if not provided.
+ */
+type P2PConfig = {
+  messageProtocols: string[]
+  relays: string[]
+  idleConnectionTimeout?: number
+};
+
+/**
+ * @callback P2PSuccess
+ */
+type P2PSuccess = () => void;
+
+/**
+ * @callback P2PStreamSuccess
+ * @param {P2PStream} stream
+ */
+type P2PStreamSuccess = (stream) => void;
+
+/**
+ * @callback P2PError
+ * @param {string} message an error message.
+ */
+type P2PError = (message) => void;
+
+/**
+ * @callback P2PMessageListener
+ * @param {P2PMessage} message
+ */
+type P2PMessageListener = (payload) => void;
+
+/**
+ * @property {number|string|undefined} timeout an optional duration in milliseconds for which the client will attempt to establish a connection with the peer. If the connection is being established through a relay, the client will wait for a direct connection within the timeout period. If unsuccessful, it will fallback to the relayed connection, if available.
+ */
+type P2PConnectOptions = {
+  timeout?: number | string
+}
+
+/**
+ * @callback P2PStreamListener
+ * @param {P2PStream} stream
+ */
+type P2PStreamListener = (stream) => void;
+
+/**
+ * @callback P2PConnectedRelayListener
+ * @param {string} address the address of the connected relay.
+ */
+type P2PConnectedRelayListener = (address) => void;
+
+/**
+ * @property {P2PMessageType} type the type of the message.
+ * @property {string} id internal id,
+ * @property {P2Peer} sender the sender of the message.
+ * @property {string} protocol the message protocol that was used to transmit this message.
+ * @property {string} bytes the payload represented as a hex string.  
+ */
+type P2PMessage = { 
+  type: P2PMessageType
+  id: string
+  sender: P2PPeer
+  protocol: string
+  bytes: string 
+};
+
+type P2PMessageType = 'request' | 'response';
+
+type P2PPeer = { type: P2PPeerType, value: string };
+type P2PPeerType = 'address' | 'peerId';
+
+/**
+ * @property {string} protocol
+ * @property {P2PPeer} peer
+ * @function read reads n bytes from the stream.
+ * @function write writes bytes to the stream.
+ * @function close closes the stream.
+ */
+type P2PStream = {
+  protocol: string
+  peer: P2PPeer
+  read: P2PStreamRead
+  write: P2PStreamWrite
+  close: P2PStreamClose
+};
+
+/**
+ * @function P2PStreamRead
+ * @param {number} n the number of bytes to read from the stream.
+ * @return {Promise<Buffer>} a promise that resolves with bytes read.
+ */
+type P2PStreamRead = (n) => Promise<Buffer>;
+
+/**
+ * @function P2PStreamWrite
+ * @param {Uint8Array | string} bytes the data to be written to the stream, provided as a `Uint8Array` or hex string.
+ */
+type P2PStreamWrite = (bytes) => Promise<void>;
+
+/**
+ * @function P2PStreamClose
+ */
+type P2PStreamClose = () => Promise<void>;
+```
+
+### **WebView**
+```javascript
+/**
+ * @since 1.23.0 (Android)
+ * 
+ * Opens a new tab in the WebView.
+ * @param {string} url the URL to open.
+ * @param {WebViewNewTabSuccess} onSuccess the success callback.
+ * @param {WebViewError} onError the error callback.
+ */
+_STD_.webview.newTab(url, onSuccess, onError);
+
+/**
+ * @since 1.9.2 (Android)
+ * 
+ * Closes all open WebView tabs, clears storage, cookies and eventual proxy settings.
+ * @param {WebViewVoidSuccess} onSuccess the success callback.
+ * @param {WebViewError} onError the error callback.
+ */
+_STD_.webview.close(onSuccess, onError);
+
+/**
+ * @since 1.23.0 (Android)
+ * 
+ * Gets an array of all currently open tabs.
+ * @param {WebViewGetTabsSuccess} onSuccess the success callback.
+ * @param {WebViewError} onError the error callback.
+ */
+_STD_.webview.getOpenTabs(onSuccess, onError);
+
+/**
+ * @since 1.23.0 (Android)
+ * 
+ * Configures the WebView to use a proxy server.
+ * @param {string} url the proxy URL.
+ * @param {WebViewProxyConfig|undefined} config additional proxy configuration, optional.
+ * @param {WebViewVoidSuccess} onSuccess the success callback.
+ * @param {WebViewError} onError the error callback.
+ */
+_STD_.webview.useProxy(url, config, onSuccess, onError);
+
+/**
+ * @since 1.23.0 (Android)
+ * 
+ * Resets the proxy configuration.
+ * @param {WebViewVoidSuccess} onSuccess the success callback.
+ * @param {WebViewError} onError the error callback.
+ */
+_STD_.webview.removeProxy(onSuccess, onError);
+
+/**
+ * @since 1.9.2 (Android)
+ * 
+ * Returns the debug URL of the WebView.
+ * @return {string} the debug URL.
+ */
+_STD_.webview.getDebugUrl(): string;
+
+/**
+ * @since 1.23.0 (Android)
+ * 
+ * @callback WebViewCloseSuccess
+ * @param {WebviewTab} tab the opened tab.
+ */
+type WebViewNewTabSuccess = (tab) => void;
+
+/**
+ * @since 1.23.0 (Android)
+ * 
+ * @callback WebViewGetTabsSuccess
+ * @param {WebViewTab[]} tabs the currently opened tabs.
+ */
+type WebViewGetTabsSuccess = (tabs) => void;
+
+/**
+ * @since 1.9.2 (Android)
+ * 
+ * @callback WebViewCloseSuccess
+ */
+type WebViewVoidSuccess = () => void;
+
+/**
+ * @since 1.9.2 (Android)
+ * 
+ * @callback WebViewCloseSuccess
+ * @param {string} error the error message.
+ */
+type WebViewError = (error) => void;
+
+/**
+ * @since 1.23.0 (Android)
+ * 
+ * @property {string} id the unique identifier of the WebView tab.
+ * @function getUrl returns the current URL of the WebView tab.
+ * @function getTrigger returns the trigger mode of the WebView tab.
+ * @function close closes the WebView tab.
+ * @function startRefreshLoop starts the refresh loop for the WebView tab.
+ * @function stopRefreshLoop stops the ongoing refresh loop for the WebView tab.
+ */
+type WebViewTab = {
+  id: string
+  getUrl: WebViewTabGetUrl;
+  getTrigger: WebViewTabGetTrigger;
+  close: WebViewTabClose;
+  startRefreshLoop: WebViewStartRefreshLoop;
+  stopRefreshLoop: WebViewStopRefreshLoop;
+};
+
+/**
+ * @since 1.23.0 (Android)
+ * 
+ * @function WebViewTabGetUrl
+ * Returns the current URL of the WebView tab.
+ */
+type WebViewTabGetUrl = () => Promise<string>;
+
+/**
+ * @since 1.23.0 (Android)
+ * 
+ * @function WebViewTabGetTrigger
+ * Returns the trigger mode of the WebView tab: 'manual' if opened via `webview.newTab` call, or 'auto' if opened automatically by one of the tabs.
+ */
+type WebViewTabGetTrigger = () => Promise<'manual' | 'auto'>;
+
+/**
+ * @since 1.23.0 (Android)
+ * 
+ * @function WebViewTabClose
+ * Closes the WebView tab.
+ * @param {WebViewCloseOptions|undefined} options
+ */
+type WebViewTabClose = (options) => Promise<void>;
+
+/**
+ * @since 1.23.0 (Android)
+ * 
+ * @property {boolean|undefined} wholeTree whether to close the whole tree of tabs spawned by this tab or only the current one. If not provided, the default is false.
+ */
+type WebViewCloseOptions = {
+  wholeTree?: boolean;
+}
+
+/**
+ * @since 1.23.0 (Android)
+ * 
+ * @function WebViewStartRefreshLoop
+ * Starts the refresh loop for the WebView tab.
+ * 
+ * This action may increase resource usage, so it should be used sparingly and
+ * only if absolutely necessary, for example in preparation for taking a screenshot.
+ * 
+ * When no longer needed, the refresh loop should be closed with `stopRefreshLoop`.
+ * @param {WebViewStartRefreshLoopOptions|undefined} options
+ */
+type WebViewStartRefreshLoop = (options) => void;
+
+/**
+ * @since 1.23.0 (Android)
+ * 
+ * @property {number|undefined} interval the interval of consecutive refreshes in milliseconds. If not provided, the default interval of 500 milliseconds is used.
+ * @property {boolean|undefined} wholeTree whether to refresh the whole tree of tabs spawned by this tab or only the current one. If not provided, the default is false.
+ */
+type WebViewStartRefreshLoopOptions = {
+  interval?: number;
+  wholeTree?: boolean;
+}
+
+/**
+ * @since 1.23.0 (Android)
+ * 
+ * @function WebViewStopRefreshLoop
+ * Stops the ongoing refresh loop for the WebView tab.
+ * @param {WebViewStopRefreshLoopOptions|undefined} options
+ */
+type WebViewStopRefreshLoop = (options) => void;
+
+/**
+ * @since 1.23.0 (Android)
+ * 
+ * @property {boolean|undefined} wholeTree whether to stop ongoing refresh loops for the whole tree of tabs spawned by this tab or only the current one. If not provided, the default is false.
+ */
+type WebViewStopRefreshLoopOptions = {
+  wholeTree?: boolean;
+}
+
+/**
+ * @since 1.23.0 (Android)
+ * 
+ * @property {string|undefined} username Proxy server username.
+ * @property {string|undefined} password Proxy server password.
+ * @property {boolean|undefined} fallback Whether to connect directly instead of using a proxy server in case of a failure. Defaults to false.
+ */
+type WebViewProxyConfig = {
+  username?: string;
+  password?: string;
+  fallback?: boolean;
+}
+
+```
+
+### **Network**
+
+```javascript
+/**
+ * @since 1.24.0 (Android), 1.8.0 (iOS)
+ *
+ * Whitelists one or more hostnames for outbound network access. The runtime
+ * performs the following verification steps for each hostname:
+ *
+ * 1. **Forward DNS + TXT** — verifies that `_acu.<host>` carries a TXT record
+ *    `v=base64(sha256(deployment_source || host))`, then resolves the hostname
+ *    to one or more IP addresses (A/AAAA).
+ * 2. **Reverse DNS + TXT** — for each resolved IP, performs a PTR lookup and
+ *    verifies that `_acu.<host>` carries a TXT record
+ *    `v=base64(sha256(deployment_source || host))`.
+ * 
+ * Where `deployment_source` is the raw 32-byte Substrate Account ID of the deployment's owner
+ * and `host` is the bare hostname (no scheme, port, or path, e.g. `example.com`).
+ *
+ * Both steps must pass for an IP to be added to the whitelist.
+ * Connections to non-whitelisted hosts are rate-limited.
+ *
+ * @param {string|string[]} hosts The hostname or array of hostnames to whitelist. Must be bare hostnames without scheme, port, or path.
+ */
+_STD_.network.whitelist(hosts);
+```
+
+Example scripts for computing the verification hash:
+
+#### Node.js
+```javascript
+// npm install @polkadot/util-crypto
+
+const { createHash } = require('crypto');
+const { decodeAddress } = require('@polkadot/util-crypto');
+
+function verificationHash(source, host) {
+    // Decode hex Account ID directly, or convert SS58 address to raw bytes
+    const sourceBytes = source.length === 64
+        ? Buffer.from(source, 'hex')
+        : Buffer.from(decodeAddress(source));
+    // SHA-256 over concatenation of source bytes and UTF-8 encoded host
+    const digest = createHash('sha256')
+        .update(sourceBytes)
+        .update(host)
+        .digest();
+    // Return the hash as a base64 string
+    return digest.toString('base64');
+}
+```
+
+#### Python
+```python
+# pip install substrate-interface
+
+import hashlib
+import base64
+
+from substrateinterface.utils.ss58 import ss58_decode
+
+
+def verification_hash(source: str, host: str) -> str:
+    # Decode hex Account ID directly, or convert SS58 address to raw bytes
+    source_bytes = bytes.fromhex(source) if len(source) == 64 else bytes.fromhex(ss58_decode(source))
+    # SHA-256 over concatenation of source bytes and UTF-8 encoded host
+    digest = hashlib.sha256(source_bytes + host.encode()).digest()
+    # Return the hash as a base64 string
+    return base64.b64encode(digest).decode()
+```
+
+### **Substrate functions**
+
+```javascript
+/**
+ * Calls the `fulfill` extrinsic on the target substrate chain.
+ * @param {string | string[]} nodes the node URL or array of node URLs.
+ * @param {string} payload the string representation of the fulfill payload.
+ * @param {object} extra an object with extra arguments. It needs to provide a `callIndex` which is the hex representation of the `fulfill` extrinsic's call index on the target substrate chain.
+ * @param {SubstrateSuccess} success the success callback.
+ * @param {SubstrateError} error the error callback.
+ */
+_STD_.chains.substrate.fulfill(nodes, payload, extra, success, error);
+
+/**
+ * @callback SubstrateSuccess
+ * @param {string} operationHash the operation hash of the submitted extrinsic.
+ */
+type SubstrateSuccess = (operationHash) => void;
+
+/**
+ * @callback SubstrateError
+ * @param {string[]} message an error message.
+ */
+type SubstrateError = (message) => void;
+```
+
+### **Substrate signer functions**
+
+```javascript
+/**
+ * Sets the curve type to use when signing.
+ * @param {'SECP256K1' | 'SECP256R1'} curveType
+ */
+_STD_.chains.substrate.signer.setSigner(curveType);
+
+/**
+ * Signs a payload.
+ *
+ * @since 1.9.2 (version code 58)
+ *
+ * @param {string} payload Hex string to sign.
+ * @return {string} Hex string representing the signature.
+ */
+_STD_.chains.substrate.signer.sign(payload);
+```
+
+### **Substrate codec functions**
+
+```javascript
+/**
+ * Hashes the given string using blake2b 256 bit.
+ * @param {string} value
+ * @return {string} The blake2b hash of the input value.
+ */
+_STD_.chains.substrate.codec.blakeTwo256(value);
+
+/**
+ * Encodes a number to the SCALE encoding.
+ * @param {number | string} value the number to encode.
+ * @param {8 | 32 | 64 | 128} bitSize the number's bit size.
+ * @return {string} Hex string representing the SCALE encoded number.
+ */
+_STD_.chains.substrate.codec.encodeUnsignedNumber(value, bitSize);
+
+/**
+ * Encodes a number to the compact SCALE encoding.
+ * @param {number | string} value the number to encode.
+ * @return {string} Hex string representing the compact SCALE encoded number.
+ */
+_STD_.chains.substrate.codec.encodeCompactUnsignedNumber(value);
+
+/**
+ * Encodes bytes to SCALE encoding.
+ * @param {string | ArrayBuffer} value hex string or an ArrayBuffer representing the bytes to encode.
+ * @return {string} Hex string representing the SCALE encoded bytes.
+ */
+_STD_.chains.substrate.codec.encodeBytes(value);
+
+/**
+ * Encodes a boolean value to SCALE encoding.
+ * @param {boolean} value the boolean value to encode.
+ * @return {string} Hex string representing the SCALE encoded boolean.
+ */
+_STD_.chains.substrate.codec.encodeBoolean(value);
+
+/**
+ * Encodes a substrate address to SCALE encoding.
+ * @param value the address to encode.
+ * @return {string} Hex string representing the SCALE encoded address.
+ */
+_STD_.chains.substrate.codec.encodeAddress(value);
+
+/**
+ * Encodes a substrate address to a `MultiAddress` SCALE encoded vale.
+ * @param value the address to encode.
+ * @return {string} Hex string representing the SCALE encoded multi address.
+ */
+_STD_.chains.substrate.codec.encodeMultiAddress(value: string);
+```
+
+### **Substrate contract functions**
+
+```javascript
+/**
+ * Calls the `fulfill` extrinsic on a contract deployed on a chain integrating the substrate contract pallet (`pallet-contract`).
+ * @param {string | stirng[]} nodes the node URL or array of node URLs.
+ * @param {string} callIndex an hex string representing the call index of the `call` extrinsic of `pallet-contract`.
+ * @param {string} destination the contract address.
+ * @param {string} data the contract call arguments as an hex string.
+ * @param {object} extra objet containing additional arguments, it has to at least provide `refTime` and `proofSize` as string values. Additionally it can provide a `value` as a string representing the amount to transfer with the contract call, `method` as a string representing the method name to use instead of `fulfill` and `storageDepositLimit` as a string value. Example: `{ refTime: "3951114240", proofSize: "629760" }`.
+ * @param {SubstrateSuccess} success the success callback.
+ * @param {SubstrateError} error the error callback.
+ */
+_STD_.chains.substrate.contract.fulfill(
+  nodes,
+  callIndex,
+  destination,
+  data,
+  extra,
+  success,
+  error
+);
+
+/**
+ * Calls the `fulfill` extrinsic on a contract deployed on a chain integrating the substrate contract pallet (`pallet-contract`).
+ * @param {string | stirng[]} nodes the node URL or array of node URLs.
+ * @param {string} method a string representing the method name to call on the destination contract.
+ * @param {string} destination the contract address.
+ * @param {string} data the contract call arguments as an hex string.
+ * @param {object} extra objet containing additional arguments. It can provide a `blockNumber` as a string to sepcify at what lever to read from and `storageDepositLimit` as a string value.
+ * @param {SubstrateSuccess} success the success callback.
+ * @param {SubstrateError} error the error callback.
+ */
+_STD_.chains.substrate.contract.callView(
+  nodes,
+  method,
+  destination,
+  data,
+  extra,
+  success,
+  error
+);
+```
+
+### **Substrate Gear functions**
+
+```javascript
+/**
+ * Sends a message to an active Gear program extrinsic on a chain integrating the Gear protocol.
+ * @param {string | stirng[]} nodes the node URL or array of node URLs.
+ * @param {string} callIndex an hex string representing the call index of the `gear.sendMessage` extrinsic.
+ * @param {string} destination the active program address.
+ * @param {string} data an hex string encoding the method and arguments to call on the program.
+ * @param {object} extra objet containing additional arguments, it has to provide `gasLimit` as a string, `value` as a string and `keepAlive` as a boolean. Example: `{ gasLimit: "2000000000", value: "0", keepAlive: true }`.
+ * @param {SubstrateSuccess} success the success callback.
+ * @param {SubstrateError} error the error callback.
+ */
+_STD_.chains.substrate.gear.sendMessage(
+  nodes,
+  callIndex,
+  destination,
+  data,
+  extra,
+  success,
+  error
+);
+```
+
+### **Tezos functions**
+
+```javascript
+/**
+ * Calls the `fulfill` entrypoint on the Tezos Acurast Proxy contract.
+ * @param {string | string[]} nodes the node URL or array of node URLs.
+ * @param {any} payload the second argument for the `fulfill` entrypoint call on the Acurast Proxy contract. It represents a Michelson value that will be packed to bytes.
+ * @param {object} extra object with extra arguments, it has to at least provide the values for the `fee`, `gasLimit` and `storageLimit` as numbers. Additionally it can provide an `entrypoint` as a string to use instead of `fulfill`. Example: `{ fee: 1500, gasLimit: 3000, storageLimit: 0 }`.
+ * @param {TezosSuccess} success the success callback.
+ * @param {TezosError} error the error callback.
+ */
+_STD_.chains.tezos.fulfill(nodes, payload, extra, success, error);
+
+/**
+ * Calls a custom entrypoint on a Tezos contract.
+ * @param {string | string[]} nodes the node URL or array of node URLs.
+ * @param {any} payload a Michelson value representing the arguments of the entrypoint being called.
+ * @param {object} extra object with extra arguments, it has to at least provide the values for the `fee`, `gasLimit` and `storageLimit` as numbers. Additionally it can provide an `entrypoint` as a string to use instead of `fulfill` and `destination` as a string for the contract address to use instead of the default Acurast Proxy contract. Example: `{ fee: 1500, gasLimit: 3000, storageLimit: 0 }`.
+ * @param {TezosSuccess} success the success callback.
+ * @param {TezosError} error the error callback.
+ */
+_STD_.chains.tezos.customCall(nodes, payload, extra, success, error);
+
+/**
+ * @callback TezosSuccess
+ * @param {string} operationHash the operation hash of the submitted operation.
+ */
+type TezosSuccess = (operationHash) => void;
+
+/**
+ * @callback TezosError
+ * @param {string[]} message an error message.
+ */
+type TezosError = (message) => void;
+```
+
+### **Tezos encoding functions**
+
+```javascript
+/**
+ * Packs the given micheline structure.
+ * @param value an object representing a micheline structure.
+ * @return {string} Hex string representing the packed value.
+ */
+_STD_.chains.tezos.encoding.pack(value);
+
+/**
+ * Encodes the given micheline structure into a hex value that can be used as key for big map values.
+ * @param {object} value an object representing a micheline structure.
+ * @return {string} Hex string representing the script hash encoded value.
+ */
+_STD_.chains.tezos.encoding.encodeExpr(value);
+```
+
+### **Tezos message signing**
+
+```javascript
+/**
+ * Signs the given message and returns the signature.
+ *
+ * Before signing, the message is prepended with the utf8 bytes of the
+ * string 'acusig' and the script's ipfs hash ('acusig' + SCRIPT_HASH + message),
+ * then the resulting bytes are hashed with blake2b256.
+ *
+ * @param {string} message an hex string representing the bytes to sign
+ * @return {string} Hex string representing the signature
+ */
+_STD_.chains.tezos.signer.sign(message);
+```
+
+### **Ethereum functions**
+
+```javascript
+/**
+ * Calls `fulfill` on a ethereum contract.
+ *
+ * The `extra` argument is an object that can provide the following:
+ * - `methodSignature`: an optional string representing the method signature, if not provided `fulfill(bytes)` is used.
+ * - `gasLimit`: a string representing the transaction's gas limit, if not provided '9000000' is used.
+ * - `maxPriorityFeePerGas`: a string representing the transaction's maxPriorityFeePerGas, if not provided '0' is used.
+ * - `maxFeePerGas`: a string representing the transaction's maxFeePerGas, if not provided '0'.
+ *
+ * @param {string} url the node URL.
+ * @param {string} destination the contract's address.
+ * @param {string} payload a hex string representing the arguments for the method call.
+ * @param {object} extra object with extra arguments.
+ * @param {EthereumSuccess} success the success callback.
+ * @param {EthereumError} error the success callback.
+ */
+_STD_.chains.ethereum.fulfill(url, destination, payload, extra, success, error);
+
+/**
+ * @callback EthereumSuccess
+ * @param {string} operationHash the operation hash of the submitted operation.
+ */
+type EthereumSuccess = (operationHash) => void;
+
+/**
+ * @callback EthereumError
+ * @param {string[]} message an error message.
+ */
+type EthereumError = (message) => void;
+
+/**
+ * @return {string} The processor's ethereum address for the current deployment.
+ */
+_STD_.chains.ethereum.getAddress();
+```
+
+### **Ethereum message signing**
+
+```javascript
+/**
+ * Signs the given message and returns the signature.
+ *
+ * Before signing, the message is prepended with the utf8 bytes of the
+ * string 'acusig' and the script's ipfs hash ('acusig' + SCRIPT_HASH + message),
+ * then the resulting bytes are hashed with Keccak256.
+ *
+ * @param {string} message an hex string representing the bytes to sign
+ * @return {string} Hex string representing the signature
+ */
+_STD_.chains.ethereum.signer.sign(message);
+```
+
+### **Ethereum ABI functions**
+
+```javascript
+/**
+ * Encodes the given value.
+ *
+ * @param {any} value A string, number or an array/object containing strings and numbers.
+ * @return {string} Hex string representing the encoded value.
+ */
+_STD_.chains.ethereum.abi.encode(value);
+
+/**
+ * Encodes a numeric value.
+ *
+ * @param {number|string} value A number or a hex string representing a big integer.
+ * @param {number} bitLength A number specifying the bit length.
+ * @param {boolean} isNatural A boolean indicating if it is a natural number.
+ * @return {string} Hex string representing the encoded value.
+ */
+_STD_.chains.ethereum.abi.encodeNumeric(value, bitLength, isNatural);
+
+/**
+ * Encodes an objects as a structure.
+ *
+ * @param {any} value A string, number or an array/object containing strings and numbers.
+ * @param {boolean} isDynamic A boolean indicating if it is a dynamic strucure.
+ * @return {string} Hex string representing the encoded value.
+ */
+_STD_.chains.ethereum.abi.encodeStruct(value, isDynamic);
+```
+
+### **Bitcoin functions**
+
+```javascript
+/**
+ * Returns the public key for the bitcoin chain.
+ *
+ * @since 1.5.0 (version code 28)
+ *
+ * @return {string} Hex string representing the public key
+ */
+_STD_.chains.bitcoin.getPublicKey();
+
+/**
+ * Returns an extended public key for the given derivation path.
+ *
+ * @since 1.7.0 (version code 38)
+ *
+ * @param {string} version an hex string representing the bytes that will be prepended to the extended public key bytes before the base58check encoding
+ * @param {string} derivationPath the derivation path to use. Currently, the only valid value is "m/0/1".
+ * @return {string} String representing the extended public key
+ */
+_STD_.chains.bitcoin.getExtendedPublicKey(version, derivationPath);
+```
+
+### **Bitcoin message signing**
+
+```javascript
+/**
+ * Signs the given message and returns the signature.
+ *
+ * Before signing, the message is prepended with the utf8 bytes of the
+ * string 'acusig' and the script's ipfs hash ('acusig' + SCRIPT_HASH + message).
+ *
+ * @since 1.4.0 (version code 26)
+ *
+ * @param {string} message an hex string representing the bytes to sign
+ * @return {string} Hex string representing the signature
+ */
+_STD_.chains.bitcoin.signer.sign(message);
+
+/**
+ * Signs the given message and returns the signature.
+ *
+ * @since 1.4.0 (version code 26)
+ *
+ * @param {string} message an hex string representing the bytes to sign
+ * @return {string} Hex string representing the signature
+ */
+_STD_.chains.bitcoin.signer.rawSign(message);
+
+/**
+ * Hashes the given value using SHA256.
+ *
+ * @since 1.4.0 (version code 26)
+ *
+ * @param {string} value an hex string representing the bytes to hash
+ * @return {string} Hex string representing the sha256 hash
+ */
+_STD_.chains.bitcoin.signer.sha256(value);
+
+/**
+ * Signs the given message with a key derived with the given derivation path and returns the signature.
+ *
+ * Before signing, the message is prepended with the utf8 bytes of the
+ * string 'acusig' and the script's ipfs hash ('acusig' + SCRIPT_HASH + message).
+ *
+ * @since 1.7.0 (version code 38)
+ *
+ * @param {string} message an hex string representing the bytes to sign
+ * @param {string} derivationPath the derivation path to use. Currently, the only valid value is "m/0/1"
+ * @return {string} Hex string representing the signature
+ */
+_STD_.chains.bitcoin.signer.signHD(message, derivationPath);
+
+/**
+ * Signs the given message with a key derived with the given derivation path and returns the signature.
+ *
+ * @since 1.7.0 (version code 38)
+ *
+ * @param {string} message an hex string representing the bytes to sign
+ * @param {string} derivationPath the derivation path to use. Currently, the only valid value is "m/0/1"
+ * @return {string} Hex string representing the signature
+ */
+_STD_.chains.bitcoin.signer.rawSignHD(message, derivationPath);
+```
+
+### **Bitcoin utils functions**
+
+```javascript
+/**
+ * Derives the given extended public key.
+ *
+ * @since 1.7.0 (version code 38)
+ *
+ * @param {string} xpub a string representing the extended public key to derive
+ * @param {string} derivationPath the derivation path to use
+ * @return {string} Hex string representing the derivced public key
+ */
+_STD_.chains.bitcoin.utils.derivePublicKey(xpub, derivationPath);
+
+/**
+ * Encodes the given bytes using base58check.
+ *
+ * @since 1.7.0 (version code 38)
+ *
+ * @param {string} value an hex string representing the bytes to encode
+ * @return {string} The base58check encoded value
+ */
+_STD_.chains.bitcoin.utils.base58CheckEncode(value);
+
+/**
+ * Encodes the given bytes using base58.
+ *
+ * @since 1.7.0 (version code 38)
+ *
+ * @param {string} value an hex string representing the bytes to encode
+ * @return {string} The base58 encoded value
+ */
+_STD_.chains.bitcoin.utils.base58Encode(value);
+
+/**
+ * Decodes the given base58check value.
+ *
+ * @since 1.7.0 (version code 38)
+ *
+ * @param {string} value a string representing the base58check value to decode
+ * @return {string} Hex string representing the decoded value
+ */
+_STD_.chains.bitcoin.utils.base58CheckDecode(value);
+
+/**
+ * Decodes the given base58 value.
+ *
+ * @since 1.7.0 (version code 38)
+ *
+ * @param {string} value a string representing the base58 value to decode
+ * @return {string} Hex string representing the decoded value
+ */
+_STD_.chains.bitcoin.utils.base58Decode(value);
+```
+
+### **Aeternity functions**
+
+```javascript
+/**
+ * Calls `fulfill` on an aeternity contract.
+ *
+ * The `extra` argument is an object that can provide the following:
+ * - `functionName`: an optional string representing the method name, if not provided `fulfill` is used.
+ * - `gasLimit`: a string representing the transaction's gas limit, if not provided '25000' is used.
+ * - `gasPrice`: a string representing the transaction's gas price, if not provided '1000000000' is used.
+ *
+ * @since 1.3.32
+ *
+ * @param {string} url the node URL.
+ * @param {string} destination the contract's address.
+ * @param {[object]} payload an array of encoded values. The objects inside this array need to be constructed using the functions found under `_STD_.chains.aeternity.data`.
+ * @param {object} extra object with extra arguments.
+ * @param {AeternitySuccess} success the success callback.
+ * @param {AeternityError} error the success callback.
+ */
+_STD_.chains.aeternity.fulfill(
+  url,
+  destination,
+  payload,
+  extra,
+  success,
+  error
+);
+
+/**
+ * Returns the Aeternity address.
+ *
+ * @since 1.3.34 (version code 19)
+ *
+ * @return {string} The Aeternity address
+ */
+_STD_.chains.aeternity.getAddress();
+
+/**
+ * @callback EthereumSuccess
+ * @param {string} operationHash the operation hash of the submitted operation.
+ */
+type AeternitySuccess = (operationHash) => void;
+
+/**
+ * @callback EthereumError
+ * @param {string[]} message an error message.
+ */
+type AeternityError = (message) => void;
+```
+
+### **Aeternity data encoding functions**
+
+```javascript
+/**
+ * Returns an object representing an integer that can be used as payload in the `fulfill` call.
+ *
+ * @since 1.3.32
+ *
+ * @param {number | string} value a value representing an integer.
+ * @return {object} an object representing an integer that can be used as payload in the `fulfill` call.
+ */
+_STD_.chains.aeternity.data.int(value);
+
+/**
+ * Returns an object representing a string that can be used as payload in the `fulfill` call.
+ *
+ * @since 1.3.32
+ *
+ * @param {string} value a string value.
+ * @return {object} an object representing a string that can be used as payload in the `fulfill` call.
+ */
+_STD_.chains.aeternity.data.string(value);
+
+/**
+ * Returns an object representing bytes that can be used as payload in the `fulfill` call.
+ *
+ * @since 1.3.32
+ *
+ * @param {string} value an hex string representing the bytes.
+ * @return {object} an object representing bytes that can be used as payload in the `fulfill` call.
+ */
+_STD_.chains.aeternity.data.bytes(value);
+
+/**
+ * Returns an object representing a list of objects that can be used as payload in the `fulfill` call.
+ *
+ * @since 1.3.32
+ *
+ * @param {object[]} values an array of objects that were created using the functions found under `_STD_.chains.aeternity.data`.
+ * @return {object} an object representing a list of objects that can be used as payload in the `fulfill` call
+ */
+_STD_.chains.aeternity.data.list(values);
+
+/**
+ * Returns an object representing a tuple can be used as payload in the `fulfill` call.
+ *
+ * @since 1.3.32
+ *
+ * @param {object[]} values an array of objects that were created using the functions found under `_STD_.chains.aeternity.data`.
+ * @return {object} an object representing a tuple can be used as payload in the `fulfill` call.
+ */
+_STD_.chains.aeternity.data.tuple(values);
+
+/**
+ * Returns an object representing a map can be used as payload in the `fulfill` call.
+ *
+ * The input value is an array of arrays of objects. The items need to be an array of size 2,
+ * where the first element represents a map key and the second element represents its value:
+ *
+ * _STD_.chains.aeternity.data.map([
+ *  [_STD_.chains.aeternity.data.string("key1"), _STD_.chains.aeternity.data.string("value1")],
+ *  [_STD_.chains.aeternity.data.string("key2"), _STD_.chains.aeternity.data.string("value2")]
+ * ]);
+ *
+ * @since 1.3.32
+ *
+ * @param {object[][]} values an array of arrays of objects that were created using the functions found under `_STD_.chains.aeternity.data`.
+ * @return {object} an object representing a map can be used as payload in the `fulfill` call.
+ */
+_STD_.chains.aeternity.data.map(values);
+
+/**
+ * Returns an object representing an account pubkey can be used as payload in the `fulfill` call.
+ *
+ * @since 1.3.32
+ *
+ * @param {string} value a string representing an account pubkey .
+ * @return {object} an object representing an account pubkey can be used as payload in the `fulfill` call.
+ */
+_STD_.chains.aeternity.data.account_pubkey(value);
+```

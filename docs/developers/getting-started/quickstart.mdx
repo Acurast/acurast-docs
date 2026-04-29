@@ -1,0 +1,71 @@
+---
+title: Quickstart
+slug: /developers/getting-started/quickstart
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Three ways to get your first deployment running on Acurast. Pick the one that fits your workflow.
+
+<Tabs groupId="entry-path">
+  <TabItem value="cli" label="CLI (Interactive)" default>
+
+Best for local development and getting started.
+
+```bash
+# Scaffold a new project
+npx @acurast/cli new my-project
+cd my-project
+
+# Initialize config (creates acurast.json and .env)
+acurast init
+
+# Fund the account shown by the CLI — https://faucet.acurast.com
+# Then deploy:
+acurast deploy
+```
+
+Full walkthrough: **[First App Deployment](/developers/deploy-first-app)** · Command reference: **[CLI docs](/developers/tools/cli)**.
+
+  </TabItem>
+  <TabItem value="sdk" label="SDK (Programmatic)">
+
+Best for CI pipelines, backends, and custom deployment flows.
+
+```bash
+npm install @acurast/sdk
+```
+
+```typescript
+import { deployProject, loadAcurastConfig } from '@acurast/sdk/deploy'
+
+const config = await loadAcurastConfig('./acurast.json')
+await deployProject({ config })
+```
+
+Full API: **[SDK docs](/developers/tools/sdk)**.
+
+  </TabItem>
+  <TabItem value="agent" label="Deploy Agent (x402)">
+
+Best for AI agents and services that pay in USDC on Base — no ACU account needed.
+
+```bash
+npx awal@latest x402 pay "https://deploy.acu.run/deploy" -X POST -d '{
+    "script": "ipfs://QmZ9mvN4RFCqSqivB2LF3VF1qgrDGTW393PJezbdPy7nH2",
+    "reward": 77136800000
+}'
+```
+
+Full walkthrough: **[Deploy Agent docs](/developers/tools/deploy-agent)**.
+
+  </TabItem>
+</Tabs>
+
+## Next steps
+
+- **[First App Deployment](/developers/deploy-first-app)** — step-by-step tutorial with a real Express server.
+- **[Example Apps](/developers/getting-started/examples)** — curated list of ready-to-clone projects.
+- **[Runtime Environment](/developers/build/runtime-environment)** — APIs available inside your deployment.
+- **[Deployment Config](/developers/build/deployment-config)** — full `acurast.json` reference.

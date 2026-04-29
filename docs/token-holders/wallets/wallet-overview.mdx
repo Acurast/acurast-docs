@@ -1,0 +1,39 @@
+---
+title: Wallets
+slug: /token-holders/wallets/wallet-overview
+---
+
+import ThemedImage from "@theme/ThemedImage";
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
+A non exhaustive list of wallets supporting Acurast:
+
+- [AirGap](https://airgap.it/)*, see a comprehensive guide here: **[Use AirGap with Acurast ↗](/token-holders/wallets/wallets-airgap)**
+- [Talisman](https://talisman.xyz/)*, see a comprehensive guide here: **[Use Talisman with Acurast ↗](/token-holders/wallets/wallets-talisman)**
+- [SubWallet](https://www.subwallet.app/)*, see a comprehensive guide here: **[Use SubWallet with Acurast ↗](/token-holders/wallets/wallets-subwallet)**
+- [Nova Wallet](https://novawallet.io/)
+- [Phantom](https://phantom.com/)
+- [WalletConnect compatible wallets](https://reown.com/)
+- [Metamask](https://www.metamask.io)
+- [Coinbase Wallet](https://www.coinbase.com/wallet) — requires "Base mode" to be disabled, see guide: **[Base Wallet ↗](/token-holders/wallets/wallets-base)**
+
+\* Recommended wallets
+
+## Wallet compatibility
+
+Acurast accounts can be created and managed across several wallets, but moving an account from one wallet to another isn't always straightforward. Different wallets use different cryptographic methods to derive accounts from a secret (mnemonic), which means importing the same seed phrase into a different wallet will often produce a *different* Acurast account rather than restoring the original one.
+
+The matrix below shows which wallet-to-wallet transitions will successfully reproduce the same Acurast account. A ✓ means the account can be imported from one wallet into another and result in the same address; a ✗ means the resulting account will differ. Some combinations involving AirGap work only when a specific derivation path is set — see the footnotes for details.
+
+| **From ↓ / To →** | Acurast Lite | SubWallet | Talisman | MetaMask | AirGap |
+|---|---|---|---|---|---|
+| **Acurast Lite** | — | ✗ | ✗ | ✗ | ✗ |
+| **SubWallet** | ✗ | — | ✓ | ✗ | ✓¹ |
+| **Talisman** | ✗ | ✓ | — | ✗ | ✓² |
+| **MetaMask** | ✗ | ✗ | ✗ | — | ✗ |
+| **AirGap** | ✗ | ✗ | ✓³ | ✗ | — |
+
+¹ SubWallet → AirGap: Set derivation path in AirGap to `/m`
+² Talisman → AirGap: Set derivation path in AirGap to `/m`
+³ AirGap → Talisman: Set derivation path in Talisman to `//44//434//0/0/0`
+

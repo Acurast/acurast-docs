@@ -111,15 +111,15 @@ const config = {
               },
               {
                 label: "Developers",
-                to: "developers/get-started",
+                to: "/developers",
               },
               {
-                label: "Processors",
-                to: "acurast-processors",
+                label: "Compute Providers",
+                to: "/processors",
               },
               {
                 label: "Integrations",
-                to: "integrations/introduction",
+                to: "/acurast-protocol/integrations",
               },
             ],
           },
@@ -183,9 +183,12 @@ const config = {
       {
         redirects: [
           {
-            to: "/acurast-processors",
+            to: "/processors/acurast-processors",
             from: "/acurast-transmitters",
           },
+          { to: "/processors/acurast-processors", from: "/acurast-processors" },
+          { to: "/processors/benchmarks", from: "/acurast-processors/benchmarks" },
+          { to: "/processors/multiple-processors", from: "/acurast-processors/multiple-processors" },
           {
             to: "/developers/deploy-first-app",
             from: "/acurast-protocol/interoperability/enterprise",
@@ -215,7 +218,7 @@ const config = {
             from: "/acurast-protocol/architecture/networks",
           },
           {
-            to: "/wallets/wallet-overview",
+            to: "/token-holders/wallets/wallet-overview",
             from: "/developers/create-address",
           },
           {
@@ -231,12 +234,36 @@ const config = {
             from: "/acurast-protocol/modules/enterprise",
           },
           {
-            to: "/developers/deployment-runtime-environment",
+            to: "/developers/build/runtime-environment",
             from: "/developers/job-runtime-environment",
           },
           {
-            to: "/developers/on-demand-deployments",
+            to: "/developers/build/runtime-environment",
+            from: "/developers/deployment-runtime-environment",
+          },
+          {
+            to: "/developers/build/on-demand-deployments",
             from: "/developers/on-demand-jobs",
+          },
+          {
+            to: "/developers/build/on-demand-deployments",
+            from: "/developers/on-demand-deployments",
+          },
+          {
+            to: "/developers/build/llm-on-acurast",
+            from: "/developers/llm-on-acurast",
+          },
+          {
+            to: "/developers/tools/cli",
+            from: "/developers/acurast-cli",
+          },
+          {
+            to: "/developers/tools/devtools",
+            from: "/developers/devtools",
+          },
+          {
+            to: "/developers/tools/deploy-agent",
+            from: "/developers/deploy-agent",
           },
           {
             to: "/developers/deploy-first-app",
@@ -247,29 +274,56 @@ const config = {
             from: "/developers/get-started",
           },
           {
-            to: "/integrations",
+            to: "/acurast-protocol/integrations",
             from: "/integrations/evm",
           },
           {
-            to: "/integrations",
+            to: "/acurast-protocol/integrations",
             from: "/integrations/substrate-wasm",
           },
           {
-            to: "/integrations",
+            to: "/acurast-protocol/integrations",
             from: "/integrations/substrate",
           },
           {
-            to: "/integrations",
+            to: "/acurast-protocol/integrations",
             from: "/integrations/tezos",
           },
           {
-            to: "/integrations",
+            to: "/acurast-protocol/integrations",
             from: "/integrations/introduction",
           },
           {
-            to: "/staked-compute/overview",
+            to: "/token-holders/staking/overview",
             from: "/staked-compute",
           },
+          // IA migration: persona-driven restructure
+          { to: "/investors/tokenomics", from: "/tokenomics" },
+          { to: "/investors/roadmap", from: "/roadmap" },
+          { to: "/investors/acurast-token", from: "/acurast-token" },
+          { to: "/investors/acurast-token", from: "/token" },
+          { to: "/token-holders/claiming-acu", from: "/token/claiming-acu" },
+          { to: "/acurast-protocol/audits", from: "/audits" },
+          { to: "/acurast-protocol/whitepapers", from: "/whitepapers" },
+          { to: "/acurast-protocol/integrations", from: "/integrations" },
+          { to: "/acurast-protocol/networks", from: "/networks" },
+          { to: "/token-holders/wallets/wallet-overview", from: "/wallets/wallet-overview" },
+          { to: "/token-holders/wallets/wallets-airgap", from: "/wallets/wallets-airgap" },
+          { to: "/token-holders/wallets/wallets-talisman", from: "/wallets/wallets-talisman" },
+          { to: "/token-holders/wallets/wallets-subwallet", from: "/wallets/wallets-subwallet" },
+          { to: "/token-holders/wallets/wallets-base", from: "/wallets/wallets-base" },
+          { to: "/token-holders/wallets/wallets-ledger", from: "/wallets/wallets-ledger" },
+          { to: "/token-holders/staking/overview", from: "/staked-compute/overview" },
+          { to: "/token-holders/staking/how-to-stake", from: "/staked-compute/how-to-stake" },
+          { to: "/token-holders/staking/staking-mechanics", from: "/staked-compute/staking-mechanics" },
+          { to: "/token-holders/staking/slashing", from: "/staked-compute/slashing" },
+          { to: "/token-holders/staking/mainnet-vs-canary", from: "/staked-compute/mainnet-vs-canary" },
+          { to: "/token-holders/staking/staking-faq", from: "/staked-compute/staking-faq" },
+          { to: "/token-holders/staking/staking-glossary", from: "/staked-compute/staking-glossary" },
+          { to: "/acurast-protocol/from-canary-to-mainnet/overview", from: "/from-canary-to-mainnet/overview" },
+          { to: "/acurast-protocol/from-canary-to-mainnet/token-transfers", from: "/from-canary-to-mainnet/token-transfers" },
+          { to: "/acurast-protocol/architecture/architecture", from: "/acurast-orchestrator" },
+          { to: "/acurast-protocol/architecture/architecture", from: "/acurast-matcher" },
         ],
       },
     ],
