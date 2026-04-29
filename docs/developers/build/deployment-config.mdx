@@ -59,7 +59,11 @@ You can create it interactively with `acurast init` — see the **[CLI docs](/de
 | `maxAllowedStartDelayInMs` | Maximum allowed start delay in milliseconds |
 | `usageLimit` | Limits for `maxMemory`, `maxNetworkRequests`, and `maxStorage` (in bytes) |
 | `numberOfReplicas` | How many processors run the deployment in parallel |
-| `requiredModules` | Modules the processor must support (e.g., `["DataEncryption"]`) |
+| `requiredModules` | Modules the processor must support. Supported values: `"DataEncryption"`, `"LLM"`, `"Shell"`. Defaults to `[]`. When `runtime` is `"Shell"`, `"Shell"` is auto-injected |
+| `runtime` | Runtime used to execute the deployment. `"NodeJSWithBundle"` (default), `"NodeJS"`, or `"Shell"`. See [Shell Runtime](/developers/tools/cli#shell-runtime) |
+| `image` | Linux distro image used by the Shell runtime. Required when `runtime` is `"Shell"`. Object: `{ url, sha256 }` (HTTPS `.tar.xz` URL + SHA256). Ignored otherwise |
+| `entrypoint` | Script or binary the processor runs after extracting the Shell image (e.g. `acurast.sh`) |
+| `restartPolicy` | `"no"` (default — run once, no retry) or `"onFailure"` (retry up to 3 times on failure; only the third failure is reported) |
 | `minProcessorReputation` | Minimum required processor reputation |
 | `maxCostPerExecution` | Maximum cost per execution in the smallest denomination of ACU |
 | `includeEnvironmentVariables` | Environment variables from `.env` to pass to the deployment. See [Environment Variables](/developers/build/environment-variables) |
@@ -89,5 +93,6 @@ ACURAST_MNEMONIC=abandon abandon about ...
 ## See also
 
 - [CLI reference](/developers/tools/cli) — commands that consume this config
-- [Runtime Environment](/developers/build/runtime-environment) — what's available to your script when it runs
+- [Node.js Runtime Environment](/developers/build/nodejs-runtime-environment) — what's available to your Node.js script when it runs
+- [Cargo Runtime Environment](/developers/build/cargo-runtime-environment) — what's available to your Cargo deployment when it runs
 - [Environment Variables](/developers/build/environment-variables) — passing encrypted secrets to your deployment

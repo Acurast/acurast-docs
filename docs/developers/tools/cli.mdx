@@ -11,7 +11,7 @@ slug: /developers/tools/cli
 
 ## Introduction
 
-The Acurast CLI is a command-line tool to deploy and manage apps on the Acurast Cloud.
+The Acurast CLI is a command-line tool to deploy and manage apps on the Acurast Cloud. It is built on top of [`@acurast/sdk`](/developers/tools/sdk), so any deployment workflow available in the CLI can also be driven programmatically from your own code.
 
 ## Installation
 
@@ -111,7 +111,11 @@ This file defines your deployment parameters. Example:
 | `maxAllowedStartDelayInMs` | Maximum allowed start delay in milliseconds |
 | `usageLimit` | Limits for `maxMemory`, `maxNetworkRequests`, and `maxStorage` (in bytes) |
 | `numberOfReplicas` | How many processors run the deployment in parallel |
-| `requiredModules` | Modules the processor must support (e.g., `["DataEncryption"]`) |
+| `requiredModules` | Modules the processor must support. Supported values: `"DataEncryption"`, `"LLM"`, `"Shell"`. Defaults to `[]`. When `runtime` is `"Shell"`, `"Shell"` is auto-injected |
+| `runtime` | Runtime used to execute the deployment. `"NodeJSWithBundle"` (default), `"NodeJS"`, or `"Shell"`. See [Shell Runtime](#shell-runtime) |
+| `image` | Linux distro image used by the Shell runtime. Required when `runtime` is `"Shell"`. Object: `{ url, sha256 }` (HTTPS `.tar.xz` URL + SHA256). Ignored otherwise |
+| `entrypoint` | Script or binary the processor runs after extracting the Shell image (e.g. `acurast.sh`) |
+| `restartPolicy` | `"no"` (default — run once, no retry) or `"onFailure"` (retry up to 3 times on failure; only the third failure is reported) |
 | `minProcessorReputation` | Minimum required processor reputation |
 | `maxCostPerExecution` | Maximum cost per execution in the smallest denomination of ACU |
 | `includeEnvironmentVariables` | Environment variables from `.env` to pass to the deployment |
@@ -246,6 +250,46 @@ acurast live
 ```
 
 This executes your project on the live processor using the configuration from `acurast init`.
+
+## Shell Runtime
+
+Set `runtime: "Shell"` to run a deployment as a native binary inside a Linux distro image on the processor (PRoot-isolated). This unlocks shell scripts, native tooling, and any language you can ship as a Linux binary.
+
+Provide an `image` (URL + SHA256) and an `entrypoint`. The CLI embeds the image reference in the deployment manifest and auto-adds the `"Shell"` required module on-chain.
+
+```json
+{
+  "projects": {
+    "my-shell-project": {
+      "projectName": "my-shell-project",
+      "fileUrl": "./shell-app",
+      "entrypoint": "acurast.sh",
+      "runtime": "Shell",
+      "image": {
+        "url": "https://github.com/termux/proot-distro/releases/download/v4.30.1/ubuntu-questing-aarch64-pd-v4.30.1.tar.xz",
+        "sha256": "5ab35b90cd9a9f180656261ba400a135c4c01c2da4b74522118342f985c2d328"
+      },
+      "restartPolicy": "no",
+      "network": "canary",
+      "onlyAttestedDevices": true,
+      "assignmentStrategy": { "type": "Single" },
+      "execution": { "type": "onetime", "maxExecutionTimeInMs": 60000 },
+      "maxAllowedStartDelayInMs": 10000,
+      "usageLimit": { "maxMemory": 0, "maxNetworkRequests": 0, "maxStorage": 0 },
+      "numberOfReplicas": 1,
+      "requiredModules": [],
+      "minProcessorReputation": 0,
+      "maxCostPerExecution": 5000000000,
+      "includeEnvironmentVariables": [],
+      "processorWhitelist": []
+    }
+  }
+}
+```
+
+Supported images: see [Termux proot-distro releases](https://github.com/termux/proot-distro).
+
+Environment variables in `includeEnvironmentVariables` are injected as standard system env vars (no `_STD_` API). Host services (deployment metadata, signing, browser control) are exposed via a JSON-RPC API on an abstract Unix socket; the socket name is in the `BRIDGE_SOCKET` env var.
 
 ## Key Reuse
 

@@ -11,7 +11,7 @@ slug: /developers/tools/sdk
 
 ## Introduction
 
-`@acurast/sdk` is the programmatic entry point for developers who want to deploy and manage deployments on Acurast from TypeScript/JavaScript. It bundles everything needed to upload a project to IPFS, register a job on-chain, match it with processors, and manage deployments.
+`@acurast/sdk` is the programmatic entry point for developers who want to deploy and manage deployments on Acurast from TypeScript/JavaScript. It bundles everything needed to upload a project to IPFS, register a job on-chain, match it with processors, and manage deployments — including Node.js, Cargo, and [Shell](/developers/tools/cli#shell-runtime) runtimes.
 
 [npm](https://www.npmjs.com/package/@acurast/sdk) · [GitHub](https://github.com/Acurast/acurast-cli) · [Examples](https://github.com/Acurast/acurast-cli/tree/main/examples)
 
@@ -63,6 +63,8 @@ import {
   walletFromMnemonic,
   getBalance,
   registerJob,
+  editScript,
+  transferEditor,
   jobAssignments,
   AcurastService,
   setEnvVars
@@ -71,7 +73,9 @@ import {
 
 Helpers include `convertConfigToJob`, duration constants (`second`, `minute`, `hour`, `day`), sensible defaults (`DEFAULT_REWARD`, `DEFAULT_REPLICAS`, ...), the `JobEnvironmentService` for encrypted env vars, and an `InMemoryKeyStore`.
 
-For the list of environment variables available at runtime on the processor, see [Runtime Environment](/developers/build/runtime-environment).
+Mutable deployments support post-creation updates via `editScript` (swap the IPFS script CID) and `transferEditor` (hand off editor permissions to another address).
+
+For the list of environment variables available at runtime on the processor, see [Node.js Runtime Environment](/developers/build/nodejs-runtime-environment).
 
 ## `@acurast/sdk/ipfs`
 

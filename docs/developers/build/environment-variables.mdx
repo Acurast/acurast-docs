@@ -29,11 +29,20 @@ See the [Deployment Config reference](/developers/build/deployment-config) for a
 
 **3. Access them in your deployment code:**
 
+On `acurast deploy`, the listed variables are encrypted and attached to the deployment automatically. How you access them in your code depends on the runtime environment:
+
+Node.js Runtime Environment
 ```typescript
 const API_KEY = _STD_.env.API_KEY;
 ```
 
-On `acurast deploy`, the listed variables are encrypted and attached to the deployment automatically.
+Cargo Runtime Environment
+
+In the Cargo runtime, environment variables are available as standard system environment variables on the deployment's distro image. For example, in Node.js:
+
+```typescript
+const API_KEY = process.env.API_KEY;
+```
 
 ## Rotating variables between executions
 
@@ -51,5 +60,6 @@ When using the [SDK](/developers/tools/sdk), the same workflow is available via 
 
 ## See also
 
-- [Runtime Environment](/developers/build/runtime-environment) — the full `_STD_` API available to scripts
+- [Node.js Runtime Environment](/developers/build/nodejs-runtime-environment) - the full `_STD_` API available to Node.js scripts
+- [Cargo Runtime Environment](/developers/build/cargo-runtime-environment) - the RPC API available to Cargo deployments
 - [CLI reference](/developers/tools/cli)
