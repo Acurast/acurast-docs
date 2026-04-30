@@ -1,0 +1,183 @@
+---
+title: How to Get ACU
+slug: /token-holders/how-to-get-acu
+---
+
+ACU is available on multiple chains. Where you buy it determines which token instance you receive and whether you need to bridge before using it on Acurast Mainnet to stake, delegate, or create deployments.
+
+## 1. Buy ACU on an exchange
+
+ACU is listed on various centralized and decentralized exchanges. Major CEX listings include:
+
+- [Binance Alpha ↗](https://www.binance.com/en/how-to-buy/acurast)
+- [Kraken ↗](https://www.kraken.com/learn/buy-acurast-acu)
+- [Gate.io ↗](https://www.gate.com/how-to-buy/acurast-acu)
+- [KuCoin ↗](https://www.kucoin.com/how-to-buy/acurast)
+- [Bitvavo ↗](https://bitvavo.com/en/acurast)
+- [MEXC ↗](https://www.mexc.com/price/ACU)
+
+For the full and current list of markets, see [CoinMarketCap ↗](https://coinmarketcap.com/currencies/acurast/#Markets) or [CoinGecko ↗](https://www.coingecko.com/en/coins/acurast).
+
+Each exchange chooses which token instance it supports (Acurast native, ERC20 on Ethereum, OFT on BSC/Base/Peaq). **Check the network before depositing or withdrawing.** Sending the wrong instance to an incompatible address can result in lost funds.
+
+| Exchange type                      | What you get           | Path to Acurast Mainnet                                |
+| ---------------------------------- | ---------------------- | ------------------------------------------------------ |
+| CEX with Acurast native withdrawal | ACU on Acurast Mainnet | Withdraw directly to your Acurast wallet               |
+| CEX/DEX with Ethereum withdrawal   | ERC20 ACU on Ethereum  | HyperDrive: Ethereum → Acurast Mainnet                 |
+| CEX/DEX on BSC, Base, or Peaq      | OFT ACU on that chain  | Stargate → Ethereum, then HyperDrive → Acurast Mainnet |
+
+See [Acurast Token](/investors/acurast-token) for the full list of deployed token contracts.
+
+## 2. Pick a wallet
+
+Before bridging or receiving ACU, set up a wallet for the network you target.
+
+- For **Acurast Mainnet** native ACU: see [Wallet Overview](/token-holders/wallets/wallet-overview).
+- For **EVM chains** (Ethereum, BSC, Base, Peaq): use any standard EVM wallet (MetaMask, Rabby, etc.).
+
+## 3. Bridge ACU to Acurast Mainnet
+
+Goal: get ACU onto Acurast Mainnet so you can stake, delegate, or create deployments. Path depends on which chain you start from.
+
+```
+ACU on BSC / Base / Peaq → (Stargate) → ACU on Ethereum → (HyperDrive) → Acurast Mainnet
+ACU on Ethereum                                          → (HyperDrive) → Acurast Mainnet
+```
+
+If you already hold ACU on Ethereum, skip to [Step B: Ethereum → Acurast Mainnet](#step-b-ethereum--acurast-mainnet-hyperdrive).
+
+The reverse direction (Acurast Mainnet → Ethereum → BSC/Base/Peaq) works the same way through the same UIs, but is not covered here.
+
+### Step A: BSC / Base / Peaq → Ethereum (Stargate)
+
+ACU on EVM chains is a LayerZero OFT. Use [stargate.finance](https://stargate.finance/) to move ACU from BSC, Base, or Peaq to Ethereum.
+
+**1. Open Stargate and connect your wallet.** Go to [stargate.finance](https://stargate.finance/) and click **Connect Wallet** in the top-right.
+
+<img
+  src="/img/how-to-get-acu/01-stargate-empty.png"
+  alt="Stargate transfer form before wallet connect"
+/>
+
+**2. Pick your wallet.** Select your EVM wallet (MetaMask, Rabby, Coinbase Smart Wallet, WalletConnect, etc.) from the EVM section.
+
+<img
+  src="/img/how-to-get-acu/02-connect-wallet.png"
+  alt="Stargate connect wallet panel listing EVM wallets"
+/>
+
+**3. Approve the connection in your wallet.** Confirm the connection prompt.
+
+<img
+  src="/img/how-to-get-acu/03-metamask-connect.png"
+  alt="MetaMask connect prompt for stargate.finance"
+/>
+
+**4. Verify your ACU balances.** Once connected, Stargate shows ACU on each chain it supports (Ethereum, BNB Chain, Base, Peaq).
+
+<img
+  src="/img/how-to-get-acu/04-wallet-balances.png"
+  alt="Connected wallet showing ACU balances per chain"
+/>
+
+**5. Select source: ACU on BSC, Base, or Peaq.** Click **From** and pick the ACU instance you hold. Set **To** to **ACU on Ethereum**.
+
+<img
+  src="/img/how-to-get-acu/05-select-source-token.png"
+  alt="Token and chain selector showing ACU on BNB, Base, Peaq with Ethereum as destination"
+/>
+
+**6. Enter the amount.** Make sure you have enough native gas (BNB, ETH on Base, etc.) on the source chain. Stargate warns `Not enough native for gas` if you don't.
+
+<img
+  src="/img/how-to-get-acu/06-form-bnb-to-eth.png"
+  alt="Stargate form filled with 0.5 ACU BNB to Ethereum, missing gas warning"
+/>
+
+**7. Click Transfer.** When the form is valid, the button activates. Review the route (OFT), total fee, and estimated time.
+
+<img
+  src="/img/how-to-get-acu/07-stargate-transfer-ready.png"
+  alt="Stargate ready to transfer 0.5 ACU Base to Ethereum"
+/>
+
+**8. Approve token spending.** First-time transfers require an ERC20 approval. Confirm the spending cap in your wallet.
+
+<img
+  src="/img/how-to-get-acu/08-approve-acu.png"
+  alt="Stargate waiting for token approval"
+/>
+
+<img
+  src="/img/how-to-get-acu/09-spending-cap.png"
+  alt="MetaMask spending cap request for AcuOFT on Base"
+/>
+
+**9. Confirm the transfer transaction.** Sign the second transaction (the actual bridge call to LZMultiCall).
+
+<img
+  src="/img/how-to-get-acu/10-stargate-tx-request.png"
+  alt="MetaMask transaction request to send AcuOFT via Stargate"
+/>
+
+ACU arrives on Ethereum in ~1–2 minutes. Continue with Step B.
+
+### Step B: Ethereum → Acurast Mainnet (HyperDrive)
+
+Use the official Acurast HyperDrive bridge to move ACU from Ethereum to Acurast Mainnet.
+
+**1. Open the Hub and connect both wallets.** Go to [hub.acurast.com](https://hub.acurast.com) and connect your EVM wallet and your Acurast (Substrate) wallet. The **Balances** page shows ACU per EVM chain and your Acurast Mainnet balance.
+
+<img
+  src="/img/how-to-get-acu/11-hub-balances-before.png"
+  alt="Acurast Hub Balances page showing 0 ACU on mainnet and 6 ACU on Ethereum"
+/>
+
+**2. Open the Bridge.** Click **Bridge** in the left sidebar. Set **From: Ethereum**, **To: Acurast**. Enter the amount.
+
+<img
+  src="/img/how-to-get-acu/12-hub-bridge-form.png"
+  alt="HyperDrive bridge form sending 1 ACU from Ethereum to Acurast"
+/>
+
+**3. Click BRIDGE and sign the transaction.** Confirm the Hyperdrive call in your EVM wallet.
+
+<img
+  src="/img/how-to-get-acu/13-hyperdrive-tx-request.png"
+  alt="MetaMask transaction request to Hyperdrive contract from hub.acurast.com"
+/>
+
+**4. Track progress in History.** The **History** tab shows the transfer state, first waiting, then pending.
+
+<img
+  src="/img/how-to-get-acu/14-bridge-history-waiting.png"
+  alt="Bridge history waiting for new transfer"
+/>
+
+<img
+  src="/img/how-to-get-acu/15-bridge-history-pending.png"
+  alt="Bridge history showing 1 ACU pending transfer"
+/>
+
+**5. Verify arrival.** Once finalized, ACU appears under **Acurast Balance** on the Balances page. Ready to stake, delegate, or use for deployments.
+
+<img
+  src="/img/how-to-get-acu/16-hub-balances-after.png"
+  alt="Acurast Hub Balances showing 1 ACU on Acurast Mainnet after bridging"
+/>
+
+## 4. Verify the token contract
+
+Only interact with token contracts listed in the [official token reference](/investors/acurast-token#overview-of-deployed-acu-token-contracts-and-instances). Beware of fake tokens with similar names.
+
+:::warning CAUTION
+
+Sending ACU to an address on the wrong network is irreversible. Always confirm the destination chain matches the token instance you are sending.
+
+:::
+
+## Related
+
+- [Acurast Token](/investors/acurast-token) — token contracts and instances.
+- [Wallets](/token-holders/wallets/wallet-overview) — supported wallets.
+- [Claim Vested ACU](/token-holders/claiming-acu) — for early-round and airdrop recipients.
