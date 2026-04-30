@@ -137,6 +137,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "token-holders/how-to-get-acu",
+          label: "How to Get ACU",
+        },
+        {
+          type: "doc",
           id: "token-holders/claiming-acu",
           label: "Claim Vested ACU",
         },
