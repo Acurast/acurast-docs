@@ -188,7 +188,6 @@ This example uses Python to fetch the processor's public key and POST it to a we
 
 ```
 app/
-  setup.sh
   start.sh
   hello.py
 acurast.json
@@ -200,10 +199,13 @@ acurast.json
 ```sh title="app/start.sh"
 #!/bin/sh
 
-# Set up PATH, HOME, and DNS - required until the processor handles this automatically.
-chmod +x setup.sh
-./setup.sh
+# Set up PATH, HOME, and DNS
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+export HOME=/root
 
+echo "nameserver 8.8.8.8" > /etc/resolv.conf
+
+# Install necessary dependencies and run the main application
 apt-get update
 apt-get install -y python3-requests
 python3 "$(dirname "$0")/hello.py"
