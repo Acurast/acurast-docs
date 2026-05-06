@@ -29,6 +29,7 @@ const sidebars = {
             "developers/getting-started/quickstart",
             "developers/deploy-first-app",
             "developers/getting-started/examples",
+            "developers/getting-started/quickstart-cargo",
           ],
         },
         {

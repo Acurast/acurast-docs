@@ -1,0 +1,234 @@
+---
+title: Quickstart - Cargo (Preview)
+slug: /developers/getting-started/quickstart-cargo
+---
+
+:::note Preview
+The Cargo runtime is in preview. APIs and configuration fields may change before general availability.
+:::
+
+Cargo deployments run as native binaries inside a Linux distro image on the processor, isolated via [PRoot](https://proot-me.github.io/). Unlike the default Node.js runtime, Cargo gives you full access to the Linux environment: shell scripts, native tooling, and any language you can ship as a Linux binary.
+
+## Prerequisites
+
+### A 64-bit Android Core processor on Canary
+
+Cargo deployments require a **64-bit (aarch64) Android device** running as an **Acurast Processor Core** on the **Canary** network. The Lite processor and iOS devices are not supported.
+
+To set one up yourself:
+
+1. Factory-reset a 64-bit Android phone (Android 12+).
+2. Visit [Acurast Hub ↗](https://hub.acurast.com/), switch to the **Canary** network, and connect your wallet.
+3. Follow the **Processor Core** setup flow - the device will be locked down as a dedicated compute provider.
+
+Full guide: **[Become a Compute Provider](/processors/become-compute-provider)**.
+
+### Acurast CLI
+
+Install the CLI globally:
+
+```bash
+npm install -g @acurast/cli
+```
+
+### cACU balance
+
+Cargo deployments run on the **Canary** network. Claim free cACU from the **[faucet ↗](https://faucet.acurast.com)**.
+
+---
+
+## Step 1 - Create a project
+
+:::note
+`acurast new` generates a Node.js project with a file structure that does not apply to Cargo and can be skipped. Create the project directory yourself and run `acurast init` inside it instead:
+:::
+
+```bash
+mkdir cargo-hello
+cd cargo-hello
+acurast init
+```
+
+This creates `acurast.json` (deployment config) and `.env` (secrets). See the **[CLI docs](/developers/tools/cli)** for all available commands and options.
+
+---
+
+## Step 2 - Write your Cargo app
+
+:::info
+The PRoot container starts with a minimal environment. Your entrypoint should set any environment variables like `PATH` or `HOME`, and DNS resolver before running any tooling that might require it.
+:::
+
+Create your app entrypoint file `acurast.sh`:
+
+```sh title="acurast.sh"
+#!/bin/sh
+
+# Set up environment variables
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+export HOME=/root
+
+# Set up DNS resolver
+echo "nameserver 8.8.8.8" > /etc/resolv.conf
+
+# TODO: Run your code
+```
+
+### The bridge socket
+
+The processor injects a `BRIDGE_SOCKET` environment variable at runtime. This is an abstract Unix domain socket that exposes host services - cryptographic signing, deployment metadata, and browser control - via a JSON-RPC 2.0 API.
+
+Full API reference: **[Cargo Runtime Environment](/developers/build/cargo-runtime-environment)**.
+
+---
+
+## Step 3 - Configure for the Cargo (Shell) runtime
+
+Open `acurast.json` and configure your project to use the `Shell` runtime. The `Shell` runtime is the foundation of Cargo - it boots a Linux distro image on the processor and runs your entrypoint script inside it.
+Your app files (`fileUrl`) are extracted into the rootfs before the entrypoint runs. Structure them however you like - the only requirement is that the file named by `entrypoint` is a shell script and is placed at the root of the `fileUrl` directory or it's the `fileUrl` itself.
+
+```json title="acurast.json"
+{
+  "projects": {
+    "cargo-hello": {
+      "projectName": "cargo-hello",
+      "fileUrl": "acurast.sh",
+      "entrypoint": "acurast.sh",
+      "runtime": "Shell",
+      "image": {
+        "url": "https://github.com/termux/proot-distro/releases/download/v4.30.1/ubuntu-questing-aarch64-pd-v4.30.1.tar.xz",
+        "sha256": "5ab35b90cd9a9f180656261ba400a135c4c01c2da4b74522118342f985c2d328"
+      },
+      "network": "canary",
+      ...
+    }
+  }
+}
+```
+
+Key fields for the Cargo runtime:
+
+| Field | Description |
+| --- | --- |
+| `runtime` | Must be `"Shell"` to enable the Cargo runtime |
+| `image` | Linux distro image to boot - `url` (HTTPS `.tar.xz`) + `sha256` for verification. Must be an **aarch64** image |
+| `entrypoint` | Script the processor runs after extracting the image |
+| `fileUrl` | Path to the directory (or file) uploaded to the processor alongside the image |
+
+For all other fields, see the **[CLI configuration reference](/developers/tools/cli#configuration-fields)**.
+
+Supported distro images are listed in the [Termux proot-distro releases ↗](https://github.com/termux/proot-distro).
+
+:::note
+The Linux image is freshly unpacked for every execution - there is no persistent cache between runs. Any dependencies installed during one execution (e.g. via `apt-get`) will not be available in the next. Make sure your deployment schedule accounts for the setup time required at the start of each execution.
+:::
+
+---
+
+## Example - Hello Cargo
+
+This example uses Python to fetch the processor's public key and POST it to a webhook. It runs four times at 3-minute intervals.
+
+**Project layout:**
+
+```
+app/
+  setup.sh
+  start.sh
+  hello.py
+acurast.json
+.env
+```
+
+**`app/start.sh`** - sets up the environment, installs dependencies, and launches the Python script:
+
+```sh title="app/start.sh"
+#!/bin/sh
+
+# Set up PATH, HOME, and DNS - required until the processor handles this automatically.
+chmod +x setup.sh
+./setup.sh
+
+apt-get update
+apt-get install -y python3-requests
+python3 "$(dirname "$0")/hello.py"
+```
+
+**`app/hello.py`** - calls the bridge socket to get the signing public key, then POSTs it to a webhook:
+
+```python title="app/hello.py"
+import json
+import os
+import socket
+
+import requests
+
+BRIDGE_SOCKET = os.environ["BRIDGE_SOCKET"]
+WEBHOOK_URL = os.environ["WEBHOOK_URL"]
+
+
+def get_public_key() -> str:
+    request = json.dumps({
+        "jsonrpc": "2.0",
+        "method": "signer_publicKey",
+        "params": [{"curve": "p256"}],
+        "id": "1",
+    }) + "\n"
+
+    with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
+        sock.connect("\0" + BRIDGE_SOCKET)
+        sock.sendall(request.encode())
+        response = b""
+        while True:
+            chunk = sock.recv(4096)
+            if not chunk:
+                break
+            response += chunk
+            if b"\n" in chunk:
+                break
+
+    return json.loads(response)["result"]["publicKey"]
+
+
+def main():
+    public_key = get_public_key()
+    url = WEBHOOK_URL.rstrip("/") + "/hello"
+    resp = requests.post(url, json={"publicKey": public_key})
+    print(resp.status_code, resp.text)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+Add your webhook URL to `.env`:
+
+```text title=".env"
+ACURAST_MNEMONIC=abandon abandon about ...
+WEBHOOK_URL=https://your-webhook.example.com
+```
+
+---
+
+## Step 4 - Deploy
+
+```bash
+acurast deploy
+```
+
+The CLI uploads your `app/` directory to IPFS and registers the deployment on-chain. The processor downloads the distro image and your app, boots the container, and runs `start.sh`.
+
+Monitor your deployment:
+
+```bash
+acurast deployments ls --network canary
+```
+
+---
+
+## Next steps
+
+- **[Cargo Runtime Environment](/developers/build/cargo-runtime-environment)** - full RPC API reference (signing, encryption, browser control, deployment metadata).
+- **[CLI docs](/developers/tools/cli)** - all commands, config fields, and environment variable encryption.
+- **[Environment Variables](/developers/build/environment-variables)** - how to declare and encrypt secrets for your deployment.
+- **[Deployment Config](/developers/build/deployment-config)** - complete `acurast.json` field reference.
