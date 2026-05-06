@@ -31,6 +31,76 @@ Env vars declared in your deployment config are injected as standard system envi
 let api_key = std::env::var("API_KEY").unwrap();
 ```
 
+## PRoot Quirks
+
+### DNS resolution
+
+Android has no system-level `/etc/resolv.conf`. When the Linux rootfs is extracted into the PRoot chroot, DNS resolution fails silently - `apt-get update` downloads nothing, package lists stay empty, and subsequent `apt-get install` calls report packages as not found.
+
+Write public DNS resolvers into `/etc/resolv.conf` at the start of your entrypoint before any network calls:
+
+```sh
+echo "nameserver 8.8.8.8" > /etc/resolv.conf
+```
+
+You can skip this if the file already contains a non-loopback nameserver entry.
+
+### Network interfaces (`getifaddrs`)
+
+Programs running inside the chroot that call `getifaddrs()` - SSH daemons, some package managers - receive Android's real network interfaces (`wlan0`, `rmnet_data0`, etc.) instead of a standard Linux interface list. This happens because PRoot bind-mounts `/proc` from the Android host and glibc queries the kernel via netlink, which responds with Android interfaces. Programs may fail to bind or behave unexpectedly as a result.
+
+To fix this, override `getifaddrs` and `freeifaddrs` in a shared library and preload it via `LD_PRELOAD`:
+
+```c title="getifaddrs_override.c"
+#include <ifaddrs.h>
+#include <string.h>
+#include <stdlib.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <net/if.h>
+
+int getifaddrs(struct ifaddrs **ifap) {
+    struct ifaddrs *ifa = calloc(1, sizeof(struct ifaddrs));
+    if (!ifa) return -1;
+    ifa->ifa_next = NULL;
+    ifa->ifa_name = strdup("lo");
+    ifa->ifa_flags = IFF_UP | IFF_RUNNING | IFF_LOOPBACK;
+
+    struct sockaddr_in *addr = calloc(1, sizeof(struct sockaddr_in));
+    addr->sin_family = AF_INET;
+    addr->sin_addr.s_addr = htonl(0x7f000001);
+    ifa->ifa_addr = (struct sockaddr *)addr;
+
+    struct sockaddr_in *netmask = calloc(1, sizeof(struct sockaddr_in));
+    netmask->sin_family = AF_INET;
+    netmask->sin_addr.s_addr = htonl(0xff000000);
+    ifa->ifa_netmask = (struct sockaddr *)netmask;
+
+    *ifap = ifa;
+    return 0;
+}
+
+void freeifaddrs(struct ifaddrs *ifa) {
+    while (ifa) {
+        struct ifaddrs *next = ifa->ifa_next;
+        free(ifa->ifa_name);
+        free(ifa->ifa_addr);
+        free(ifa->ifa_netmask);
+        free(ifa);
+        ifa = next;
+    }
+}
+```
+
+Compile and preload it before starting the affected program:
+
+```sh
+gcc -shared -fPIC -o /usr/local/lib/getifaddrs_override.so getifaddrs_override.c
+export LD_PRELOAD=/usr/local/lib/getifaddrs_override.so
+```
+
+---
+
 ## RPC API
 
 The processor injects a `BRIDGE_SOCKET` environment variable at runtime containing the name of an abstract Unix socket. To call a host API, open a new socket connection, send a single [JSON-RPC 2.0](https://www.jsonrpc.org/specification) request line, and read back the response line. Each connection carries exactly one request/response exchange.

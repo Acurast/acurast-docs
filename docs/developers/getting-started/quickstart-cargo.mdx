@@ -56,7 +56,15 @@ This creates `acurast.json` (deployment config) and `.env` (secrets). See the **
 ## Step 2 - Write your Cargo app
 
 :::info
-The PRoot container starts with a minimal environment. Your entrypoint should set any environment variables like `PATH` or `HOME`, and DNS resolver before running any tooling that might require it.
+The PRoot container starts with a minimal environment. Depending on the tooling you use, you may need to set `PATH`, `HOME`, or configure DNS resolution before running it.
+
+**DNS resolution** - Android has no system-level `/etc/resolv.conf`. Without it, DNS resolution inside the chroot fails silently: `apt-get update` downloads nothing, package lists stay empty, and subsequent `apt-get install` calls report packages as not found. Write a nameserver entry before any network calls:
+
+```sh
+echo "nameserver 8.8.8.8" > /etc/resolv.conf
+```
+
+See **[PRoot Quirks](/developers/build/cargo-runtime-environment#proot-quirks)** for more known environment issues, including a `getifaddrs()` workaround for programs that inspect network interfaces.
 :::
 
 Create your app entrypoint file `acurast.sh`:
