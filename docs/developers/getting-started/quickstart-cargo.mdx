@@ -23,6 +23,10 @@ To set one up yourself:
 
 Full guide: **[Become a Compute Provider](/processors/become-compute-provider)**.
 
+:::note
+After onboarding, there is a warmup period of up to 3 epochs (~4.5 hours) before the device becomes eligible for public assignment matching. If you want to deploy on your freshly onboarded device before the warmup completes, it can be skipped by targeting the device directly with [Instant deploy](#instant-deploy).
+:::
+
 ### Acurast CLI
 
 Install the CLI globally:
@@ -131,6 +135,49 @@ Supported distro images are listed in the [Termux proot-distro releases ↗](htt
 The Linux image is freshly unpacked for every execution - there is no persistent cache between runs. Any dependencies installed during one execution (e.g. via `apt-get`) will not be available in the next. Make sure your deployment schedule accounts for the setup time required at the start of each execution.
 :::
 
+### Instant deploy
+
+To deploy directly to a specific device without waiting for the warmup period, use the `instantMatch` field inside `assignmentStrategy`. Each entry targets a processor by its SS58 address:
+
+```json
+{
+  "projects": {
+    "cargo-hello": {
+      ...
+      "assignmentStrategy": {
+        "type": "Single",
+        "instantMatch": [
+          {
+            "processor": "<SS58-address>",
+            "maxAllowedStartDelayInMs": 10000
+          }
+        ]
+      },
+      "numberOfReplicas": 1,
+      ...
+    }
+  }
+}
+```
+
+Set `numberOfReplicas` to match the number of entries in `instantMatch`. You can find the processor address in the Acurast Hub after onboarding.
+
+---
+
+## Step 4 - Deploy
+
+```bash
+acurast deploy
+```
+
+The CLI uploads your `app/` directory to IPFS and registers the deployment on-chain. The processor downloads the distro image and your app, boots the container, and runs `start.sh`.
+
+Monitor your deployment:
+
+```bash
+acurast deployments ls --network canary
+```
+
 ---
 
 ## Example - Hello Cargo
@@ -214,22 +261,6 @@ Add your webhook URL to `.env`:
 ```text title=".env"
 ACURAST_MNEMONIC=abandon abandon about ...
 WEBHOOK_URL=https://your-webhook.example.com
-```
-
----
-
-## Step 4 - Deploy
-
-```bash
-acurast deploy
-```
-
-The CLI uploads your `app/` directory to IPFS and registers the deployment on-chain. The processor downloads the distro image and your app, boots the container, and runs `start.sh`.
-
-Monitor your deployment:
-
-```bash
-acurast deployments ls --network canary
 ```
 
 ---
