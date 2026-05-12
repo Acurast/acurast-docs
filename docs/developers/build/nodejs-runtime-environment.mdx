@@ -677,9 +677,9 @@ type WebViewProxyConfig = {
  * 1. **Forward DNS + TXT** — verifies that `_acu.<host>` carries a TXT record
  *    `v=base64(sha256(deployment_source || host))`, then resolves the hostname
  *    to one or more IP addresses (A/AAAA).
- * 2. **Reverse DNS + TXT** — for each resolved IP, performs a PTR lookup and
- *    verifies that `_acu.<host>` carries a TXT record
- *    `v=base64(sha256(deployment_source || host))`.
+ * 2. **Reverse DNS + TXT** — for each resolved IP, performs a PTR lookup to
+ *    obtain the PTR hostname and verifies that `_acu.<ptr_hostname>` carries a
+ *    TXT record `v=base64(sha256(deployment_source || ptr_hostname))`.
  * 
  * Where `deployment_source` is the raw 32-byte Substrate Account ID of the deployment's owner
  * and `host` is the bare hostname (no scheme, port, or path, e.g. `example.com`).

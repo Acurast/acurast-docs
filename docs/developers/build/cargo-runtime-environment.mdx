@@ -122,6 +122,8 @@ protocol:        JSON-RPC 2.0, newline-delimited, one call per connection
 
 ### Processor
 
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.25.0+</span>
+
 #### `processor_version`
 
 Returns the version of the processor runtime.
@@ -148,6 +150,8 @@ Returns the version of the processor runtime.
 ---
 
 ### Deployment
+
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.25.0+</span>
 
 #### `deployment_id`
 
@@ -178,6 +182,8 @@ Returns the identifier of the active deployment.
 
 ---
 
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.25.0+</span>
+
 #### `deployment_ipfsHash`
 
 Returns the IPFS CID of the deployment app.
@@ -203,6 +209,8 @@ Returns the IPFS CID of the deployment app.
 
 ---
 
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.25.0+</span>
+
 #### `deployment_slot`
 
 Returns the execution slot index assigned to this processor, or `null` if no slot is assigned.
@@ -227,6 +235,8 @@ Returns the execution slot index assigned to this processor, or `null` if no slo
 ```
 
 ---
+
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.25.0+</span>
 
 #### `deployment_publicKeys`
 
@@ -257,6 +267,8 @@ Returns the signing public keys of this processor for the active deployment, key
 
 ---
 
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.25.0+</span>
+
 #### `deployment_encryptionKeys`
 
 Returns the ECDH encryption public keys of this processor for the active deployment. Supported curves: `p256`, `secp256k1`.
@@ -284,6 +296,8 @@ Returns the ECDH encryption public keys of this processor for the active deploym
 ```
 
 ---
+
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.25.0+</span>
 
 #### `deployment_assignedProcessors`
 
@@ -322,6 +336,8 @@ Returns all processors assigned to this deployment, keyed by their SS58 address,
 
 Supported curves: `"p256"`, `"secp256k1"`, `"ed25519"`. Encryption and decryption support `"p256"` and `"secp256k1"` only.
 
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.25.0+</span>
+
 #### `signer_publicKey`
 
 Returns the public key for the given curve. Pass `derivationPath` for HD key derivation (supported on `secp256k1`).
@@ -350,6 +366,8 @@ Returns the public key for the given curve. Pass `derivationPath` for HD key der
 ```
 
 ---
+
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.25.0+</span>
 
 #### `signer_sign`
 
@@ -380,6 +398,8 @@ Signs a hex-encoded byte string with the given curve key. Pass `derivationPath` 
 
 ---
 
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.25.0+</span>
+
 #### `signer_encrypt`
 
 Encrypts bytes using ECDH key agreement with the receiver's public key. Supported curves: `p256`, `secp256k1`.
@@ -409,6 +429,8 @@ Encrypts bytes using ECDH key agreement with the receiver's public key. Supporte
 ```
 
 ---
+
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.25.0+</span>
 
 #### `signer_decrypt`
 
@@ -444,6 +466,8 @@ Decrypts bytes using ECDH key agreement with the sender's public key. Supported 
 
 These methods control an embedded WebView on the processor device and are only available on Android processors.
 
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.25.0+</span>
+
 #### `browser_debugUrl`
 
 Returns the Chrome DevTools remote debugging URL for the WebView.
@@ -469,6 +493,8 @@ Returns the Chrome DevTools remote debugging URL for the WebView.
 
 ---
 
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.25.0+</span>
+
 #### `browser_newTab`
 
 Opens a new tab in the WebView and returns its ID.
@@ -493,6 +519,8 @@ Opens a new tab in the WebView and returns its ID.
 ```
 
 ---
+
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.25.0+</span>
 
 #### `browser_closeTab`
 
@@ -520,6 +548,8 @@ Closes a tab by ID. Set `wholeTree` to `true` to also close all tabs spawned by 
 
 ---
 
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.25.0+</span>
+
 #### `browser_openTabs`
 
 Returns a list of currently open tab IDs.
@@ -544,6 +574,8 @@ Returns a list of currently open tab IDs.
 ```
 
 ---
+
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.25.0+</span>
 
 #### `browser_currentUrl`
 
@@ -570,6 +602,8 @@ Returns the current URL of a tab, or `null` if it has not loaded yet.
 
 ---
 
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.25.0+</span>
+
 #### `browser_loadCause`
 
 Returns why the tab last loaded: `"manual"` (opened via `browser_newTab`) or `"auto"` (opened by a tab autonomously), or `null` if not yet loaded.
@@ -594,6 +628,8 @@ Returns why the tab last loaded: `"manual"` (opened via `browser_newTab`) or `"a
 ```
 
 ---
+
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.25.0+</span>
 
 #### `browser_startRefreshLoop`
 
@@ -622,6 +658,8 @@ Starts a periodic refresh loop for a tab. Stop with `browser_stopRefreshLoop` wh
 
 ---
 
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.25.0+</span>
+
 #### `browser_stopRefreshLoop`
 
 Stops the refresh loop for a tab.
@@ -647,6 +685,8 @@ Stops the refresh loop for a tab.
 ```
 
 ---
+
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.25.0+</span>
 
 #### `browser_useProxy`
 
@@ -678,6 +718,8 @@ Configures the WebView to route traffic through a proxy server.
 
 ---
 
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.25.0+</span>
+
 #### `browser_removeProxy`
 
 Removes the current proxy configuration from the WebView.
@@ -701,6 +743,8 @@ Removes the current proxy configuration from the WebView.
 
 ---
 
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.25.0+</span>
+
 #### `browser_close`
 
 Closes all open tabs and destroys the WebView, clearing storage, cookies, and proxy settings.
@@ -720,6 +764,85 @@ Closes all open tabs and destroys the WebView, clearing storage, cookies, and pr
   "result": {},
   "id": string
 }
+```
+
+---
+
+### Network
+
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.25.0+</span>
+
+#### `network_whitelist`
+
+Verifies `host` via DNS TXT records and, if valid, whitelists its resolved IP addresses so they bypass the rate-limiter in the network extension.
+
+The processor performs the following verification steps:
+
+1. **Forward DNS + TXT** - verifies that `_acu.<host>` carries a TXT record `v=base64(sha256(deployment_source || host))`, then resolves the hostname to one or more IP addresses (A/AAAA).
+2. **Reverse DNS + TXT** - for each resolved IP, performs a PTR lookup to obtain the PTR hostname and verifies that `_acu.<ptr_hostname>` carries a TXT record `v=base64(sha256(deployment_source || ptr_hostname))`.
+
+Both steps must pass for an IP to be added to the whitelist. Connections to non-whitelisted hosts are rate-limited.
+
+`deployment_source` is the raw 32-byte Substrate Account ID of the deployment's owner. `host` is the bare hostname (no scheme, port, or path — e.g. `example.com`).
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "network_whitelist",
+  "params": [{ "host": string }],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {},
+  "id": string
+}
+```
+
+##### Verification hash
+
+Example scripts for computing the TXT record value:
+
+```javascript title="Node.js"
+// npm install @polkadot/util-crypto
+
+const { createHash } = require('crypto');
+const { decodeAddress } = require('@polkadot/util-crypto');
+
+function verificationHash(source, host) {
+    // Decode hex Account ID directly, or convert SS58 address to raw bytes
+    const sourceBytes = source.length === 64
+        ? Buffer.from(source, 'hex')
+        : Buffer.from(decodeAddress(source));
+    // SHA-256 over concatenation of source bytes and UTF-8 encoded host
+    const digest = createHash('sha256')
+        .update(sourceBytes)
+        .update(host)
+        .digest();
+    // Return the hash as a base64 string
+    return digest.toString('base64');
+}
+```
+
+```python title="Python"
+# pip install substrate-interface
+
+import hashlib
+import base64
+
+from substrateinterface.utils.ss58 import ss58_decode
+
+
+def verification_hash(source: str, host: str) -> str:
+    # Decode hex Account ID directly, or convert SS58 address to raw bytes
+    source_bytes = bytes.fromhex(source) if len(source) == 64 else bytes.fromhex(ss58_decode(source))
+    # SHA-256 over concatenation of source bytes and UTF-8 encoded host
+    digest = hashlib.sha256(source_bytes + host.encode()).digest()
+    # Return the hash as a base64 string
+    return base64.b64encode(digest).decode()
 ```
 
 ---
