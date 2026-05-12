@@ -60,30 +60,19 @@ This creates `acurast.json` (deployment config) and `.env` (secrets). See the **
 ## Step 2 - Write your Cargo app
 
 :::info
-The PRoot container starts with a minimal environment. Depending on the tooling you use, you may need to set `PATH`, `HOME`, or configure DNS resolution before running it.
-
-**DNS resolution** - Android has no system-level `/etc/resolv.conf`. Without it, DNS resolution inside the chroot fails silently: `apt-get update` downloads nothing, package lists stay empty, and subsequent `apt-get install` calls report packages as not found. Write a nameserver entry before any network calls:
-
-```sh
-echo "nameserver 8.8.8.8" > /etc/resolv.conf
-```
-
-See **[PRoot Quirks](/developers/build/cargo-runtime-environment#proot-quirks)** for more known environment issues, including a `getifaddrs()` workaround for programs that inspect network interfaces.
+The PRoot container starts with a minimal environment. The processor presets sensible defaults for `PATH`, `HOME`, and `/etc/resolv.conf` before your entrypoint runs, but these can be overridden in your script if your deployment needs different values. See **[PRoot Quirks](/developers/build/cargo-runtime-environment#proot-quirks)** for the exact defaults and known issues, including a `getifaddrs()` workaround for programs that inspect network interfaces.
 :::
 
 Create your app entrypoint file `acurast.sh`:
 
-```sh title="acurast.sh"
+```bash title="acurast.sh"
 #!/bin/sh
 
-# Set up environment variables
-export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-export HOME=/root
-
-# Set up DNS resolver
-echo "nameserver 8.8.8.8" > /etc/resolv.conf
+# PATH, HOME and /etc/resolv.conf are preset by the processor.
+# Override them here if your deployment requires different values.
 
 # TODO: Run your code
+echo "Hello, world!"
 ```
 
 ### The bridge socket
@@ -198,18 +187,14 @@ acurast.json
 
 **`app/start.sh`** - sets up the environment, installs dependencies, and launches the Python script:
 
-```sh title="app/start.sh"
+```bash title="app/start.sh"
 #!/bin/sh
 
-# Set up PATH, HOME, and DNS
-export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-export HOME=/root
-
-echo "nameserver 8.8.8.8" > /etc/resolv.conf
-
-# Install necessary dependencies and run the main application
+# Install necessary dependencies
 apt-get update
 apt-get install -y python3-requests
+
+# Run the main application
 python3 "$(dirname "$0")/hello.py"
 ```
 
