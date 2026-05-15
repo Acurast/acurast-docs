@@ -6,7 +6,7 @@ slug: /acurast-protocol/node-setup
 import ThemedImage from "@theme/ThemedImage";
 import useBaseUrl from "@docusaurus/useBaseUrl";
 
-The recommended way to run the Acurast node is by using the published [Docker image](https://hub.docker.com/r/acurast/node-canary/tags).
+The recommended way to run the Acurast node is by using the published Docker images for [Mainnet](https://hub.docker.com/r/acurast/node-mainnet/tags) and [Canary](https://hub.docker.com/r/acurast/node-canary/tags).
 
 ## Get the chain spec
 
@@ -29,7 +29,7 @@ For Acurast Canary:
 ```yml
 services:
   node:
-    image: "acurast/node-canary:acurast-v0.20.0"
+    image: "acurast/node-canary:acurast-v0.25.5"
     command: "--chain /node/chain-specs/acurast-kusama-parachain-2239-raw.json \
       --base-path /node/data \
       --bootnodes /ip4/57.129.99.69/tcp/30334/ws/p2p/12D3KooWKrSDeVQ4tVQ1eGjqVAhAW3cgMQFHNCBbJrpmupEvdD4A \
@@ -58,7 +58,7 @@ For Acurast Mainnet:
 ```yml
 services:
   node:
-    image: "acurast/node-mainnet:acurast-v0.20.0"
+    image: "acurast/node-mainnet:acurast-v0.25.5"
     command: "--chain /node/chain-specs/acurast-mainnet-parachain-3396-raw.json \
       --base-path /node/data \
       --bootnodes /ip4/82.220.91.112/tcp/30335/ws/p2p/12D3KooWMJM3htCon6tQ6FzRuWkxtwEkd3i5awZitdTviWwJX3KY \
