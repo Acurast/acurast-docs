@@ -1,24 +1,20 @@
 ---
-title: Quickstart - Cargo (Preview)
+title: Quickstart - Cargo
 slug: /developers/getting-started/quickstart-cargo
 ---
-
-:::note Preview
-The Cargo runtime is in preview. APIs and configuration fields may change before general availability.
-:::
 
 Cargo deployments run as native binaries inside a Linux distro image on the processor, isolated via [PRoot](https://proot-me.github.io/). Unlike the default Node.js runtime, Cargo gives you full access to the Linux environment: shell scripts, native tooling, and any language you can ship as a Linux binary.
 
 ## Prerequisites
 
-### A 64-bit Android Core processor on Canary
+### A 64-bit Android Core processor
 
-Cargo deployments require a **64-bit (aarch64) Android device** running as an **Acurast Processor Core** on the **Canary** network. The Lite processor and iOS devices are not supported.
+Cargo deployments require a **64-bit (aarch64) Android device** running as an **Acurast Processor Core**. The Lite processor and iOS devices are not supported.
 
 To set one up yourself:
 
 1. Factory-reset a 64-bit Android phone (Android 12+).
-2. Visit [Acurast Hub ↗](https://hub.acurast.com/), switch to the **Canary** network, and connect your wallet.
+2. Visit [Acurast Hub ↗](https://hub.acurast.com/) and connect your wallet.
 3. Follow the **Processor Core** setup flow - the device will be locked down as a dedicated compute provider.
 
 Full guide: **[Become a Compute Provider](/processors/become-compute-provider)**.
@@ -35,9 +31,9 @@ Install the CLI globally:
 npm install -g @acurast/cli
 ```
 
-### cACU balance
+### ACU balance
 
-Cargo deployments run on the **Canary** network. Claim free cACU from the **[faucet ↗](https://faucet.acurast.com)**.
+Cargo deployments require ACU to cover execution costs. If you are deploying on **Mainnet**, you need real ACU. If you are deploying on **Canary**, claim free cACU from the **[faucet ↗](https://faucet.acurast.com)**.
 
 ---
 
@@ -100,7 +96,7 @@ Your app files (`fileUrl`) are extracted into the rootfs before the entrypoint r
         "url": "https://github.com/termux/proot-distro/releases/download/v4.30.1/ubuntu-questing-aarch64-pd-v4.30.1.tar.xz",
         "sha256": "5ab35b90cd9a9f180656261ba400a135c4c01c2da4b74522118342f985c2d328"
       },
-      "network": "canary",
+      "network": "mainnet",
       ...
     }
   }
@@ -164,7 +160,7 @@ The CLI uploads your `app/` directory to IPFS and registers the deployment on-ch
 Monitor your deployment:
 
 ```bash
-acurast deployments ls --network canary
+acurast deployments ls
 ```
 
 ---
