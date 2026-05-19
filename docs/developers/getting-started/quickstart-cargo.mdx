@@ -250,6 +250,14 @@ WEBHOOK_URL=https://your-webhook.example.com
 
 ---
 
+## Example - Cargo SSH
+
+This example launches a Dropbear SSH server inside an Ubuntu rootfs and exposes it through a reverse tunnel (ngrok, bore, or pinggy - selectable via environment variable). Once the tunnel is established, the connection details are POSTed to a callback URL so you can SSH directly into the processor.
+
+Full source: **[acurast-example-apps/apps/app-cargo-ssh ↗](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-cargo-ssh)**.
+
+---
+
 ## Next steps
 
 - **[Cargo Runtime Environment](/developers/build/cargo-runtime-environment)** - full RPC API reference (signing, encryption, browser control, deployment metadata).
