@@ -847,6 +847,136 @@ def verification_hash(source: str, host: str) -> str:
 
 ---
 
+### Tunnel
+
+Opens a reverse tunnel that forwards inbound TLS connections from a public URL (`https://<clientId>.<domainSuffix>:8443`) to a local address inside the deployment. Only one tunnel may be active per deployment.
+
+Before calling `tunnel_start`, the `<domainSuffix>` must have the required wildcard and verification TXT records — see the [tunnel quick start](https://github.com/Acurast/quic-tunnel/blob/main/QUICKSTART.md) for details.
+
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.26.0+</span>
+
+#### `tunnel_start`
+
+Opens the tunnel and returns the public URL it serves.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "tunnel_start",
+  "params": [{
+    "serverAddrs": string[],        // relay endpoints, e.g. ["relay-2.canary.acurast.com:4433"]
+    "domainSuffix": string,         // DNS suffix you control
+    "localAddr": string,            // local "host:port" to forward to
+    "primaryKey": {
+      "algorithm": "Secp256r1",     // only P-256 is accepted
+      "bytes": string               // base64 of PKCS#8 DER (no wrap)
+    },
+    "acmeStaging"?: boolean,        // default false
+    "acmeEmail"?: string,           // Let's Encrypt account contact
+    "certPem"?: string,             // pre-supplied PEM chain; when set, ACME is skipped
+    "forceH2"?: boolean,            // skip QUIC, use HTTP/2 fallback pool (default false)
+    "poolSize"?: number             // H2 pool size when forceH2 is on (default 4)
+  }],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "url": string,                  // https://<clientId>.<domainSuffix>:8443
+    "clientId": string,             // the deployment's tunnel identifier
+    "secondaryUrl"?: string,
+    "secondaryClientId"?: string
+  },
+  "id": string
+}
+```
+
+Persist `primaryKey.bytes` across deployment restarts to keep the same `clientId`. Persist the cert PEM from `tunnel_certPem` and pass it back here as `certPem` to skip ACME on subsequent starts.
+
+---
+
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.26.0+</span>
+
+#### `tunnel_stop`
+
+Closes the active tunnel. The cached ACME credentials and certificate are preserved on disk so a subsequent `tunnel_start` with the same identity can reuse them. No-op if no tunnel is running.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "tunnel_stop",
+  "params": [],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {},
+  "id": string
+}
+```
+
+---
+
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.26.0+</span>
+
+#### `tunnel_status`
+
+Returns the current tunnel status.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "tunnel_status",
+  "params": [],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "status": number   // 0 = Starting, 1 = Running, 2 = Stopped, 3 = Failed, -1 = no tunnel active
+  },
+  "id": string
+}
+```
+
+---
+
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.26.0+</span>
+
+#### `tunnel_certPem`
+
+Returns the PEM-encoded full certificate chain currently issued for the tunnel.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "tunnel_certPem",
+  "params": [],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "pem"?: string     // omitted if no certificate has been issued yet (or no tunnel is active)
+  },
+  "id": string
+}
+```
+
+---
+
 ## Examples
 
 The examples below call `processor_version` to show how to connect to the bridge and make a request in different languages.

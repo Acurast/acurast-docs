@@ -30,6 +30,7 @@ const sidebars = {
             "developers/deploy-first-app",
             "developers/getting-started/examples",
             "developers/getting-started/quickstart-cargo",
+            // "developers/getting-started/quickstart-tunnel",
           ],
         },
         {
@@ -218,6 +219,7 @@ const sidebars = {
           ],
         },
         "acurast-protocol/node-setup",
+        "acurast-protocol/node-tunnel-setup",
         "acurast-protocol/governance",
         "acurast-protocol/deployment-pricing",
         "acurast-protocol/networks",

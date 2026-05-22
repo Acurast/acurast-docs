@@ -1,0 +1,229 @@
+---
+title: Node Tunnel Setup (Canary Preview)
+slug: /acurast-protocol/node-tunnel-setup
+---
+
+import ThemedImage from "@theme/ThemedImage";
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
+## Deploying a node with the Acurast Tunnel service
+
+This document walks through running an Acurast Canary Node with the built-in Acurast
+Tunnel service enabled. It is self-contained: every CLI flag, port, cert mode,
+and proxy rule needed to bring a tunnel enabled node is described inline.
+
+### Overview
+
+The tunnel service relays end-user TCP traffic to Acurast processors. Clients
+(processors) open a long lived control connection to the node, over QUIC by
+default, or HTTP/2-over-TLS if QUIC is blocked, and the node forwards public
+end user TCP byte streams to a registered processor based on the SNI sent by
+the end user.
+
+The server owns **four ports**:
+
+| Port (default) | Protocol | Role |
+| --- | --- | --- |
+| `4433`         | UDP (QUIC) | Processor (agent) connections — primary |
+| `4433`         | TCP (HTTP/2 + TLS) | Processor connections — fallback when QUIC is blocked |
+| `8443`         | TCP | Public end-user connections (SNI-routed to a registered agent) |
+| `443`          | TCP | ACME TLS-ALPN-01 challenge port |
+
+Auth is bound to on-chain state: a client is accepted only if its mTLS cert
+carries an `(AcurastJobId, processor_id)` extension that resolves to a valid
+`StoredMatches` entry in `pallet-acurast-marketplace`, **and** if the cert's
+P-256 public key appears in that assignment's `pub_keys`.
+
+### Prerequisites
+
+- A running Acurast Canary Node, see [Node Setup](./node-setup).
+- DNS A record for the relay hostname (e.g. `relay.acurast.example.com`)
+  pointing at the host's public IP.
+- TCP port 443 reachable from the public internet, with **no TLS terminator**
+  intercepting it for the relay SNI (see "Behind an nginx reverse proxy"
+  below).
+
+### CLI flags
+
+All flags below take effect only when `--tunnel` is also set.
+
+| Flag | Default | Purpose |
+| --- | --- | --- |
+| `--tunnel` | _off_ | Enable the integrated tunnel server. Required for any other `--tunnel-*` flag to take effect. |
+| `--tunnel-bind-addr <ADDR>` | `0.0.0.0` | IP the tunnel listeners bind to. |
+| `--tunnel-api-port <PORT>` | `4433` | QUIC (UDP) + HTTP/2-over-TLS (TCP) port for processor (agent) connections. |
+| `--tunnel-pub-port <PORT>` | `8443` | Public TCP port for end user connections. The server peeks SNI and routes raw bytes to a registered agent. |
+| `--tunnel-alpn-port <PORT>` | `443` | TLS-ALPN-01 challenge port. **Must be reachable as port 443** (or have port 443 stream proxied to it, _not_ TLS terminated). |
+| `--tunnel-cert-path <PATH>` | _none_ | Path to the server's PEM certificate chain. This is where the provisioned cert is written and re-read. |
+| `--tunnel-key-path <PATH>` | _none_ | Path to the PEM private key matching `--tunnel-cert-path`. |
+| `--tunnel-acme-domain <DOMAIN>` | _none_ | Domain to provision via ACME TLS-ALPN-01 (e.g. `relay.example.com`). |
+| `--tunnel-acme-creds-path <PATH>` | `server_acme_creds.json` | Path used to persist ACME account credentials between runs. |
+| `--tunnel-acme-renew-days <N>` | `30` | Trigger background ACME renewal this many days before expiry. |
+
+## Listener roles
+
+| Listener | Port flag | Behavior |
+| --- | --- | --- |
+| **ALPN**     | `--tunnel-alpn-port` (TCP) | Peeks SNI. If the SNI matches the server's own ACME challenge domain, completes the TLS-ALPN-01 challenge locally; otherwise proxies bytes through the registered tunnel client (so the client can complete _its own_ ACME challenge). |
+| **QUIC**     | `--tunnel-api-port` (UDP) | Accepts QUIC connections from agents. |
+| **H2 + TLS** | `--tunnel-api-port` (TCP) | Accepts HTTP/2-over-TLS connections from agents (used when QUIC is blocked). |
+| **Public**   | `--tunnel-pub-port` (TCP) | Accepts raw TCP from end users, SNI routed to a registered agent. |
+
+> If `--tunnel-alpn-port` is not 443, port 443 must be forwarded to it via a
+> **TCP stream proxy** (e.g. nginx `stream {}` module). A TLS-terminating
+> proxy (nginx `http {}`) will break the ACME challenge and end-user tunnel
+> TLS.
+
+## Docker Compose deployment
+
+Use the `acurast/node-canary:acurast-v0.26.0` docker image.
+
+An example `docker-compose.yml` for a Acurast Tunnel enabled deployment:
+
+```yaml
+services:
+  node:
+    image: acurast/node-canary:acurast-v0.26.0
+    restart: always
+    command: "--chain /node/chain-specs/acurast-kusama-parachain-2239-raw.json \
+      --base-path /node/data \
+      --bootnodes /ip4/57.129.99.69/tcp/30334/ws/p2p/12D3KooWKrSDeVQ4tVQ1eGjqVAhAW3cgMQFHNCBbJrpmupEvdD4A \
+      --port 30334 \
+      --rpc-port 9934 \
+      --rpc-external \
+      --rpc-methods safe \
+      --rpc-cors all \
+      --name MyNode \ # choose an appropriate name here
+      --telemetry-url \"wss://telemetry.polkadot.io/submit/ 0\" \
+      --database=rocksdb \
+      --pruning=archive \
+      --tunnel \
+      --tunnel-acme-domain relay.acurast.example.com \
+      --tunnel-cert-path /node/acme/server_cert.pem \
+      --tunnel-key-path  /node/acme/server.key \
+      --tunnel-acme-creds-path /node/acme/server_acme_creds.json"
+    ports:
+      # Substrate p2p
+      - '30334:30334'
+      # JSON-RPC
+      - '9934:9934'
+      # Tunnel: processor API (QUIC needs UDP; H2 fallback is TCP)
+      - '4433:4433/tcp'
+      - '4433:4433/udp'
+      # Tunnel: public end-user port
+      - '8443:8443'
+      # Tunnel: ACME TLS-ALPN-01 — published as host :443 when the node owns 443.
+      # Behind an nginx reverse proxy, publish a different host port (e.g. 6443)
+      # and let nginx own 443 (see the next section).
+      - '443:443'
+    volumes:
+      # Chain data + certs in a single project-relative directory.
+      - ./:/node
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+```
+
+### Volume layout
+
+The `./:/node` mount means the working directory contains, after first
+startup:
+
+```
+./
+├── chain-specs/...
+├── data/                       # substrate database
+└── acme/
+    ├── server_cert.pem         # written by ACME provisioner
+    ├── server.key              # written by ACME provisioner
+    └── server_acme_creds.json  # persisted ACME account
+```
+
+## Behind an nginx reverse proxy
+
+If the host already runs nginx on port 443 (e.g. terminating TLS for other
+websites), the tunnel cannot also bind 443 directly. Instead, publish the
+tunnel container's port 443 on a non-standard host port (e.g. `6443`) and let
+nginx route SNI to it via the **stream** module with `ssl_preread`.
+
+### Compose change
+
+```yaml
+    ports:
+      - '6443:443/tcp'    # was '443:443/tcp'
+```
+
+(All other tunnel port mappings stay the same.)
+
+### nginx.conf
+
+```nginx
+stream {
+    # Route incoming :443 connections by SNI without decrypting them.
+    map $ssl_preread_server_name $upstream {
+        hostnames;
+
+        # explicitly route the relay hostname to the node
+        relay.acurast.example.com   acurast_tunnel;
+        # route existing domains that need to terminate TLS
+        *.my-existing-domain.com    https_terminator;
+        # all the rest are routed to the node (Acurast deployments trying to setup a tunnel with custom domains)
+        default                     acurast_tunnel;
+    }
+
+    upstream acurast_tunnel {
+        # docker-compose published the container's :443 as host :6443.
+        server 127.0.0.1:6443;
+    }
+
+    upstream https_terminator {
+        # Whatever local nginx http {} server handles your other sites.
+        server 127.0.0.1:7443;
+    }
+
+    server {
+        listen 443;
+        listen [::]:443;
+        proxy_pass $upstream;
+        ssl_preread on;
+    }
+}
+
+# Your existing http {} block handles non-tunnel SNI on 127.0.0.1:7443.
+http {
+    # ... standard config ...
+
+
+    server {
+        # here we need to listen on 7443
+        listen 7443 ssl;
+    
+        server_name rpc.my-existing-domain.com;
+        ssl_certificate /etc/letsencrypt/live/rpc.my-existing-domain.com/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/rpc.my-existing-domain.com/privkey.pem;
+        include /etc/letsencrypt/options-ssl-nginx.conf;
+        ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+        location / {
+            proxy_pass http://127.0.0.1:9934;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header Host $host;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+        }
+    }
+}
+```
+
+## Verification
+
+Expected log sequence on a clean first start:
+
+```
+ROUTER: API 0.0.0.0:4433 | PUB 0.0.0.0:8443 | ALPN 0.0.0.0:443
+TLS: cert at /node/certs/server_cert.pem is expired or missing, provisioning via ACME
+ACME: provisioning server cert for relay.acurast.example.com
+ACME: provisioned cert valid until <timestamp>
+```
