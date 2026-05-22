@@ -218,6 +218,7 @@ const sidebars = {
           ],
         },
         "acurast-protocol/node-setup",
+        "acurast-protocol/node-tunnel-setup",
         "acurast-protocol/governance",
         "acurast-protocol/deployment-pricing",
         "acurast-protocol/networks",
