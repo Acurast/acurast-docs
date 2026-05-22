@@ -1,0 +1,347 @@
+---
+title: Quickstart - Tunnel (Canary Preview)
+slug: /developers/getting-started/quickstart-tunnel
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+The Acurast reverse tunnel exposes a service running inside a deployment to the public internet, without the processor needing an inbound public IP or open ports. 
+The processor only makes **outbound** connections to a relay node, the relay then routes incoming traffic from external users back to the processor.
+
+Once the tunnel is up, the deployment is reachable at `https://<clientId>.<yourDomainSuffix>:8443` with a valid Let's Encrypt certificate provisioned automatically.
+
+## Prerequisites
+
+### A Canary Android Core processor
+
+Tunnel deployments require Processor version 1.26.0-rc1 on Canary.
+
+Full guide: **[Become a Compute Provider](/processors/become-compute-provider)**.
+
+### Acurast CLI
+
+Install the CLI globally:
+
+```bash
+npm install -g @acurast/cli
+```
+
+### ACU balance
+
+Tunnel deployments require cACU to cover execution costs. On **Canary**, claim free cACU from the **[faucet ↗](https://faucet.acurast.com)**.
+
+### A DNS suffix you control
+
+The tunnel relay only accepts deployments under a domain suffix whose DNS records prove that you, the deployer, own the suffix. Pick any subdomain you control, `tunnel.example.com`, `apps.mybrand.com`, etc. You will configure two records under it in Step 2.
+
+---
+
+## Step 1 - Create a project
+
+<Tabs groupId="tunnel-runtime">
+  <TabItem value="nodejs" label="Node.js" default>
+
+```bash
+npx @acurast/cli new my-tunnel-app
+cd my-tunnel-app
+acurast init
+```
+
+  </TabItem>
+  <TabItem value="cargo" label="Cargo">
+
+:::note
+`acurast new` generates a Node.js project with a file structure that does not apply to Cargo and can be skipped. Create the project directory yourself and run `acurast init` inside it instead:
+:::
+
+```bash
+mkdir cargo-tunnel
+cd cargo-tunnel
+acurast init
+```
+
+  </TabItem>
+</Tabs>
+
+This creates `acurast.json` (deployment config) and `.env` (secrets). See the **[CLI docs](/developers/tools/cli)** for all available commands and options.
+
+---
+
+## Step 2 - Configure DNS
+
+Pick a subdomain you control (`tunnel.example.com` in the examples below) and add two records at your DNS provider.
+
+### Record 1 - wildcard pointing at the relay
+
+The public URL of every deployment is `https://<clientId>.<yourDomainSuffix>:8443`. The wildcard makes any `<clientId>` resolve to the relay:
+
+```
+*.tunnel.example.com.   CNAME   relay-2.canary.acurast.com.
+*.tunnel.example.com.   CNAME   ...
+```
+
+### Record 2 - TXT record proving deployer ownership
+
+The relay validates that whoever runs a deployment under your suffix also controls the suffix's DNS. Add a TXT record at `_acu.<yourDomainSuffix>`:
+
+```
+_acu.tunnel.example.com.   TXT   "<base64-sha256 hash>"
+```
+
+The value is `base64(sha256(<deployer-pubkey-bytes> || <yourDomainSuffix>))`, where `<deployer-pubkey-bytes>` is the 32-byte public-key bytes of the Acurast account that submits the deployment.
+
+Use [ss58.org ↗](https://ss58.org) to convert your deployer SS58 address to its public-key hex, then compute the TXT value:
+
+```bash
+{ printf '%s' MY_ADDRESS_HEX_VALUE | xxd -r -p; printf '%s' MY_DOMAIN_SUFFIX; } | openssl dgst -sha256 -binary | base64
+```
+
+Replace `MY_ADDRESS_HEX_VALUE` with your deployer address's hex value and `MY_DOMAIN_SUFFIX` with your subdomain (e.g. `tunnel.example.com`).
+
+If multiple deployer accounts share the same suffix, publish multiple TXT records on the same name, the relay accepts any matching record.
+
+---
+
+## Step 3 - Write your app
+
+Your app opens the tunnel by calling `tunnel.start(spec)` with the relay addresses, your domain suffix, and the local port your service listens on. Once it returns `{ url, clientId, ... }`, the tunnel is live and external traffic is forwarded to your local port.
+
+<Tabs groupId="tunnel-runtime">
+  <TabItem value="nodejs" label="Node.js" default>
+
+The Node.js runtime exposes the tunnel via `_STD_.tunnel.*` global callbacks. The example below starts a small HTTP server on `127.0.0.1:3000` and asks the tunnel to forward `https://<clientId>.tunnel.example.com:8443` to it.
+
+```javascript title="index.js"
+const http = require('http');
+
+const DOMAIN_SUFFIX = 'tunnel.example.com';
+const TUNNEL_RELAYS = ['relay-2.canary.acurast.com:4433'];
+const LOCAL_ADDR = '127.0.0.1:3000';
+
+// Generate or load a P-256 identity key as base64-encoded PKCS#8 DER.
+// Persist this value across runs to keep the same `clientId` (and avoid
+// re-running ACME on every restart).
+const primaryKeyBase64 = '...';
+
+const spec = {
+    serverAddrs: TUNNEL_RELAYS,
+    domainSuffix: DOMAIN_SUFFIX,
+    localAddr: LOCAL_ADDR,
+    primaryKey: {
+        algorithm: 'Secp256r1',
+        bytes: primaryKeyBase64,
+    },
+    acmeStaging: false,
+};
+
+http.createServer((_req, res) => {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('Hello from Acurast\n');
+}).listen(3000, '127.0.0.1', () => {
+    print('HTTP server listening on 127.0.0.1:3000');
+
+    _STD_.tunnel.start(
+        spec,
+        (info) => print('Tunnel ready at: ' + info.url),
+        (err) => print('Tunnel failed: ' + err),
+    );
+});
+```
+
+For an end-to-end reference with multi-processor leader election and certificate persistence, see **[acurast-tunnel-scripts ↗](https://github.com/Acurast/acurast-tunnel-scripts)**.
+
+Full tunnel API reference: **[Node.js Runtime Environment - Tunnel](/developers/build/nodejs-runtime-environment#tunnel)**.
+
+  </TabItem>
+  <TabItem value="cargo" label="Cargo">
+
+The Cargo runtime exposes the tunnel via a JSON-RPC bridge on the abstract Unix socket named in `$BRIDGE_SOCKET`. The example below opens the tunnel from Python and points it at whatever local service you choose to run alongside it.
+
+:::info
+Privileged ports (`< 1024`) cannot be bound inside the PRoot sandbox. Use ports >= 1024 for your local service. The public-facing port is always `8443`.
+:::
+
+**`app/start.sh`** - installs Python and runs the tunnel script:
+
+```bash title="app/start.sh"
+#!/bin/sh
+
+apt-get update
+apt-get install -y python3 python3-cryptography
+
+python3 "$(dirname "$0")/tunnel.py"
+```
+
+**`app/tunnel.py`** - generates a P-256 identity key and opens the tunnel via the bridge socket:
+
+```python title="app/tunnel.py"
+import base64
+import json
+import os
+import socket
+import time
+
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import ec
+
+DOMAIN_SUFFIX = "tunnel.example.com"
+TUNNEL_RELAYS = ["relay-2.canary.acurast.com:4433"]
+LOCAL_ADDR = "127.0.0.1:8080"   # point at your local service
+
+BRIDGE_SOCKET = os.environ["BRIDGE_SOCKET"]
+
+
+def rpc(method, params):
+    req = {"jsonrpc": "2.0", "method": method, "params": params, "id": 1}
+    s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    s.connect("\0" + BRIDGE_SOCKET)
+    s.sendall((json.dumps(req) + "\n").encode())
+    line = s.makefile("rb").readline()
+    s.close()
+    resp = json.loads(line)
+    if "error" in resp:
+        raise RuntimeError(resp["error"])
+    return resp["result"]
+
+
+def primary_key_b64():
+    """Generate a P-256 keypair as base64-encoded PKCS#8 DER.
+
+    Persist the bytes to disk and reload on subsequent starts to keep the
+    same `clientId` (and skip re-running ACME).
+    """
+    key = ec.generate_private_key(ec.SECP256R1())
+    pkcs8 = key.private_bytes(
+        encoding=serialization.Encoding.DER,
+        format=serialization.PrivateFormat.PKCS8,
+        encryption_algorithm=serialization.NoEncryption(),
+    )
+    return base64.b64encode(pkcs8).decode("ascii")
+
+
+info = rpc("tunnel_start", [{
+    "serverAddrs": TUNNEL_RELAYS,
+    "domainSuffix": DOMAIN_SUFFIX,
+    "localAddr": LOCAL_ADDR,
+    "primaryKey": {"algorithm": "Secp256r1", "bytes": primary_key_b64()},
+    "acmeStaging": False,
+}])
+print(f"Tunnel ready at: {info['url']}")
+
+# Keep the process alive while the tunnel is up.
+while True:
+    time.sleep(30)
+```
+
+For an end-to-end reference (dropbear SSH + callback events + cert reuse) see **[acurast-tunnel-proot ↗](https://github.com/Acurast/acurast-tunnel-proot)**.
+
+Full tunnel API reference: **[Cargo Runtime Environment - Tunnel](/developers/build/cargo-runtime-environment#tunnel)**.
+
+  </TabItem>
+</Tabs>
+
+---
+
+## Step 4 - Configure `acurast.json`
+
+<Tabs groupId="tunnel-runtime">
+  <TabItem value="nodejs" label="Node.js" default>
+
+```json title="acurast.json"
+{
+  "projects": {
+    "my-tunnel-app": {
+      "projectName": "my-tunnel-app",
+      "fileUrl": "index.js",
+      "entrypoint": "index.js",
+      "runtime": "NodeJS",
+      "network": "canary",
+      "minProcessorVersions": {
+        "android": "122"
+      },
+      ...
+    }
+  }
+}
+```
+
+  </TabItem>
+  <TabItem value="cargo" label="Cargo">
+
+```json title="acurast.json"
+{
+  "projects": {
+    "cargo-tunnel": {
+      "projectName": "cargo-tunnel",
+      "fileUrl": "app",
+      "entrypoint": "start.sh",
+      "runtime": "Shell",
+      "image": {
+        "url": "https://github.com/termux/proot-distro/releases/download/v4.30.1/ubuntu-questing-aarch64-pd-v4.30.1.tar.xz",
+        "sha256": "5ab35b90cd9a9f180656261ba400a135c4c01c2da4b74522118342f985c2d328"
+      },
+      "network": "canary",
+      "requiredModules": ["Shell"],
+      "minProcessorVersions": {
+        "android": "122"
+      },
+      ...
+    }
+  }
+}
+```
+
+  </TabItem>
+</Tabs>
+
+For all other fields, see the **[CLI configuration reference](/developers/tools/cli#configuration-fields)**.
+
+---
+
+## Step 5 - Deploy
+
+```bash
+acurast deploy
+```
+
+The CLI uploads your app to IPFS and registers the deployment on-chain. The processor pulls it down, starts your app, and the app opens the tunnel.
+
+Monitor your deployment:
+
+```bash
+acurast deployments ls
+```
+
+---
+
+## Step 6 - Connect
+
+Once the deployment logs print `Tunnel ready at: https://<clientId>.tunnel.example.com:8443`, connect from anywhere.
+
+For HTTP/HTTPS services:
+
+```bash
+curl https://<clientId>.tunnel.example.com:8443/
+```
+
+Add `-k` while testing on Canary (the certificate is issued from Let's Encrypt staging, which is not in the default trust store). Mainnet uses Let's Encrypt production.
+
+The tunnel does TLS pass-through, so any protocol you can wrap in TLS works. For raw-TCP services like SSH, prefix with `openssl s_client` as a `ProxyCommand`:
+
+```bash
+ssh -o ProxyCommand='openssl s_client -quiet \
+  -servername <clientId>.tunnel.example.com \
+  -connect <clientId>.tunnel.example.com:8443' \
+  root@<clientId>
+```
+
+---
+
+## Next steps
+
+- **[Node.js Tunnel API reference](/developers/build/nodejs-runtime-environment#tunnel)** - full `_STD_.tunnel.*` surface.
+- **[Cargo Tunnel API reference](/developers/build/cargo-runtime-environment#tunnel)** - full JSON-RPC surface.
+- **[Example NodeJS deployment ↗](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-tunnel/nodejs)** - NodeJS reference with leader election + cert reuse.
+- **[Example Cargo deployment ↗](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-tunnel/cargo)** - Cargo reference with dropbear SSH + callback events.
+- **[Deployment Config](/developers/build/deployment-config)** - complete `acurast.json` reference.

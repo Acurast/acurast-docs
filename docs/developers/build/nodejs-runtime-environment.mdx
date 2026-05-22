@@ -465,6 +465,134 @@ type P2PStreamWrite = (bytes) => Promise<void>;
 type P2PStreamClose = () => Promise<void>;
 ```
 
+### **Tunnel**
+
+Exposes the deployment's reverse tunnel to job scripts. The tunnel forwards inbound TLS connections (terminated at `https://<clientId>.<domainSuffix>:8443`) to a local address inside the deployment. See [Tunnel quick start](https://github.com/Acurast/quic-tunnel/blob/main/QUICKSTART.md) for the DNS records that must be in place on `<domainSuffix>` before calling `start`.
+
+```javascript
+/**
+ * Opens the deployment's reverse tunnel. Only one tunnel may be active per
+ * deployment; calling `start` again before `stop` results in an error.
+ * 
+ * @since Android 1.26.0
+ *
+ * @param {TunnelSpec} spec the tunnel configuration.
+ * @param {TunnelStartSuccess} success the success callback, invoked with the tunnel info.
+ * @param {TunnelError} error the error callback.
+ */
+_STD_.tunnel.start(spec, success, error);
+
+/**
+ * Closes the active tunnel. The cached ACME credentials and certificate are
+ * preserved on disk so a subsequent `start` with the same identity reuses them.
+ * 
+ * @since Android 1.26.0
+ *
+ * @param {TunnelSuccess} success the success callback.
+ * @param {TunnelError} error the error callback.
+ */
+_STD_.tunnel.stop(success, error);
+
+/**
+ * Returns the tunnel status ordinal:
+ *   0 = Starting, 1 = Running, 2 = Stopped, 3 = Failed, -1 = no tunnel active.
+ * 
+ * @since Android 1.26.0
+ *
+ * @param {TunnelStatusSuccess} success the success callback.
+ * @param {TunnelError} error the error callback.
+ */
+_STD_.tunnel.status(success, error);
+
+/**
+ * Returns the PEM-encoded full certificate chain currently issued for the
+ * tunnel, or `null` if no certificate has been issued yet (or no tunnel is
+ * active). Persist this value and pass it back via `spec.certPem` on the
+ * next `start` to skip the ACME flow.
+ * 
+ * @since Android 1.26.0
+ *
+ * @param {TunnelCertPemSuccess} success the success callback.
+ * @param {TunnelError} error the error callback.
+ */
+_STD_.tunnel.certPem(success, error);
+
+/**
+ * @typedef TunnelSpec
+ * @property {string[]} serverAddrs one or more `host:port` relay endpoints.
+ * @property {string} domainSuffix DNS suffix you control; must satisfy the DNS prerequisites.
+ * @property {string} localAddr local `host:port` to forward decrypted traffic to.
+ * @property {TunnelPrimaryKey} primaryKey identity key material for the tunnel.
+ * @property {boolean} [acmeStaging=false] use the Let's Encrypt staging environment.
+ * @property {string} [acmeEmail] account contact email for Let's Encrypt.
+ * @property {string} [certPem] pre-supplied full-chain PEM; when set, ACME is skipped.
+ * @property {boolean} [forceH2=false] skip QUIC and use the HTTP/2 fallback pool.
+ * @property {number} [poolSize=4] H2 connection pool size when `forceH2` is on.
+ */
+type TunnelSpec = {
+    serverAddrs: string[],
+    domainSuffix: string,
+    localAddr: string,
+    primaryKey: TunnelPrimaryKey,
+    acmeStaging?: boolean,
+    acmeEmail?: string,
+    certPem?: string,
+    forceH2?: boolean,
+    poolSize?: number,
+};
+
+/**
+ * @typedef TunnelPrimaryKey
+ * @property {'Secp256r1'} algorithm the curve used. Only P-256 is accepted;
+ *   the relay rejects other algorithms at start time.
+ * @property {string} bytes base64-encoded PKCS#8 DER private key (no wrap).
+ */
+type TunnelPrimaryKey = { algorithm: 'Secp256r1', bytes: string };
+
+/**
+ * @typedef TunnelInfo
+ * @property {string} url public URL of the form `https://<clientId>.<domainSuffix>:8443`.
+ * @property {string} clientId the deployment's tunnel identifier.
+ * @property {string} [secondaryUrl] optional secondary tunnel URL.
+ * @property {string} [secondaryClientId] optional secondary tunnel identifier.
+ */
+type TunnelInfo = {
+    url: string,
+    clientId: string,
+    secondaryUrl?: string,
+    secondaryClientId?: string,
+};
+
+/**
+ * @callback TunnelSuccess
+ */
+type TunnelSuccess = () => void;
+
+/**
+ * @callback TunnelStartSuccess
+ * @param {TunnelInfo} info the started tunnel's connection info.
+ */
+type TunnelStartSuccess = (info) => void;
+
+/**
+ * @callback TunnelStatusSuccess
+ * @param {number} status the status ordinal (see above).
+ */
+type TunnelStatusSuccess = (status) => void;
+
+/**
+ * @callback TunnelCertPemSuccess
+ * @param {string | null} pem PEM-encoded cert chain, or `null` if none issued yet.
+ */
+type TunnelCertPemSuccess = (pem) => void;
+
+/**
+ * @callback TunnelError
+ * @param {string} message an error message.
+ */
+type TunnelError = (message) => void;
+```
+
 ### **WebView**
 ```javascript
 /**
