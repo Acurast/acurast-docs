@@ -30,7 +30,7 @@ const sidebars = {
             "developers/deploy-first-app",
             "developers/getting-started/examples",
             "developers/getting-started/quickstart-cargo",
-            // "developers/getting-started/quickstart-tunnel",
+            "developers/getting-started/quickstart-tunnel",
           ],
         },
         {
