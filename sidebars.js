@@ -57,28 +57,6 @@ const sidebars = {
             "developers/tools/deploy-agent",
           ],
         },
-        {
-          type: "category",
-          label: "Reference",
-          collapsed: true,
-          items: [
-            {
-              type: "link",
-              label: "Protocol Architecture",
-              href: "/acurast-protocol/architecture/architecture",
-            },
-            {
-              type: "link",
-              label: "Networks",
-              href: "/acurast-protocol/networks",
-            },
-            {
-              type: "link",
-              label: "Ecosystems & Integrations",
-              href: "/acurast-protocol/integrations",
-            },
-          ],
-        },
       ],
     },
     {
@@ -180,11 +158,6 @@ const sidebars = {
         "investors/metrics",
         {
           type: "link",
-          label: "Use Cases & Ecosystems",
-          href: "/acurast-protocol/integrations",
-        },
-        {
-          type: "link",
           label: "Audits",
           href: "/acurast-protocol/audits",
         },
@@ -223,7 +196,6 @@ const sidebars = {
         "acurast-protocol/governance",
         "acurast-protocol/deployment-pricing",
         "acurast-protocol/networks",
-        "acurast-protocol/integrations",
         "acurast-protocol/audits",
         "acurast-protocol/whitepapers",
         {

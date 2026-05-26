@@ -117,10 +117,6 @@ const config = {
                 label: "Compute Providers",
                 to: "/processors",
               },
-              {
-                label: "Integrations",
-                to: "/acurast-protocol/integrations",
-              },
             ],
           },
           {
@@ -278,26 +274,6 @@ const config = {
             from: "/developers/get-started",
           },
           {
-            to: "/acurast-protocol/integrations",
-            from: "/integrations/evm",
-          },
-          {
-            to: "/acurast-protocol/integrations",
-            from: "/integrations/substrate-wasm",
-          },
-          {
-            to: "/acurast-protocol/integrations",
-            from: "/integrations/substrate",
-          },
-          {
-            to: "/acurast-protocol/integrations",
-            from: "/integrations/tezos",
-          },
-          {
-            to: "/acurast-protocol/integrations",
-            from: "/integrations/introduction",
-          },
-          {
             to: "/token-holders/staking/overview",
             from: "/staked-compute",
           },
@@ -309,7 +285,6 @@ const config = {
           { to: "/token-holders/claiming-acu", from: "/token/claiming-acu" },
           { to: "/acurast-protocol/audits", from: "/audits" },
           { to: "/acurast-protocol/whitepapers", from: "/whitepapers" },
-          { to: "/acurast-protocol/integrations", from: "/integrations" },
           { to: "/acurast-protocol/networks", from: "/networks" },
           { to: "/token-holders/wallets/wallet-overview", from: "/wallets/wallet-overview" },
           { to: "/token-holders/wallets/wallets-airgap", from: "/wallets/wallets-airgap" },
