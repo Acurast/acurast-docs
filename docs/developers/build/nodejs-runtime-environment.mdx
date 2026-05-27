@@ -467,7 +467,7 @@ type P2PStreamClose = () => Promise<void>;
 
 ### **Tunnel**
 
-Exposes the deployment's reverse tunnel to job scripts. The tunnel forwards inbound TLS connections (terminated at `https://<clientId>.<domainSuffix>:8443`) to a local address inside the deployment. See [Tunnel quick start](https://github.com/Acurast/quic-tunnel/blob/main/QUICKSTART.md) for the DNS records that must be in place on `<domainSuffix>` before calling `start`.
+Exposes the deployment's reverse tunnel to job scripts. The tunnel forwards inbound TLS connections (terminated at `https://<clientId>.<domainSuffix>:8443`) to a local address inside the deployment. See [Tunnel quick start](/developers/getting-started/quickstart-tunnel) for the DNS records that must be in place on `<domainSuffix>` before calling `start`.
 
 ```javascript
 /**
