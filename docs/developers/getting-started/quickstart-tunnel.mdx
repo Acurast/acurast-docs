@@ -70,15 +70,34 @@ This creates `acurast.json` (deployment config) and `.env` (secrets). See the **
 
 ## Step 2 - Configure DNS
 
-Pick a subdomain you control (`tunnel.example.com` in the examples below) and add two records at your DNS provider.
+Pick a subdomain you control (`tunnel.example.com` in the examples below) and add records at your DNS provider.
 
-### Record 1 - wildcard pointing at the relay
+The domain needs to point to one or more relay nodes:
 
-The public URL of every deployment is `https://<clientId>.<yourDomainSuffix>:8443`. The wildcard makes any `<clientId>` resolve to the relay:
+<Tabs groupId="tunnel-relays">
+  <TabItem value="nodejs" label="Canary" default>
+
+| Domain | IP |
+| --- | --- |
+| relay-2.canary.acurast.com | 57.129.64.128 |
+| canary-relay.5elementsnodes.com | 176.9.45.137 |
+| acurast-canary-relay.dishich.com | 82.154.208.246 |
+| relay.el9-acurast.com | 213.136.88.18 |
+| canary-relay.vincent-acurast.xyz | 213.136.90.239 |
+| canary-relay.acurast.online | 107.172.233.226 |
+  
+  </TabItem>
+</Tabs>
+
+
+### Record 1 - wildcard pointing at the relays
+
+The public URL of every deployment is `https://<clientId>.<yourDomainSuffix>:8443`. The wildcard makes any `<clientId>` resolve to the relays:
 
 ```
-*.tunnel.example.com.   CNAME   relay-2.canary.acurast.com.
-*.tunnel.example.com.   CNAME   ...
+*.tunnel.example.com.   A   57.129.64.128
+*.tunnel.example.com.   A   176.9.45.137
+*.tunnel.example.com.   A   ...
 ```
 
 ### Record 2 - TXT record proving deployer ownership
@@ -116,7 +135,14 @@ The Node.js runtime exposes the tunnel via `_STD_.tunnel.*` global callbacks. Th
 const http = require('http');
 
 const DOMAIN_SUFFIX = 'tunnel.example.com';
-const TUNNEL_RELAYS = ['relay-2.canary.acurast.com:4433'];
+const TUNNEL_RELAYS = [
+  'relay-2.canary.acurast.com:4433', 
+  'canary-relay.5elementsnodes.com:4433', 
+  'acurast-canary-relay.dishich.com:4433', 
+  'relay.el9-acurast.com:4433', 
+  'canary-relay.vincent-acurast.xyz:4433', 
+  'canary-relay.acurast.online:4433',
+];
 const LOCAL_ADDR = '127.0.0.1:3000';
 
 // Generate or load a P-256 identity key as base64-encoded PKCS#8 DER.
@@ -186,7 +212,14 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 
 DOMAIN_SUFFIX = "tunnel.example.com"
-TUNNEL_RELAYS = ["relay-2.canary.acurast.com:4433"]
+TUNNEL_RELAYS = [
+  "relay-2.canary.acurast.com:4433", 
+  "canary-relay.5elementsnodes.com:4433", 
+  "acurast-canary-relay.dishich.com:4433", 
+  "relay.el9-acurast.com:4433", 
+  "canary-relay.vincent-acurast.xyz:4433", 
+  "canary-relay.acurast.online:4433",
+]
 LOCAL_ADDR = "127.0.0.1:8080"   # point at your local service
 
 BRIDGE_SOCKET = os.environ["BRIDGE_SOCKET"]
@@ -240,6 +273,10 @@ Full tunnel API reference: **[Cargo Runtime Environment - Tunnel](/developers/bu
 
   </TabItem>
 </Tabs>
+
+:::note
+The TUNNEL_RELAYS list needs to correspond to the DNS records configured on [Step 2](#step-2---configure-dns)
+:::
 
 ---
 
