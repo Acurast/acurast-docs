@@ -150,12 +150,12 @@ const sidebars = {
       type: "category",
       label: "Discover Acurast",
       collapsed: true,
-      link: { type: "doc", id: "investors/hub" },
+      link: { type: "doc", id: "discover/hub" },
       items: [
-        "investors/acurast-token",
-        "investors/tokenomics",
-        "investors/roadmap",
-        "investors/metrics",
+        "discover/acurast-token",
+        "discover/tokenomics",
+        "discover/roadmap",
+        "discover/metrics",
         {
           type: "link",
           label: "Audits",
