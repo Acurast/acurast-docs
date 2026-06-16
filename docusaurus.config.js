@@ -242,12 +242,12 @@ const config = {
             from: "/developers/build/runtime-environment",
           },
           {
-            to: "/developers/build/on-demand-deployments",
-            from: "/developers/on-demand-jobs",
-          },
-          {
-            to: "/developers/build/on-demand-deployments",
-            from: "/developers/on-demand-deployments",
+            to: "/developers",
+            from: [
+              "/developers/build/on-demand-deployments",
+              "/developers/on-demand-jobs",
+              "/developers/on-demand-deployments",
+            ],
           },
           {
             to: "/developers/build/llm-on-acurast",
