@@ -10,7 +10,7 @@ import TabItem from '@theme/TabItem';
 
 ## Deploying a node with the Acurast Tunnel service
 
-This document walks through running an Acurast Canary Node with the built-in Acurast
+This document walks through running an Acurast Node with the built-in Acurast
 Tunnel service enabled. It is self-contained: every CLI flag, port, cert mode,
 and proxy rule needed to bring a tunnel enabled node is described inline.
 
@@ -37,7 +37,7 @@ P-256 public key appears in that assignment's `pub_keys`.
 
 ### Prerequisites
 
-- A running Acurast Canary Node, see [Node Setup](./node-setup).
+- A running Acurast Node, see [Node Setup](./node-setup).
 - DNS A record for the relay hostname (e.g. `relay.acurast.example.com`)
   pointing at the host's public IP.
 - TCP port 443 reachable from the public internet, with **no TLS terminator**
@@ -75,7 +75,20 @@ All flags below take effect only when `--tunnel` is also set.
 
 ## Docker Compose deployment
 
-Use the `acurast/node-canary:acurast-v0.26.2` docker image.
+Use the following docker image:
+
+<Tabs groupId="tunnel-docker-image">
+  <TabItem value="mainnet" label="Mainnet" default>
+
+  `acurast/node-mainnet:acurast-v0.26.2`
+  
+  </TabItem>
+  <TabItem value="canary" label="Canary">
+
+  `acurast/node-canary:acurast-v0.26.2`
+
+  </TabItem>
+</Tabs>
 
 An example `docker-compose.yml` for a Acurast Tunnel enabled deployment:
 
@@ -131,7 +144,7 @@ services:
 ```yaml
 services:
   node:
-    image: acurast/node-canary:acurast-v0.26.0
+    image: acurast/node-canary:acurast-v0.26.2
     restart: always
     command: "--chain /node/chain-specs/acurast-kusama-parachain-2239-raw.json \
       --base-path /node/data \
