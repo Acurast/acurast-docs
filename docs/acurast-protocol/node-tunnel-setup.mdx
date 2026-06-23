@@ -1,10 +1,12 @@
 ---
-title: Node Tunnel Setup (Canary Preview)
+title: Node Tunnel Setup
 slug: /acurast-protocol/node-tunnel-setup
 ---
 
 import ThemedImage from "@theme/ThemedImage";
 import useBaseUrl from "@docusaurus/useBaseUrl";
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 ## Deploying a node with the Acurast Tunnel service
 
@@ -26,8 +28,7 @@ The server owns **four ports**:
 | --- | --- | --- |
 | `4433`         | UDP (QUIC) | Processor (agent) connections — primary |
 | `4433`         | TCP (HTTP/2 + TLS) | Processor connections — fallback when QUIC is blocked |
-| `8443`         | TCP | Public end-user connections (SNI-routed to a registered agent) |
-| `443`          | TCP | ACME TLS-ALPN-01 challenge port |
+| `443`          | TCP | ACME TLS-ALPN-01 challenge port and Public end-user connections (SNI-routed to a registered agent) |
 
 Auth is bound to on-chain state: a client is accepted only if its mTLS cert
 carries an `(AcurastJobId, processor_id)` extension that resolves to a valid
@@ -52,8 +53,7 @@ All flags below take effect only when `--tunnel` is also set.
 | `--tunnel` | _off_ | Enable the integrated tunnel server. Required for any other `--tunnel-*` flag to take effect. |
 | `--tunnel-bind-addr <ADDR>` | `0.0.0.0` | IP the tunnel listeners bind to. |
 | `--tunnel-api-port <PORT>` | `4433` | QUIC (UDP) + HTTP/2-over-TLS (TCP) port for processor (agent) connections. |
-| `--tunnel-pub-port <PORT>` | `8443` | Public TCP port for end user connections. The server peeks SNI and routes raw bytes to a registered agent. |
-| `--tunnel-alpn-port <PORT>` | `443` | TLS-ALPN-01 challenge port. **Must be reachable as port 443** (or have port 443 stream proxied to it, _not_ TLS terminated). |
+| `--tunnel-port <PORT>` | `443` | TLS-ALPN-01 challenge port. **Must be reachable as port 443** (or have port 443 stream proxied to it, _not_ TLS terminated). Also, public TCP port for end user connections. The server peeks SNI and routes raw bytes to a registered agent. |
 | `--tunnel-cert-path <PATH>` | _none_ | Path to the server's PEM certificate chain. This is where the provisioned cert is written and re-read. |
 | `--tunnel-key-path <PATH>` | _none_ | Path to the PEM private key matching `--tunnel-cert-path`. |
 | `--tunnel-acme-domain <DOMAIN>` | _none_ | Domain to provision via ACME TLS-ALPN-01 (e.g. `relay.example.com`). |
@@ -64,21 +64,69 @@ All flags below take effect only when `--tunnel` is also set.
 
 | Listener | Port flag | Behavior |
 | --- | --- | --- |
-| **ALPN**     | `--tunnel-alpn-port` (TCP) | Peeks SNI. If the SNI matches the server's own ACME challenge domain, completes the TLS-ALPN-01 challenge locally; otherwise proxies bytes through the registered tunnel client (so the client can complete _its own_ ACME challenge). |
+| **ALPN**, **Public**     | `--tunnel-port` (TCP) | Peeks SNI. If the SNI matches the server's own ACME challenge domain, completes the TLS-ALPN-01 challenge locally; otherwise proxies bytes through the registered tunnel client (so the client can complete _its own_ ACME challenge). Also, accepts raw TCP from end users, SNI routed to a registered agent. |
 | **QUIC**     | `--tunnel-api-port` (UDP) | Accepts QUIC connections from agents. |
 | **H2 + TLS** | `--tunnel-api-port` (TCP) | Accepts HTTP/2-over-TLS connections from agents (used when QUIC is blocked). |
-| **Public**   | `--tunnel-pub-port` (TCP) | Accepts raw TCP from end users, SNI routed to a registered agent. |
 
-> If `--tunnel-alpn-port` is not 443, port 443 must be forwarded to it via a
+> If `--tunnel-port` is not 443, port 443 must be forwarded to it via a
 > **TCP stream proxy** (e.g. nginx `stream {}` module). A TLS-terminating
 > proxy (nginx `http {}`) will break the ACME challenge and end-user tunnel
 > TLS.
 
 ## Docker Compose deployment
 
-Use the `acurast/node-canary:acurast-v0.26.0` docker image.
+Use the `acurast/node-canary:acurast-v0.26.2` docker image.
 
 An example `docker-compose.yml` for a Acurast Tunnel enabled deployment:
+
+<Tabs groupId="tunnel-docker-compose">
+  <TabItem value="mainnet" label="Mainnet" default>
+
+```yaml
+services:
+  node:
+    image: acurast/node-mainnet:acurast-v0.26.2
+    restart: always
+    command: "--chain /node/chain-specs/acurast-mainnet-parachain-3396-raw.json \
+      --base-path /node/data \
+      --bootnodes /ip4/82.220.91.112/tcp/30335/ws/p2p/12D3KooWMJM3htCon6tQ6FzRuWkxtwEkd3i5awZitdTviWwJX3KY \
+      --port 30334 \
+      --rpc-port 9934 \
+      --rpc-external \
+      --rpc-methods safe \
+      --rpc-cors all \
+      --name MyNode \ # choose an appropriate name here
+      --telemetry-url \"wss://telemetry.polkadot.io/submit/ 0\" \
+      --database=rocksdb \
+      --pruning=archive \
+      --tunnel \
+      --tunnel-acme-domain relay.acurast.example.com \
+      --tunnel-cert-path /node/acme/server_cert.pem \
+      --tunnel-key-path  /node/acme/server.key \
+      --tunnel-acme-creds-path /node/acme/server_acme_creds.json"
+    ports:
+      # Substrate p2p
+      - '30334:30334'
+      # JSON-RPC
+      - '9934:9934'
+      # Tunnel: processor API (QUIC needs UDP; H2 fallback is TCP)
+      - '4433:4433/tcp'
+      - '4433:4433/udp'
+      # Tunnel: ACME TLS-ALPN-01 — published as host :443 when the node owns 443.
+      # Behind an nginx reverse proxy, publish a different host port (e.g. 6443)
+      # and let nginx own 443 (see the next section).
+      - '443:443'
+    volumes:
+      # Chain data + certs in a single project-relative directory.
+      - ./:/node
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+```
+
+  </TabItem>
+  <TabItem value="canary" label="Canary">
 
 ```yaml
 services:
@@ -110,8 +158,6 @@ services:
       # Tunnel: processor API (QUIC needs UDP; H2 fallback is TCP)
       - '4433:4433/tcp'
       - '4433:4433/udp'
-      # Tunnel: public end-user port
-      - '8443:8443'
       # Tunnel: ACME TLS-ALPN-01 — published as host :443 when the node owns 443.
       # Behind an nginx reverse proxy, publish a different host port (e.g. 6443)
       # and let nginx own 443 (see the next section).
@@ -124,6 +170,8 @@ services:
         max-size: "10m"
         max-file: "3"
 ```
+  </TabItem>
+</Tabs>
 
 ### Volume layout
 
