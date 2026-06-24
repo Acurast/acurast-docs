@@ -1,5 +1,5 @@
 ---
-title: Quickstart - Tunnel (Canary Preview)
+title: Quickstart - Tunnel
 slug: /developers/getting-started/quickstart-tunnel
 ---
 
@@ -9,13 +9,13 @@ import TabItem from '@theme/TabItem';
 The Acurast reverse tunnel exposes a service running inside a deployment to the public internet, without the processor needing an inbound public IP or open ports. 
 The processor only makes **outbound** connections to a relay node, the relay then routes incoming traffic from external users back to the processor.
 
-Once the tunnel is up, the deployment is reachable at `https://<clientId>.<yourDomainSuffix>:8443` with a valid Let's Encrypt certificate provisioned automatically.
+Once the tunnel is up, the deployment is reachable at `https://<clientId>.<yourDomainSuffix>` with a valid Let's Encrypt certificate provisioned automatically.
 
 ## Prerequisites
 
-### A Canary Android Core processor
+### A Android Core processor
 
-Tunnel deployments require Processor version 1.26.0-rc1 on Canary.
+Tunnel deployments require Processor version 1.26.0.
 
 Full guide: **[Become a Compute Provider](/processors/become-compute-provider)**.
 
@@ -29,7 +29,7 @@ npm install -g @acurast/cli
 
 ### ACU balance
 
-Tunnel deployments require cACU to cover execution costs. On **Canary**, claim free cACU from the **[faucet ↗](https://faucet.acurast.com)**.
+Tunnel deployments require ACU / cACU to cover execution costs. On **Canary**, claim free cACU from the **[faucet ↗](https://faucet.acurast.com)**.
 
 ### A DNS suffix you control
 
@@ -75,7 +75,14 @@ Pick a subdomain you control (`tunnel.example.com` in the examples below) and ad
 The domain needs to point to one or more relay nodes:
 
 <Tabs groupId="tunnel-relays">
-  <TabItem value="nodejs" label="Canary" default>
+  <TabItem value="mainnet" label="Mainnet" default>
+
+| Domain | IP |
+| --- | --- |
+| relay-1.mainnet.acurast.com | 82.220.91.110 |
+  
+  </TabItem>
+  <TabItem value="canary" label="Canary">
 
 | Domain | IP |
 | --- | --- |
@@ -92,11 +99,11 @@ The domain needs to point to one or more relay nodes:
 
 ### Record 1 - wildcard pointing at the relays
 
-The public URL of every deployment is `https://<clientId>.<yourDomainSuffix>:8443`. The wildcard makes any `<clientId>` resolve to the relays:
+The public URL of every deployment is `https://<clientId>.<yourDomainSuffix>`. The wildcard makes any `<clientId>` resolve to the relays:
 
 ```
-*.tunnel.example.com.   A   57.129.64.128
-*.tunnel.example.com.   A   176.9.45.137
+*.tunnel.example.com.   A   82.220.91.110
+*.tunnel.example.com.   A   ...
 *.tunnel.example.com.   A   ...
 ```
 
@@ -129,7 +136,7 @@ Your app opens the tunnel by calling `tunnel.start(spec)` with the relay address
 <Tabs groupId="tunnel-runtime">
   <TabItem value="nodejs" label="Node.js" default>
 
-The Node.js runtime exposes the tunnel via `_STD_.tunnel.*` global callbacks. The example below starts a small HTTP server on `127.0.0.1:3000` and asks the tunnel to forward `https://<clientId>.tunnel.example.com:8443` to it.
+The Node.js runtime exposes the tunnel via `_STD_.tunnel.*` global callbacks. The example below starts a small HTTP server on `127.0.0.1:3000` and asks the tunnel to forward `https://<clientId>.tunnel.example.com` to it.
 
 ```javascript title="index.js"
 const http = require('http');
@@ -185,7 +192,7 @@ Full tunnel API reference: **[Node.js Runtime Environment - Tunnel](/developers/
 The Cargo runtime exposes the tunnel via a JSON-RPC bridge on the abstract Unix socket named in `$BRIDGE_SOCKET`. The example below opens the tunnel from Python and points it at whatever local service you choose to run alongside it.
 
 :::info
-Privileged ports (`< 1024`) cannot be bound inside the PRoot sandbox. Use ports >= 1024 for your local service. The public-facing port is always `8443`.
+Privileged ports (`< 1024`) cannot be bound inside the PRoot sandbox. Use ports >= 1024 for your local service. The public-facing port is always `443`.
 :::
 
 **`app/start.sh`** - installs Python and runs the tunnel script:
@@ -295,7 +302,7 @@ The TUNNEL_RELAYS list needs to correspond to the DNS records configured on [Ste
       "runtime": "NodeJS",
       "network": "canary",
       "minProcessorVersions": {
-        "android": "122"
+        "android": "1.26.0"
       },
       ...
     }
@@ -321,7 +328,7 @@ The TUNNEL_RELAYS list needs to correspond to the DNS records configured on [Ste
       "network": "canary",
       "requiredModules": ["Shell"],
       "minProcessorVersions": {
-        "android": "122"
+        "android": "1.26.0"
       },
       ...
     }
@@ -359,17 +366,15 @@ Once the deployment logs print `Tunnel ready at: https://<clientId>.tunnel.examp
 For HTTP/HTTPS services:
 
 ```bash
-curl https://<clientId>.tunnel.example.com:8443/
+curl https://<clientId>.tunnel.example.com
 ```
-
-Add `-k` while testing on Canary (the certificate is issued from Let's Encrypt staging, which is not in the default trust store). Mainnet uses Let's Encrypt production.
 
 The tunnel does TLS pass-through, so any protocol you can wrap in TLS works. For raw-TCP services like SSH, prefix with `openssl s_client` as a `ProxyCommand`:
 
 ```bash
 ssh -o ProxyCommand='openssl s_client -quiet \
   -servername <clientId>.tunnel.example.com \
-  -connect <clientId>.tunnel.example.com:8443' \
+  -connect <clientId>.tunnel.example.com:443' \
   root@<clientId>
 ```
 
