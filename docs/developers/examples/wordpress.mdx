@@ -1,0 +1,131 @@
+---
+title: "Host a WordPress Site on Acurast"
+slug: /developers/examples/wordpress
+description: "Run a full WordPress stack (Apache, PHP, MariaDB) on an Acurast processor, served at a public HTTPS URL over the Acurast tunnel."
+---
+
+# Host a WordPress Site on Acurast
+
+This example runs a full **WordPress** stack — Apache + PHP + MariaDB — inside an
+Acurast Cargo deployment and publishes it over the Acurast Tunnel:
+
+- the **primary** connection serves Apache/WordPress at a real HTTPS URL, and
+- the **secondary** connection carries **SSH** for shell access to the deployment.
+
+## 1. Get the repo and open the example
+
+```bash
+git clone https://github.com/Acurast/acurast-example-apps.git
+cd acurast-example-apps/apps/app-cargo-wordpress
+```
+
+## 2. What's in the `app/` folder
+
+| File | Purpose |
+| --- | --- |
+| `start.sh` | Entrypoint. Installs Apache, PHP, MariaDB and Dropbear; builds the `getifaddrs` shim; initializes MariaDB and creates the DB/user; downloads WordPress core; starts Apache on `127.0.0.1:8080` and SSH on `127.0.0.1:2222`. |
+| `wp-config.php` | WordPress config: takes DB creds from the environment and derives `WP_HOME`/`WP_SITEURL` from the request host, so it works at whatever tunnel URL it lands on. Trusts `X-Forwarded-Proto` so WordPress builds `https://` URLs. |
+| `tunnel.py` | Opens the reverse tunnel — primary → WordPress (`8080`), secondary → SSH (`2222`). |
+| `getifaddrs_override.c` | PRoot shim. |
+| `callback.sh` | POSTs `log` / `started` / `error` events to your `CALLBACK_URL`. |
+
+## 3. Prerequisite: a domain suffix you control
+
+The tunnel needs a DNS suffix with a wildcard record and an `_acu` TXT record — a
+one-time setup covered by the
+[Tunnel Quick Start](/developers/getting-started/quickstart-tunnel)
+(step 2). Here it's `tunnel.acurast.dev`.
+
+## 4. Configure `.env`
+
+```bash
+cp .env.example .env
+```
+
+| Variable | Required | What to set |
+| --- | --- | --- |
+| `ACURAST_MNEMONIC` | ✅ | Deployer seed phrase. **Never commit it.** |
+| `NETWORK` | ✅ | `canary` or `mainnet`. Must match `acurast.json`. |
+| `DOMAIN_SUFFIX_MAINNET` / `_CANARY` | ✅ (active one) | Your tunnel DNS suffix. Set only the one matching `NETWORK`. |
+| `SSH_PASSWORD` | optional | Root SSH password. Defaults to `password` — set a strong value. |
+| `WORDPRESS_DB_NAME` / `_USER` / `_PASSWORD` | optional | Database created on first start. Set strong values. |
+| `CALLBACK_URL` | optional | Lifecycle-event webhook. **Use [webhook.watch](https://webhook.watch).** |
+
+### Getting a `CALLBACK_URL` from webhook.watch
+
+Open [webhook.watch](https://webhook.watch), grab the unique inspector URL, and
+paste it into `CALLBACK_URL`. The `started` event that arrives there carries the
+public WordPress URL and the SSH connect command.
+
+![Editing the .env: WORDPRESS_DB_* credentials, SSH_PASSWORD, CALLBACK_URL (webhook.watch)](images/wordpress/01-env.png)
+
+## 5. A glance at `acurast.json`
+
+- `runtime: "Shell"` on a `proot-distro` Ubuntu image.
+- `execution`: `onetime`, `maxExecutionTimeInMs: 7200000` (2-hour window).
+- `minProcessorVersions.android: "1.26.0"` (tunnel support).
+- `includeEnvironmentVariables`: `CALLBACK_URL`, `SSH_PASSWORD`,
+  `DOMAIN_SUFFIX_MAINNET`, `NETWORK`, `WORDPRESS_DB_NAME/USER/PASSWORD`.
+
+## 6. Deploy
+
+```bash
+npm i
+npm run deploy   # runs `acurast deploy`
+```
+
+The CLI shows the reward market and a **suggested price** — accept it and confirm.
+
+![`acurast deploy` — accept the suggested fee](images/wordpress/02-deploy-fee.png)
+
+Then watch webhook.watch. The install is heavier than the plain tunnel (Apache,
+PHP, MariaDB, WordPress core), so you'll see a run of `log` events first…
+
+![webhook.watch showing an install `log` event (Phase 1: installing SSH + tunnel deps)](images/wordpress/03-webhook-log.png)
+
+…and finally the `started` event with the public URL and SSH command.
+
+![The `started` event: WordPress reverse tunnel is up, public URL delivered](images/wordpress/04-webhook-started.png)
+
+---
+
+## Part 2 — Setting up the site
+
+### Run the install wizard
+
+Open the `url` from the `started` event. Because it's a fresh install, WordPress
+greets you with its setup wizard — pick a language and fill in the site details.
+
+![The WordPress install wizard in the browser](images/wordpress/05-install-wizard.png)
+
+Set the site title, admin user and password, and finish the install.
+
+![Filling in the WordPress setup form](images/wordpress/06-install-form.png)
+
+### A live site
+
+That's it — you have a real WordPress site running on a phone, reachable at a
+trusted HTTPS URL.
+
+![The live WordPress site — "Hello world!"](images/wordpress/07-live-site.png)
+
+Log in at `/wp-admin` and you get the full WordPress dashboard — publish posts,
+install themes and plugins, everything.
+
+![The WordPress admin dashboard, running on the processor](images/wordpress/08-admin.png)
+
+### Shell access
+
+Need to poke around? Run the `connect` command from the `started` event (it wraps
+SSH over the secondary TLS connection) and authenticate with `SSH_PASSWORD`:
+
+```bash
+ssh -o ProxyCommand='openssl s_client -quiet \
+  -servername <secondaryClientId>.<DOMAIN_SUFFIX> \
+  -connect <secondaryClientId>.<DOMAIN_SUFFIX>:443' \
+  root@<secondaryClientId>
+```
+
+Note: the database and uploads live in the processor's ephemeral storage and are
+**lost when the deployment ends** — this is a disposable/demo site, not durable
+hosting.

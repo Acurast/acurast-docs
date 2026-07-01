@@ -179,6 +179,10 @@ const config = {
       {
         redirects: [
           {
+            to: "/developers/examples",
+            from: "/developers/getting-started/examples",
+          },
+          {
             to: "/processors/acurast-processors",
             from: "/acurast-transmitters",
           },

@@ -1,0 +1,219 @@
+---
+title: "Run Any Language on Acurast (Python, Go, Rust & More)"
+slug: /developers/examples/languages
+description: "Run Python, Go, Rust, Java, C++, and any other Linux workload on an Acurast processor using the Cargo (Shell) runtime — bring your own toolchain."
+---
+
+# Run Any Language on Acurast
+
+**Node.js was never the limit. With Cargo, if it runs on Linux, it runs on Acurast — Python, Go, Rust, Java, and everything else.**
+
+For a long time, deploying to Acurast meant writing JavaScript. The processors run Node.js, and that runtime is a great fit for a huge class of workloads: oracles, bots, scrapers, API glue. But it was also a ceiling. If your workload was a Python ML script, a Go networking daemon, or a Rust binary, you were out of luck.
+
+Cargo removes that ceiling. It is Acurast's **Shell runtime**: instead of handing your code to a JavaScript engine, the processor boots a full Linux image, mounts your files, and runs an entrypoint script inside it. From there, you are no longer deploying "a Node.js app" — you are deploying a Linux workload. And a Linux workload can be written in any language you like.
+
+> If it runs on Linux, it runs on Acurast.
+
+To prove it, we built the same tiny program in **ten different languages** and deployed every one of them to the network. Each example lives in [`acurast-example-apps`](https://github.com/Acurast/acurast-example-apps) and does exactly one thing: POST a small JSON payload to a webhook, tagged with the language it came from. Boring on purpose — the interesting part is that the *same deployment model* carries all ten.
+
+## How Cargo works
+
+A Cargo deployment is just a directory of files plus an entrypoint. Three things make it tick, all declared in `acurast.json`:
+
+```json
+{
+  "runtime": "Shell",
+  "image": {
+    "url": "https://github.com/termux/proot-distro/releases/download/.../ubuntu-questing-aarch64-pd-v4.30.1.tar.xz",
+    "sha256": "5ab35b90cd9a9f180656261ba400a135c4c01c2da4b74522118342f985c2d328"
+  },
+  "fileUrl": "app",
+  "entrypoint": "start.sh"
+}
+```
+
+- **`runtime: "Shell"`** tells the processor to run a script, not a JS bundle.
+- **`image`** is a `proot-distro` Linux rootfs (here, Ubuntu on `aarch64`) — pinned by `sha256` so every processor runs the exact same bytes.
+- **`fileUrl`** is the directory uploaded as your cargo; **`entrypoint`** is the script run inside the rootfs.
+
+The processor downloads the image, mounts your `app/` directory, and runs `start.sh`. Everything after that is up to you. For the full walkthrough, see the [Cargo Quickstart](/developers/getting-started/quickstart-cargo) and the [Cargo runtime reference](/developers/build/cargo-runtime-environment).
+
+## The pattern: bring your own toolchain
+
+Every language example follows the same three-step shape inside `start.sh`:
+
+1. **Prepare the rootfs** — set `PATH`/`HOME`, point `TMPDIR` at a writable dir, and configure DNS.
+2. **Install the toolchain** — `apt-get install` the interpreter or compiler (or download a prebuilt tarball when apt doesn't carry it).
+3. **Run the program.**
+
+For an **interpreted** language like Python, that's nearly trivial — install and run:
+
+```sh
+apt-get install -y python3-requests
+python3 "$SCRIPT_DIR/main.py"
+```
+
+A **compiled** language adds one step: build, then run. Go installs from apt and compiles on the device:
+
+```sh
+apt-get install -y golang-go
+export CGO_ENABLED=0   # pure-Go DNS + runtime; no C toolchain needed
+go run "$SCRIPT_DIR/main.go"
+```
+
+And when a language isn't reliably packaged, you just fetch the official build — exactly what you'd do on any Linux box. Zig, for example:
+
+```sh
+ZIG_VERSION=0.13.0
+curl -fsSL "https://ziglang.org/download/${ZIG_VERSION}/zig-linux-aarch64-${ZIG_VERSION}.tar.xz" -o "$HOME/zig.tar.xz"
+tar -C "$HOME" -xf "$HOME/zig.tar.xz"
+export PATH="$HOME/zig-linux-aarch64-${ZIG_VERSION}:$PATH"
+
+zig build-exe "$SCRIPT_DIR/main.zig" -lc -lcurl -femit-bin="$HOME/zig-app"
+"$HOME/zig-app"
+```
+
+That's the whole trick. There is no special integration — `apt`, `curl`, and `tar` are the integration. If you can install it on Linux, you can run it on Acurast.
+
+## Per-language starting points
+
+The repository ships the same webhook program in each language below. Same `acurast.json` shape, same `start.sh` skeleton — only the toolchain line differs. Pick the one closest to your stack, swap in your own program, and deploy.
+
+### C++ {#cpp}
+
+Installs `g++` from apt, compiles `main.cpp` on the device, and runs the binary.
+
+```sh
+apt-get install -y g++ libcurl4-openssl-dev
+```
+
+Example: [`app-cargo-cpp`](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-cargo-cpp)
+
+### C# {#csharp}
+
+Uses the Mono compiler and runtime from apt.
+
+```sh
+apt-get install -y mono-mcs mono-runtime
+```
+
+Example: [`app-cargo-csharp`](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-cargo-csharp)
+
+### Go {#go}
+
+Installs the Go toolchain from apt and compiles on the device. `CGO_ENABLED=0` keeps it pure-Go, so no C toolchain is needed.
+
+```sh
+apt-get install -y golang-go
+export CGO_ENABLED=0
+go run "$SCRIPT_DIR/main.go"
+```
+
+Example: [`app-cargo-go`](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-cargo-go)
+
+### Java {#java}
+
+Installs the default JDK and runs a single source file directly (`java Main.java`).
+
+```sh
+apt-get install -y default-jdk
+java "$SCRIPT_DIR/Main.java"
+```
+
+Example: [`app-cargo-java`](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-cargo-java)
+
+### Node.js {#nodejs}
+
+Cargo can also run Node.js as an ordinary Linux workload — install it from apt like any other toolchain.
+
+```sh
+apt-get install -y nodejs
+```
+
+Example: [`app-cargo-nodejs`](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-cargo-nodejs)
+
+### PHP {#php}
+
+Installs the PHP CLI and cURL extension from apt.
+
+```sh
+apt-get install -y php-cli php-curl
+```
+
+Example: [`app-cargo-php`](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-cargo-php)
+
+### Python {#python}
+
+Installs the interpreter (with `requests`) from apt and runs the script — the simplest possible case.
+
+```sh
+apt-get install -y python3-requests
+python3 "$SCRIPT_DIR/main.py"
+```
+
+Example: [`app-cargo-python`](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-cargo-python)
+
+### Ruby {#ruby}
+
+Installs Ruby from apt and runs the script.
+
+```sh
+apt-get install -y ruby
+```
+
+Example: [`app-cargo-ruby`](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-cargo-ruby)
+
+### Rust {#rust}
+
+Installs current stable Rust via `rustup` (apt's `rustc` is too old for some crates), then builds and runs.
+
+```sh
+curl -fsSL https://sh.rustup.rs | sh -s -- -y
+```
+
+Example: [`app-cargo-rust`](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-cargo-rust)
+
+### Zig {#zig}
+
+apt doesn't carry Zig, so the example fetches the official prebuilt tarball, then compiles and runs.
+
+```sh
+ZIG_VERSION=0.13.0
+curl -fsSL "https://ziglang.org/download/${ZIG_VERSION}/zig-linux-aarch64-${ZIG_VERSION}.tar.xz" -o "$HOME/zig.tar.xz"
+tar -C "$HOME" -xf "$HOME/zig.tar.xz"
+```
+
+Example: [`app-cargo-zig`](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-cargo-zig)
+
+## Seeing what happened
+
+One catch comes with running off-device: the processor's stdout and stderr aren't accessible to you. So the examples include an **optional** debug block in `start.sh` that POSTs lifecycle and error reports to your webhook — `startup`, `done`, and on failure an `error` with the stage, exit code, and a tail of stderr:
+
+```sh
+report() {
+    curl -sS -X POST "$WEBHOOK_URL" -H "Content-Type: application/json" \
+        -d "{\"language\":\"python\",\"status\":\"$1\"${2:+,$2}}" >/dev/null 2>&1 || true
+}
+```
+
+It is not required — the program already POSTs on success — but it turns a silent failure into a readable one. Strip it out once your workload is stable for a minimal deployment.
+
+## Deploying it yourself
+
+Every example deploys the same way:
+
+```bash
+cp .env.example .env   # set ACURAST_MNEMONIC and WEBHOOK_URL
+npm i
+npm run deploy
+```
+
+The CLI uploads your `app/` directory, the processor pulls the pinned image, mounts the cargo, and runs `start.sh`. Within seconds your Python — or Rust, or Zig — is running on a real device somewhere on the network, POSTing back to your webhook.
+
+## Why this matters
+
+For builders, Cargo means you stop bending your workload to fit the platform. Bring the language, libraries, and binaries you already use. The deployment model is the same regardless of what's inside — which means the thing you learn once carries across every project you ship.
+
+For the network, it widens the front door. The set of workloads that can run on Acurast is no longer "things expressible in JavaScript" — it's "things that run on Linux." That's most of the software ever written.
+
+Node.js was the start. Cargo is what comes after.

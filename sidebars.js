@@ -28,9 +28,24 @@ const sidebars = {
           items: [
             "developers/getting-started/quickstart",
             "developers/deploy-first-app",
-            "developers/getting-started/examples",
             "developers/getting-started/quickstart-cargo",
             "developers/getting-started/quickstart-tunnel",
+          ],
+        },
+        {
+          type: "category",
+          label: "Example Apps",
+          collapsed: true,
+          link: { type: "doc", id: "developers/examples/index" },
+          items: [
+            "developers/examples/tunnel",
+            "developers/examples/languages",
+            "developers/examples/postgres",
+            "developers/examples/wordpress",
+            "developers/examples/garage",
+            "developers/examples/minecraft",
+            "developers/examples/hermes",
+            "developers/examples/openclaw",
           ],
         },
         {
