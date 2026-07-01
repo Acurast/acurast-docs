@@ -33,12 +33,14 @@ cd acurast-example-apps/apps/app-cargo-openclaw
 | `getifaddrs_override.c` | PRoot shim. |
 | `callback.sh` | POSTs `log` / `started` / `error` (and `webui_password`) events to your `CALLBACK_URL`. |
 
-## 3. Prerequisite: a domain suffix you control
+## 3. (Optional) Use your own domain
 
-The tunnel needs a DNS suffix with a wildcard record and an `_acu` TXT record — a
-one-time setup covered by the
+By default the tunnel serves on `https://<clientId>.acu.run`, with a Let's Encrypt
+certificate provisioned automatically — nothing to set up. To use your own domain
+suffix instead, do the one-time DNS setup (a wildcard record and an `_acu` TXT
+record) from the
 [Tunnel Quick Start](/developers/getting-started/quickstart-tunnel)
-(step 2). Here it's `tunnel.acurast.dev`.
+(step 2) and set `DOMAIN_SUFFIX_MAINNET`/`_CANARY` below.
 
 ## 4. Configure `.env`
 
@@ -51,7 +53,7 @@ cp .env.example .env
 | `ACURAST_MNEMONIC` | ✅ | Deployer seed phrase. **Never commit it.** |
 | `OPENROUTER_API_KEY` | ✅ | Your [OpenRouter](https://openrouter.ai/keys) API key — OpenClaw is pinned to `provider=openrouter`. |
 | `NETWORK` | ✅ | `canary` or `mainnet`. Must match `acurast.json`. |
-| `DOMAIN_SUFFIX_MAINNET` / `_CANARY` | ✅ (active one) | Your tunnel DNS suffix. Set only the one matching `NETWORK`. |
+| `DOMAIN_SUFFIX_MAINNET` / `_CANARY` | optional | Only for a custom domain. Leave unset to serve on `acu.run`. If set, use the one matching `NETWORK` and add it to `includeEnvironmentVariables`. |
 | `OPENCLAW_MODEL` | optional | OpenRouter model id (default `openai/gpt-4o-mini`; the `openrouter/` prefix is added for you). |
 | `OPENCLAW_GATEWAY_PASSWORD` | optional | Protects the public Control UI. If unset, `start.sh` generates a strong one and reports it as the `webui_password` event — the URL is never left open. |
 | `SSH_PASSWORD` | optional | Root SSH password. Defaults to `password` — set a strong value. |
@@ -72,9 +74,8 @@ SSH command — and, if you didn't set one, the auto-generated
 - `execution`: `onetime`, `maxExecutionTimeInMs: 14400000` (a 4-hour window — the
   install downloads a fair amount, so give it time).
 - `minProcessorVersions.android: "1.26.0"` (tunnel support).
-- `includeEnvironmentVariables`: `CALLBACK_URL`, `DOMAIN_SUFFIX_MAINNET`,
-  `NETWORK`, `SSH_PASSWORD`, `OPENROUTER_API_KEY`, `OPENCLAW_MODEL`,
-  `OPENCLAW_GATEWAY_PASSWORD`.
+- `includeEnvironmentVariables`: `CALLBACK_URL`, `NETWORK`, `SSH_PASSWORD`,
+  `OPENROUTER_API_KEY`, `OPENCLAW_MODEL`, `OPENCLAW_GATEWAY_PASSWORD`.
 
 ## 6. Deploy
 
@@ -120,8 +121,8 @@ event and authenticate with `SSH_PASSWORD`:
 
 ```bash
 ssh -o ProxyCommand='openssl s_client -quiet \
-  -servername <secondaryClientId>.<DOMAIN_SUFFIX> \
-  -connect <secondaryClientId>.<DOMAIN_SUFFIX>:443' \
+  -servername <secondaryClientId>.acu.run \
+  -connect <secondaryClientId>.acu.run:443' \
   root@<secondaryClientId>
 ```
 

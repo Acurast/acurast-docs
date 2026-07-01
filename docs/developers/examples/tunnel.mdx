@@ -41,13 +41,15 @@ The two-connection idea is the key: the **primary** connection gets a real
 Let's Encrypt certificate (good for browsers); the **secondary** connection gets a
 self-signed cert and is used here to carry raw SSH.
 
-## 3. Prerequisite: a domain suffix you control
+## 3. (Optional) Use your own domain
 
-The tunnel maps `https://<clientId>.<your-suffix>` to your deployment, so you need
-a DNS suffix where a wildcard record and an `_acu` TXT record have been published.
-This is a one-time setup — follow the
+By default the tunnel serves your deployment on `https://<clientId>.acu.run`, with a
+Let's Encrypt certificate provisioned automatically — nothing to set up.
+
+If you'd rather use your own domain suffix, it's a one-time DNS setup (a wildcard
+record and an `_acu` TXT record) — follow the
 [Tunnel Quick Start](/developers/getting-started/quickstart-tunnel)
-(step 2) to configure it. In this example the suffix is `tunnel.acurast.dev`.
+(step 2), then set `DOMAIN_SUFFIX_MAINNET`/`DOMAIN_SUFFIX_CANARY` below.
 
 ## 4. Configure `.env`
 
@@ -61,7 +63,7 @@ cp .env.example .env
 | --- | --- | --- |
 | `ACURAST_MNEMONIC` | ✅ | Your deployer seed phrase (signs the on-chain deployment). **Never commit it.** |
 | `NETWORK` | ✅ | `canary` or `mainnet`. Must match the `network` field in `acurast.json`. |
-| `DOMAIN_SUFFIX_MAINNET` / `DOMAIN_SUFFIX_CANARY` | ✅ (active one) | Your tunnel DNS suffix. Set only the one matching `NETWORK`. |
+| `DOMAIN_SUFFIX_MAINNET` / `DOMAIN_SUFFIX_CANARY` | optional | Only for a custom domain. Leave unset to serve on `acu.run`. If set, use the one matching `NETWORK` and add it to `includeEnvironmentVariables` in `acurast.json`. |
 | `SSH_PASSWORD` | optional | Root password for the SSH session. Defaults to `password` — set a strong value. |
 | `CALLBACK_URL` | optional | Webhook that receives the lifecycle events. **Use [webhook.watch](https://webhook.watch).** |
 
@@ -86,7 +88,7 @@ worth knowing what it declares:
 - `minProcessorVersions.android: "1.26.0"` — the tunnel API needs a processor on
   app version 1.26.0 or newer.
 - `includeEnvironmentVariables` — the allowlist of `.env` vars forwarded to the
-  processor (`CALLBACK_URL`, `SSH_PASSWORD`, `DOMAIN_SUFFIX_MAINNET`, `NETWORK`).
+  processor (`CALLBACK_URL`, `SSH_PASSWORD`, `NETWORK`).
 - `startAt.msFromNow` — schedules the start a couple of minutes out.
 
 ## 6. Deploy
@@ -119,7 +121,7 @@ things to try.
 Take the `url` from the `started` event and open it in a browser:
 
 ```
-https://<clientId>.<DOMAIN_SUFFIX>
+https://<clientId>.acu.run
 ```
 
 You get a page served *from the phone* over a real HTTPS certificate — no public
@@ -134,8 +136,8 @@ SSH rides the secondary (self-signed) connection, so it's wrapped in TLS via an
 
 ```bash
 ssh -o ProxyCommand='openssl s_client -quiet \
-  -servername <secondaryClientId>.<DOMAIN_SUFFIX> \
-  -connect <secondaryClientId>.<DOMAIN_SUFFIX>:8443' \
+  -servername <secondaryClientId>.acu.run \
+  -connect <secondaryClientId>.acu.run:8443' \
   root@<secondaryClientId>
 ```
 

@@ -37,12 +37,14 @@ cd acurast-example-apps/apps/app-cargo-postgres
 | `getifaddrs_override.c` / `sysv_shm_override.c` | PRoot shims (Postgres needs the SysV shared-memory one). |
 | `callback.sh` | POSTs `log` / `started` / `error` events to your `CALLBACK_URL`. |
 
-## 3. Prerequisite: a domain suffix you control
+## 3. (Optional) Use your own domain
 
-The tunnel needs a DNS suffix with a wildcard record and an `_acu` TXT record
-published — a one-time setup covered by the
+By default the tunnel serves on `https://<clientId>.acu.run`, with a Let's Encrypt
+certificate provisioned automatically — nothing to set up. To use your own domain
+suffix instead, do the one-time DNS setup (a wildcard record and an `_acu` TXT
+record) from the
 [Tunnel Quick Start](/developers/getting-started/quickstart-tunnel)
-(step 2). Here it's `tunnel.acurast.dev`.
+(step 2) and set `DOMAIN_SUFFIX_MAINNET`/`_CANARY` below.
 
 ## 4. Configure `.env`
 
@@ -54,7 +56,7 @@ cp .env.example .env
 | --- | --- | --- |
 | `ACURAST_MNEMONIC` | ✅ | Deployer seed phrase. **Never commit it.** |
 | `NETWORK` | ✅ | `canary` or `mainnet`. Must match `acurast.json`. |
-| `DOMAIN_SUFFIX_MAINNET` / `_CANARY` | ✅ (active one) | Your tunnel DNS suffix. Set only the one matching `NETWORK`. |
+| `DOMAIN_SUFFIX_MAINNET` / `_CANARY` | optional | Only for a custom domain. Leave unset to serve on `acu.run`. If set, use the one matching `NETWORK` and add it to `includeEnvironmentVariables`. |
 | `SSH_PASSWORD` | optional | Root SSH password. Defaults to `password` — set a strong value. |
 | `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` | optional | Superuser, password and DB created on first start. Set strong values. |
 | `CALLBACK_URL` | optional | Lifecycle-event webhook. **Use [webhook.watch](https://webhook.watch).** |
@@ -73,8 +75,8 @@ dig through logs.
 - `runtime: "Shell"` on a `proot-distro` Ubuntu image.
 - `execution`: `onetime`, `maxExecutionTimeInMs: 7200000` (2-hour window).
 - `minProcessorVersions.android: "1.26.0"` (tunnel support).
-- `includeEnvironmentVariables`: `CALLBACK_URL`, `DOMAIN_SUFFIX_MAINNET`,
-  `NETWORK`, `SSH_PASSWORD`, `POSTGRES_USER/PASSWORD/DB`, `WEB_PORT`.
+- `includeEnvironmentVariables`: `CALLBACK_URL`, `NETWORK`, `SSH_PASSWORD`,
+  `POSTGRES_USER/PASSWORD/DB`, `WEB_PORT`.
 
 ## 6. Deploy
 
