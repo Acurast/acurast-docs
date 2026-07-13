@@ -10,12 +10,13 @@ slug: /developers/tools/deploy-agent
 :::
 
 The Acurast Deploy Agent lets developers deploy computational jobs to the Acurast decentralized processor network directly from EVM chains (starting with USDC on Base).
-Via the deploy agent's HTTP API a simple [x402](https://docs.cdp.coinbase.com/x402/core-concepts/how-it-works) payment together with a job specification will trigger the deployment for you.
+Via the deploy agent's HTTP API a simple [x402](https://docs.cdp.coinbase.com/x402/core-concepts/how-it-works) payment together with either a job specification or a VPS request will trigger the deployment for you.
 
 This approach is ideal for:
 
 - **AI agents** using [agentic wallets](https://docs.cdp.coinbase.com/agentic-wallet/welcome) to deploy Acurast jobs from LLM clients
 - **Backend services** that need to programmatically deploy Acurast jobs without interacting with the Acurast parachain or managing ACU accounts
+- **Anyone who wants a public SSH-reachable Ubuntu VPS** on a decentralized processor — see [Deploy a VPS](#deploy-a-vps-ssh-tunnel) below
 
 Both approaches are outlined below.
 
@@ -86,6 +87,10 @@ Then, deploy a job via
 ```
 /pay-for-service deploy.acu.run
 ```
+
+:::note
+Hitting `invalid_payload: contract call failed: execution reverted`? See [Troubleshooting](#troubleshooting).
+:::
 
 <details>
 <summary>A typical flow to deploy a job on Acurast</summary>
@@ -209,6 +214,9 @@ This approach uses Coinbase's `awal` tool directly, instead of via the LLM. This
    WETH    0.0008
    ```
 
+   You need both USDC (for the deploy) and a little ETH on Base (for gas) — see
+   [Troubleshooting](#troubleshooting) if a payment fails with insufficient funds.
+
 <details>
 <summary>3. OPTIONAL: Query accepted tokens and pricing before deploying</summary>
 
@@ -300,6 +308,168 @@ Example response:
     The deploy agent has deployed the job under [`5H3ChM1QgrYyGwzmyQ1QkdFCJxzakjWsbQN5tSGP8dkn2VCR`](https://hub.acurast.com/explorer/address/5H3ChM1QgrYyGwzmyQ1QkdFCJxzakjWsbQN5tSGP8dkn2VCR).
 
 
+## Deploy a VPS (SSH tunnel)
+
+Instead of a job spec, send `{ "vps": { "sshKey": "..." } }`. The deploy agent
+generates a P-256 tunnel keypair, precomputes the `<hash>.acu.run` subdomain,
+submits a Shell-runtime job to Acurast, and returns the shell connect command
+**before the processor has even started**. Once a processor picks the job up
+(~1-3 min), it installs Ubuntu + dropbear inside a proot sandbox, opens the
+Acurast reverse tunnel targeting dropbear, and Let's Encrypt issues a real
+certificate for the precomputed subdomain.
+
+The domain is knowable off-chain because the tunnel's `clientId` is
+`hex(sha256(compressed_pubkey)[0:8])` and the agent controls the keypair — it
+injects the private key into the job as an encrypted env var after match.
+
+### Minimal deploy
+
+`sshKey`, `reward`, and `maxExecutionTimeInMs` are the three required fields.
+`reward` is per-execution in picoACU and `maxExecutionTimeInMs` bounds how long
+the VPS runs — price the reward for that window (see [VPS parameters](#vps-parameters)).
+
+```shell
+npx awal@latest x402 pay "https://deploy.acu.run/deploy" -X POST -d "{
+    \"vps\": {
+        \"sshKey\": \"$(cat ~/.ssh/id_rsa.pub)\",
+        \"reward\": 48686320000,
+        \"maxExecutionTimeInMs\": 7200000
+    }
+}"
+```
+
+Example response:
+
+```json
+{
+  "success": true,
+  "acurastJobHash": "0x...",
+  "domain": "https://<hash>.acu.run",
+  "probeUrl": "https://deploy.acu.run/vps/probe?domain=<hash>.acu.run",
+  "sshCommand": "ssh -o \"ProxyCommand=openssl s_client -quiet -servername %h -connect %h:443\" root@<hash>.acu.run",
+  "explorerLink": "https://hub.acurast.com/explorer/extrinsic/0x..."
+}
+```
+
+### Connect
+
+The tunnel wraps traffic in TLS (that's what gives the Let's Encrypt cert on
+`<hash>.acu.run`), so SSH speaks through an `openssl s_client` `ProxyCommand`
+that terminates the outer TLS at the relay. Use `-i` + `IdentitiesOnly=yes` to
+force the exact key you submitted — otherwise a client with multiple keys in
+`~/.ssh/` may present a non-matching one first and hit
+`Permission denied (publickey)` before offering the right one.
+
+**One-liner:**
+
+```shell
+ssh -o "ProxyCommand=openssl s_client -quiet -servername %h -connect %h:443" \
+    -i ~/.ssh/id_rsa -o IdentitiesOnly=yes \
+    root@<hash>.acu.run
+```
+
+**Ergonomic version** — add this once to `~/.ssh/config`:
+
+```
+Host *.acu.run
+    ProxyCommand openssl s_client -quiet -servername %h -connect %h:443
+    User root
+    IdentityFile ~/.ssh/id_rsa
+    IdentitiesOnly yes
+    StrictHostKeyChecking accept-new
+```
+
+Then forever after just:
+
+```shell
+ssh <hash>.acu.run
+```
+
+:::note Key-only auth
+The tunnel bundle runs dropbear with `-s -g` (no password auth advertised).
+If `SSH_AUTHORIZED_KEY` fails to reach the processor for any reason the job
+aborts rather than exposing a password-authenticated shell.
+:::
+
+### Poll for readiness
+
+The deploy response returns immediately, but the processor still needs
+~2-5 min to install Ubuntu, dropbear, and open the reverse tunnel. Poll
+`GET /vps/probe?domain=<returned-domain>` until `ready: true`:
+
+```shell
+curl -s "https://deploy.acu.run/vps/probe?domain=<hash>.acu.run" | jq
+```
+
+```json
+{
+  "domain": "<hash>.acu.run",
+  "ready": true,
+  "banner": "SSH-2.0-dropbear_2025.88",
+  "cert": {
+    "subject": "<hash>.acu.run",
+    "issuer": "YE2",
+    "notBefore": "...",
+    "notAfter": "..."
+  }
+}
+```
+
+`ready: false` responses carry an `error` field (`timeout`, `unrecognized
+banner`, `connection closed before banner`, TLS handshake failures) — retry
+on an interval, don't hot-loop.
+
+### Expose an HTTP service on the same subdomain
+
+Add `httpPort` to the request; the bundle then installs
+[sslh](https://github.com/yrutschle/sslh) in front of dropbear so the same
+`<hash>.acu.run` domain serves both shell and HTTP simultaneously. Byte-0
+protocol sniffing routes shell traffic to dropbear and HTTP requests to your
+app on `127.0.0.1:<httpPort>`.
+
+```shell
+npx awal@latest x402 pay "https://deploy.acu.run/deploy" -X POST -d "{
+    \"vps\": {
+        \"sshKey\": \"$(cat ~/.ssh/id_rsa.pub)\",
+        \"reward\": 48686320000,
+        \"maxExecutionTimeInMs\": 7200000,
+        \"httpPort\": 8080
+    }
+}"
+```
+
+Response echoes it back as `httpPort: 8080`. Inside the VPS, bind your service
+on `127.0.0.1:8080` (or `0.0.0.0:8080`). Browsers hitting
+`https://<hash>.acu.run/` then get your app; the existing `ProxyCommand`
+recipe keeps working for shell access.
+
+**Tradeoffs:**
+
+- Small (~200 ms) connect-time delay on new shell connections while sslh
+  waits its `--on-timeout` fallback (imperceptible for interactive use).
+- One HTTP backend per subdomain. For multiple services, run nginx / caddy
+  inside the VPS and reverse-proxy from there.
+- Adds ~5-10 s to first-boot on the processor for `apt-get install sslh`.
+
+### VPS parameters
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `sshKey` | string | **REQUIRED** OpenSSH public key line (e.g., `ssh-ed25519 AAAA... user@host`), installed into dropbear's `/root/.ssh/authorized_keys`. |
+| `reward` | number | **REQUIRED** Reward per execution in picoACU (1 ACU = 10¹² picoACU). No default — price it for `maxExecutionTimeInMs` (e.g. `48686320000` ≈ 0.049 ACU is priced for a 2 h window; scale roughly linearly for longer/shorter windows or processors will skip the job). |
+| `maxExecutionTimeInMs` | number | **REQUIRED** How long the VPS runs before the processor tears it down, in ms (setup time counts). No default. Longer windows should scale `reward` proportionally. |
+| `httpPort` | number | Enable HTTP multiplexing on the same subdomain via sslh. Must be an integer in `1024..65535`. Bind your app on `127.0.0.1:<httpPort>` inside the VPS. |
+| `image` | string | Image preset. Currently only `"ubuntu"` (default) — Ubuntu 25.04 aarch64 proot-distro. |
+| `network` | string | Target network: `"mainnet"` (default) or `"canary"`. |
+| `callbackUrl` | string | Optional webhook receiving `log` / `started` / `error` JSON events from the tunnel bundle. Useful for observing boot progress or catching install failures. |
+| `minMemory` | number | Minimum total processor RAM in bytes (matched against the `v1_ram_total` benchmark pool). |
+| `minStorage` | number | Minimum available processor storage in bytes (matched against `v1_storage_avail`). |
+| `minCpuScore` | number | Minimum single-core CPU benchmark score (Geekbench-style; matched against `v1_cpu_single_core`). |
+| `minCpuMultiScore` | number | Minimum multi-core CPU benchmark score (matched against `v1_cpu_multi_core`). |
+| `minProcessorReputation` | number | Minimum processor reputation on a `0..1_000_000` scale. Default `0` (no reputation filter). |
+| `startAt` | object | When the execution window opens — relative `{ "msFromNow": 180000 }` or absolute `{ "timestamp": <unix-ms> }`. Default `{ "msFromNow": 180000 }` (3 min). Must leave ≥ 2 min lead time for a processor to match. |
+| `maxStartDelayMs` | number | Maximum tolerated start-delay in ms. Default `30000` (30 s). Widen for slower processors that may not be ready in time. |
+
 ## Full job specification
 
 :::tip Generate job specification
@@ -341,7 +511,7 @@ The `jobSpec` object follows the standard Acurast job registration format:
 
 | Field                      | Type             | Description                                           |
 | -------------------------- | ---------------- | ----------------------------------------------------- |
-| `script`                   | string           | **REQUIRED** IPFS hash or inline script code          |
+| `script`                   | string           | **REQUIRED** IPFS URL of an already-pinned script (`ipfs://Qm...`). The agent does not upload scripts — pin first (e.g. `acurast deploy --only-upload`) and pass the URL. Non-`ipfs://` values are rejected with a `400`. |
 | `allowedSources`           | string[] \| null | Processor whitelist (null = any)         |
 | `allowOnlyVerifiedSources` | boolean          | Require attested processors              |
 | `schedule.startTime`       | number           | Job start time (Unix ms)                 |
@@ -358,3 +528,22 @@ The `jobSpec` object follows the standard Acurast job registration format:
 | `reward`                   | number           | **REQUIRED** Reward per execution (picoACU)           |
 | `minReputation`            | number           | Min processor reputation (0-1000000)     |
 | `runtime`                  | string           | "NodeJS", "NodeJSWithBundle", or "Shell" |
+
+## Troubleshooting
+
+### `invalid_payload: contract call failed: execution reverted`
+
+**Symptom:** A deploy payment fails with
+`invalid_payload: contract call failed: execution reverted`. See
+[coinbase/payments-mcp#30](https://github.com/coinbase/payments-mcp/issues/30).
+
+**Workaround:** For now, creating a new wallet account under a different email
+address might resolves the issue.
+
+### `insufficient funds` even though USDC balance is enough
+
+Payments settle on Base, so the wallet needs a small amount of **base ETH** to
+cover gas — having only USDC is not enough. Per
+[Coinbase](https://docs.cdp.coinbase.com/agentic-wallet/welcome), keep a little
+ETH on Base in the wallet alongside your USDC. Check with `npx awal balance` and
+top up ETH if it reads `0`.
