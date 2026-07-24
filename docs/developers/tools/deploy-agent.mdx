@@ -220,7 +220,9 @@ This approach uses Coinbase's `awal` tool directly, instead of via the LLM. This
 <details>
 <summary>3. OPTIONAL: Query accepted tokens and pricing before deploying</summary>
 
-You can query the deploy agent to see accepted tokens and the job's price before making a payment:
+You don't need to calculate the cost yourself. We recommend to omit the **optional** `reward` — in which case the agent estimates a market rate.
+
+For more control, you can query the deploy agent to see accepted tokens and the quoted price before making a payment:
 
 ```shell
 curl "https://deploy.acu.run/deploy" -X POST -H "Content-Type: application/json" -i -d '{
@@ -324,15 +326,16 @@ injects the private key into the job as an encrypted env var after match.
 
 ### Minimal deploy
 
-`sshKey`, `reward`, and `maxExecutionTimeInMs` are the three required fields.
-`reward` is per-execution in picoACU and `maxExecutionTimeInMs` bounds how long
-the VPS runs — price the reward for that window (see [VPS parameters](#vps-parameters)).
+`sshKey` and `maxExecutionTimeInMs` are the two required fields;
+`maxExecutionTimeInMs` bounds how long the VPS runs. `reward` is **optional** —
+omit it and the agent estimates a market rate for that window from the matcher
+(the 402 quote reflects the estimate). Provide `reward` only to override it
+(see [VPS parameters](#vps-parameters)).
 
 ```shell
 npx awal@latest x402 pay "https://deploy.acu.run/deploy" -X POST -d "{
     \"vps\": {
         \"sshKey\": \"$(cat ~/.ssh/id_rsa.pub)\",
-        \"reward\": 48686320000,
         \"maxExecutionTimeInMs\": 7200000
     }
 }"
@@ -456,8 +459,8 @@ recipe keeps working for shell access.
 | Field | Type | Description |
 | --- | --- | --- |
 | `sshKey` | string | **REQUIRED** OpenSSH public key line (e.g., `ssh-ed25519 AAAA... user@host`), installed into dropbear's `/root/.ssh/authorized_keys`. |
-| `reward` | number | **REQUIRED** Reward per execution in picoACU (1 ACU = 10¹² picoACU). No default — price it for `maxExecutionTimeInMs` (e.g. `48686320000` ≈ 0.049 ACU is priced for a 2 h window; scale roughly linearly for longer/shorter windows or processors will skip the job). |
-| `maxExecutionTimeInMs` | number | **REQUIRED** How long the VPS runs before the processor tears it down, in ms (setup time counts). No default. Longer windows should scale `reward` proportionally. |
+| `reward` | number | **OPTIONAL** Reward per execution in picoACU (1 ACU = 10¹² picoACU). Omit it and the agent estimates a market rate for the `maxExecutionTimeInMs` window. Provide it only to override (e.g. `48686320000` ≈ 0.049 ACU). |
+| `maxExecutionTimeInMs` | number | **REQUIRED** How long the VPS runs before the processor tears it down, in ms (setup time counts). No default. Drives the reward estimate when `reward` is omitted. |
 | `httpPort` | number | Enable HTTP multiplexing on the same subdomain via sslh. Must be an integer in `1024..65535`. Bind your app on `127.0.0.1:<httpPort>` inside the VPS. |
 | `image` | string | Image preset. Currently only `"ubuntu"` (default) — Ubuntu 25.04 aarch64 proot-distro. |
 | `network` | string | Target network: `"mainnet"` (default) or `"canary"`. |
@@ -525,7 +528,7 @@ The `jobSpec` object follows the standard Acurast job registration format:
 | `requiredModules`          | number[]         | Required modules (e.g., LLM)             |
 | `assignmentStrategy`       | string           | "Single" or "Competing"                  |
 | `slots`                    | number           | Number of processor slots                |
-| `reward`                   | number           | **REQUIRED** Reward per execution (picoACU)           |
+| `reward`                   | number           | Reward per execution (picoACU). Omit to let the agent estimate a market rate. |
 | `minReputation`            | number           | Min processor reputation (0-1000000)     |
 | `runtime`                  | string           | "NodeJS", "NodeJSWithBundle", or "Shell" |
 
