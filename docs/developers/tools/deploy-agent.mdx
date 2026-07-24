@@ -10,7 +10,7 @@ slug: /developers/tools/deploy-agent
 :::
 
 The Acurast Deploy Agent lets developers deploy computational jobs to the Acurast decentralized processor network directly from EVM chains (starting with USDC on Base).
-Via the deploy agent's HTTP API a simple [x402](https://docs.cdp.coinbase.com/x402/core-concepts/how-it-works) payment together with either a job specification or a VPS request will trigger the deployment for you.
+Via the deploy agent's HTTP API, a simple [x402](https://docs.cdp.coinbase.com/x402/core-concepts/how-it-works) payment together with either a job specification or a VPS request will trigger the deployment for you.
 
 This approach is ideal for:
 
@@ -91,6 +91,25 @@ Then, deploy a job via
 :::note
 Hitting `invalid_payload: contract call failed: execution reverted`? See [Troubleshooting](#troubleshooting).
 :::
+
+You are likely presented with a choice similar to
+
+```
+───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ ☐ Deploy target
+
+What do you want to deploy (and pay for) at deploy.acu.run?
+
+❯ 1. A script job
+     Deploy a script by IPFS URL (ipfs://Qm...). I'll need the IPFS URL and optionally a reward.
+  2. A VPS
+     Deploy an SSH-reachable Ubuntu VPS. I'll need at least an sshKey and maxExecutionTimeInMs.
+  3. Just price discovery
+     Only fetch/decode the 402 payment requirements. No payment, no deployment.
+  4. Type something.
+───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  5. Chat about this
+```
 
 <details>
 <summary>A typical flow to deploy a job on Acurast</summary>
@@ -193,7 +212,7 @@ Hitting `invalid_payload: contract call failed: execution reverted`? See [Troubl
 </details>
 
 
-## Programmatically deploy
+## Programmatically deploy a job {#programmatically-deploy}
 
 This approach uses Coinbase's `awal` tool directly, instead of via the LLM. This is a deterministic approach for dApps and backends.
 
@@ -220,7 +239,9 @@ This approach uses Coinbase's `awal` tool directly, instead of via the LLM. This
 <details>
 <summary>3. OPTIONAL: Query accepted tokens and pricing before deploying</summary>
 
-You can query the deploy agent to see accepted tokens and the job's price before making a payment:
+You don't need to calculate the cost yourself. We recommend omitting the **optional** `reward` — in which case the agent estimates a market rate.
+
+For more control, you can query the deploy agent to see accepted tokens and the quoted price before making a payment:
 
 ```shell
 curl "https://deploy.acu.run/deploy" -X POST -H "Content-Type: application/json" -i -d '{
@@ -308,7 +329,7 @@ Example response:
     The deploy agent has deployed the job under [`5H3ChM1QgrYyGwzmyQ1QkdFCJxzakjWsbQN5tSGP8dkn2VCR`](https://hub.acurast.com/explorer/address/5H3ChM1QgrYyGwzmyQ1QkdFCJxzakjWsbQN5tSGP8dkn2VCR).
 
 
-## Deploy a VPS (SSH tunnel)
+## Programmatically deploy a VPS (SSH tunnel) {#deploy-a-vps-ssh-tunnel}
 
 Instead of a job spec, send `{ "vps": { "sshKey": "..." } }`. The deploy agent
 generates a P-256 tunnel keypair, precomputes the `<hash>.acu.run` subdomain,
@@ -320,19 +341,24 @@ certificate for the precomputed subdomain.
 
 The domain is knowable off-chain because the tunnel's `clientId` is
 `hex(sha256(compressed_pubkey)[0:8])` and the agent controls the keypair — it
-injects the private key into the job as an encrypted env var after match.
+injects the private key into the job as an encrypted env var after the match.
 
 ### Minimal deploy
 
-`sshKey`, `reward`, and `maxExecutionTimeInMs` are the three required fields.
-`reward` is per-execution in picoACU and `maxExecutionTimeInMs` bounds how long
-the VPS runs — price the reward for that window (see [VPS parameters](#vps-parameters)).
+`sshKey` and `maxExecutionTimeInMs` are the two required fields;
+`maxExecutionTimeInMs` bounds how long the VPS runs. `reward` is **optional** —
+omit it and the agent estimates a market rate for that window from the matcher
+(the 402 quote reflects the estimate). Provide `reward` only to override it
+(see [VPS parameters](#vps-parameters)).
+
+As mentioned above, you can deploy [via your LLM](#use-via-llm) asking it for a VPS.
+
+Instead you can programmatically deploy a VPS with
 
 ```shell
 npx awal@latest x402 pay "https://deploy.acu.run/deploy" -X POST -d "{
     \"vps\": {
         \"sshKey\": \"$(cat ~/.ssh/id_rsa.pub)\",
-        \"reward\": 48686320000,
         \"maxExecutionTimeInMs\": 7200000
     }
 }"
@@ -456,8 +482,8 @@ recipe keeps working for shell access.
 | Field | Type | Description |
 | --- | --- | --- |
 | `sshKey` | string | **REQUIRED** OpenSSH public key line (e.g., `ssh-ed25519 AAAA... user@host`), installed into dropbear's `/root/.ssh/authorized_keys`. |
-| `reward` | number | **REQUIRED** Reward per execution in picoACU (1 ACU = 10¹² picoACU). No default — price it for `maxExecutionTimeInMs` (e.g. `48686320000` ≈ 0.049 ACU is priced for a 2 h window; scale roughly linearly for longer/shorter windows or processors will skip the job). |
-| `maxExecutionTimeInMs` | number | **REQUIRED** How long the VPS runs before the processor tears it down, in ms (setup time counts). No default. Longer windows should scale `reward` proportionally. |
+| `reward` | number | **OPTIONAL** Reward per execution in picoACU (1 ACU = 10¹² picoACU). Omit it and the agent estimates a market rate for the `maxExecutionTimeInMs` window. Provide it only to override (e.g. `48686320000` ≈ 0.049 ACU). |
+| `maxExecutionTimeInMs` | number | **REQUIRED** How long the VPS runs before the processor tears it down, in ms (setup time counts). No default. Drives the reward estimate when `reward` is omitted. |
 | `httpPort` | number | Enable HTTP multiplexing on the same subdomain via sslh. Must be an integer in `1024..65535`. Bind your app on `127.0.0.1:<httpPort>` inside the VPS. |
 | `image` | string | Image preset. Currently only `"ubuntu"` (default) — Ubuntu 25.04 aarch64 proot-distro. |
 | `network` | string | Target network: `"mainnet"` (default) or `"canary"`. |
@@ -525,7 +551,7 @@ The `jobSpec` object follows the standard Acurast job registration format:
 | `requiredModules`          | number[]         | Required modules (e.g., LLM)             |
 | `assignmentStrategy`       | string           | "Single" or "Competing"                  |
 | `slots`                    | number           | Number of processor slots                |
-| `reward`                   | number           | **REQUIRED** Reward per execution (picoACU)           |
+| `reward`                   | number           | Reward per execution (picoACU). Omit to let the agent estimate a market rate. |
 | `minReputation`            | number           | Min processor reputation (0-1000000)     |
 | `runtime`                  | string           | "NodeJS", "NodeJSWithBundle", or "Shell" |
 
@@ -538,11 +564,11 @@ The `jobSpec` object follows the standard Acurast job registration format:
 [coinbase/payments-mcp#30](https://github.com/coinbase/payments-mcp/issues/30).
 
 **Workaround:** For now, creating a new wallet account under a different email
-address might resolves the issue.
+address might resolve the issue.
 
 ### `insufficient funds` even though USDC balance is enough
 
-Payments settle on Base, so the wallet needs a small amount of **base ETH** to
+Payments settle on Base, so the wallet needs a small amount of **Base ETH** to
 cover gas — having only USDC is not enough. Per
 [Coinbase](https://docs.cdp.coinbase.com/agentic-wallet/welcome), keep a little
 ETH on Base in the wallet alongside your USDC. Check with `npx awal balance` and
