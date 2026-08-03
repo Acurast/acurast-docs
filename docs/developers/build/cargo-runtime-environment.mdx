@@ -493,6 +493,68 @@ Returns the Chrome DevTools remote debugging URL for the WebView.
 
 ---
 
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: TBD</span>
+
+#### `browser_initSurface`
+
+Sets the size of the surface the browser paints its pages to, applied when the surface is created as the first tab is opened. Only takes effect if called before any tab is open - without it, the surface is created at the device's display size.
+
+Fails if the surface size has already been initialized, if a surface already exists, or if the requested size is outside the supported bounds: each side between 240 and 2560 device pixels, total pixel count no more than 2560x1440, and `deviceScaleFactor` between 0.5 and 4.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "browser_initSurface",
+  "params": [{
+    "width": number,               // device pixels
+    "height": number,              // device pixels
+    "deviceScaleFactor"?: number   // device pixels per CSS pixel, default: 1
+  }],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {},
+  "id": string
+}
+```
+
+---
+
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: TBD</span>
+
+#### `browser_surfaceSize`
+
+Returns the size of the surface the browser paints its pages to, or `null` if the browser currently has no surface.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "browser_surfaceSize",
+  "params": [],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "size": {
+      "width": number,             // device pixels
+      "height": number,            // device pixels
+      "deviceScaleFactor": number  // device pixels per CSS pixel
+    } | null
+  },
+  "id": string
+}
+```
+
+---
+
 <span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.25.0+</span>
 
 #### `browser_newTab`
