@@ -644,7 +644,7 @@ _STD_.webview.useProxy(url, config, onSuccess, onError);
 _STD_.webview.removeProxy(onSuccess, onError);
 
 /**
- * @since TBD (Android)
+ * @since 1.27.0 (Android)
  * 
  * Sets the size of the surface the browser paints its pages to. Only takes effect if called
  * before any tab is open - the surface is created at this size when the first tab opens.
@@ -659,7 +659,7 @@ _STD_.webview.removeProxy(onSuccess, onError);
 _STD_.webview.initSurface(size, onSuccess, onError);
 
 /**
- * @since TBD (Android)
+ * @since 1.27.0 (Android)
  * 
  * Returns the size of the surface the browser paints its pages to.
  * @param {WebViewGetSurfaceSizeSuccess} onSuccess the success callback.
@@ -816,7 +816,7 @@ type WebViewProxyConfig = {
 }
 
 /**
- * @since TBD (Android)
+ * @since 1.27.0 (Android)
  * 
  * @callback WebViewGetSurfaceSizeSuccess
  * @param {WebViewSurfaceSize | null} size the surface size, or `null` if the browser currently has no surface.
@@ -824,7 +824,7 @@ type WebViewProxyConfig = {
 type WebViewGetSurfaceSizeSuccess = (size) => void;
 
 /**
- * @since TBD (Android)
+ * @since 1.27.0 (Android)
  * 
  * @property {number} width the surface width in device pixels.
  * @property {number} height the surface height in device pixels.
@@ -837,7 +837,7 @@ type WebViewSurfaceSize = {
 }
 
 /**
- * @since TBD (Android)
+ * @since 1.27.0 (Android)
  * 
  * @property {number} width the requested surface width in device pixels.
  * @property {number} height the requested surface height in device pixels.
