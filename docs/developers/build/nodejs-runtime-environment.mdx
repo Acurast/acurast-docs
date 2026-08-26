@@ -232,10 +232,18 @@ _STD_.signers.secp256k1.decrypt(publicKey, salt, payload);
 _STD_.signers.ed25519.sign(payload);
 ```
 
-### **Websocket**
+### **Websocket (deprecated)** {#websocket}
+
+:::warning Deprecated
+The Websocket API is deprecated. Use the [P2P API](#p2p) instead, which covers the same
+processor-to-processor messaging. Existing deployments continue to work, but new deployments
+should not use `_STD_.ws`.
+:::
 
 ```javascript
 /**
+ * @deprecated Use `_STD_.p2p` instead.
+ *
  * @param {string | string[]} url to the acurast websocket service.
  * @param {WsSuccess} success the success callback.
  * @param {WsError} error the error callback.
@@ -243,17 +251,23 @@ _STD_.signers.ed25519.sign(payload);
 _STD_.ws.open(url, success, error);
 
 /**
+ * @deprecated Use `_STD_.p2p` instead.
+ *
  * @param {WsSuccess} success the success callback.
  * @param {WsError} error the error callback.
  */
 _STD_.ws.close(success, error);
 
 /**
+ * @deprecated Use `_STD_.p2p` instead.
+ *
  * @param {WsHandler} handler the handler called on every incoming message.
  */
 _STD_.ws.registerPayloadHandler(handler);
 
 /**
+ * @deprecated Use `_STD_.p2p` instead.
+ *
  * @param {string} recipient the public key in hex format of the recipient.
  * @param {string} payload the payload to send as a hex string.
  * @param {WsSuccess} success the success callback.
