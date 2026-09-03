@@ -1,0 +1,159 @@
+---
+title: "Signing Requests from a Deployment"
+slug: /developers/examples/signing-requests
+description: "Authenticate HTTP requests sent by an Acurast deployment: sign on the processor with the deployment's P-256 key and verify server-side against the key published on-chain."
+---
+
+# Signing Requests from a Deployment
+
+A deployment often needs to call your own backend. How does the backend know the
+request really came from a processor running *your* deployment, and not from
+anyone who read your code? Every processor holds a set of per-deployment keys
+whose public halves are recorded on-chain, so the deployment can **sign** each
+request and the backend can **verify** it against the chain.
+
+This example shows the working path with the P-256 (secp256r1) key in the
+Node.js runtime, and the three details that trip people up:
+
+1. The signer is `_STD_.signers.secp256r1`, but the public key is `getPublicKeys().p256`. Same key, different names.
+2. `secp256r1.sign()` does **not** hash. Pass a 32-byte SHA-256 digest.
+3. The signature is raw `r || s` (64 bytes), not DER.
+
+:::caution Don't use `_STD_.chains.substrate.signer` for this
+`_STD_.chains.substrate.signer.setSigner('SECP256R1')` throws
+`Unknown Substrate signer SECP256R1`. That API selects the key used for
+Substrate **extrinsics**, and its curve ids are `'P256'`, `'SECP256K1'`,
+`'ED25519'`. For signing arbitrary bytes use `_STD_.signers.*` as shown below.
+:::
+
+## 1. Sign on the processor
+
+```javascript title="deployment/index.js"
+const { createHash } = require('crypto');
+
+const BACKEND = 'https://api.example.com';
+
+async function signedFetch(path, body) {
+  const timestamp = Date.now().toString();
+  const bodyText = JSON.stringify(body);
+
+  // Canonical message: method, path, timestamp, body. Keep it deterministic.
+  const message = ['POST', path, timestamp, bodyText].join('\n');
+
+  // ECDSA signers sign a *digest*: hash first, then sign the 32-byte hash.
+  const digestHex = createHash('sha256').update(message).digest('hex');
+  const signatureHex = _STD_.signers.secp256r1.sign(digestHex); // raw r||s, 64 bytes
+
+  // Compressed P-256 public key (33 bytes, hex). Also on-chain as SECP256r1.
+  const publicKeyHex = _STD_.job.getPublicKeys().p256;
+
+  return fetch(BACKEND + path, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'x-acurast-pubkey': publicKeyHex,
+      'x-acurast-timestamp': timestamp,
+      'x-acurast-signature': signatureHex,
+    },
+    body: bodyText,
+  });
+}
+
+signedFetch('/ingest', { temperature: 21.5 }).then((r) => console.log(r.status));
+```
+
+The hash step is also available without Node's `crypto` module as
+`_STD_.chains.bitcoin.signer.sha256(hex)`, which takes and returns hex.
+
+## 2. Verify on the server
+
+Node's `crypto.verify` accepts the raw `r || s` encoding directly when
+`dsaEncoding` is set to `ieee-p1363`. The compressed public key needs to be
+wrapped in a SubjectPublicKeyInfo (SPKI) structure to become a `KeyObject`; the
+snippet below builds it by hand so no extra dependency is needed.
+
+```javascript title="server/verify.js"
+const crypto = require('crypto');
+
+// Compressed P-256 point -> SPKI DER -> KeyObject.
+function p256KeyFromCompressedHex(hex) {
+  const point = Buffer.from(hex, 'hex');
+  if (point.length !== 33) throw new Error('expected 33-byte compressed P-256 key');
+  const spkiPrefix = Buffer.from(
+    '3039301306072a8648ce3d020106082a8648ce3d030107032200', // SEQ{ AlgId(ecPublicKey, prime256v1), BIT STRING(len 34) }
+    'hex'
+  );
+  return crypto.createPublicKey({
+    key: Buffer.concat([spkiPrefix, point]),
+    format: 'der',
+    type: 'spki',
+  });
+}
+
+function verifyRequest(req, rawBody, isRegisteredKey) {
+  const pubKeyHex = req.headers['x-acurast-pubkey'];
+  const timestamp = req.headers['x-acurast-timestamp'];
+  const signature = Buffer.from(req.headers['x-acurast-signature'], 'hex');
+
+  // 1. Only accept keys that belong to an active deployment of yours (see below).
+  if (!isRegisteredKey(pubKeyHex)) return false;
+
+  // 2. Reject stale requests.
+  if (Math.abs(Date.now() - Number(timestamp)) > 5 * 60 * 1000) return false;
+
+  // 3. Rebuild the exact message the processor signed and verify.
+  const message = ['POST', req.path, timestamp, rawBody].join('\n');
+  return crypto.verify(
+    'sha256',
+    Buffer.from(message),
+    { key: p256KeyFromCompressedHex(pubKeyHex), dsaEncoding: 'ieee-p1363' },
+    signature
+  );
+}
+
+module.exports = { verifyRequest };
+```
+
+`crypto.verify('sha256', message, ...)` hashes `message` with SHA-256 and checks
+the signature over that digest. That is why the processor side signs
+`sha256(message)` and not `message`. If you instead see verification failures
+with a correct key, this mismatch is the first thing to check.
+
+## 3. Know which keys to trust
+
+A valid signature only proves that *some* processor with *some* deployment key
+signed the request. To know it was **your** deployment, the server needs the
+set of public keys assigned to it. Two ways to get them:
+
+- **Read the match record on-chain.** When a processor is matched to your
+  deployment, the assignment stored in the `acurastMarketplace` pallet includes
+  `pubKeys`, with the P-256 key under `SECP256r1`. It equals
+  `getPublicKeys().p256` byte for byte. Use the
+  [Acurast SDK](/developers/tools/sdk) or a Polkadot.js connection to read it.
+- **Register on first contact.** Have the deployment call a registration
+  endpoint on start with its `getPublicKeys()`, and have the server cross-check
+  the key against the on-chain match record before storing it.
+
+:::warning Match records are cleaned up
+When a deployment ends and is cleaned up, its match records (including
+`pubKeys`) are removed from chain state. Harvest and persist the keys you need
+**while the deployment is active**. Do not rely on reading them back later.
+:::
+
+## Using the other curves
+
+The same flow works with `secp256k1` (public key `getPublicKeys().secp256k1`,
+raw low-`s` `r || s` output, no recovery byte) and with `ed25519`. Ed25519
+differs in one way: it hashes internally, so pass the **full message** to
+`_STD_.signers.ed25519.sign()`, not a digest, and verify with
+`crypto.verify(null, message, key, signature)` on the server.
+
+In the [Cargo runtime](/developers/build/cargo-runtime-environment#signer) the
+equivalent call is the `signer_sign` RPC method with `curve: "p256"`. It has the
+same digest-in, `r || s`-out behavior.
+
+## Reference
+
+- [Node.js Runtime Environment - Signers](/developers/build/nodejs-runtime-environment#signers)
+- [Node.js Runtime Environment - Substrate signer functions](/developers/build/nodejs-runtime-environment#substrate-signer-functions)
+- [Cargo Runtime Environment - Signer](/developers/build/cargo-runtime-environment#signer)

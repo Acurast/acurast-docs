@@ -46,6 +46,7 @@ const sidebars = {
             "developers/examples/minecraft",
             "developers/examples/hermes",
             "developers/examples/openclaw",
+            "developers/examples/signing-requests",
           ],
         },
         {
