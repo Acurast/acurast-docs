@@ -1,0 +1,206 @@
+---
+title: Post Mortem - 2026-07-20 - Acurast Compute — Double claiming of staking rewards
+slug: /incidents/post-mortem-20260720-1
+---
+
+# Post mortem: Acurast Compute — Double claiming of staking rewards
+
+## Duplicate reward payout in `delegate_more` / `redelegate` / `kick_out`
+
+#### Date: 2026-07-20
+
+#### Authors: Simon
+
+#### Status: FIXED
+
+### Summary:
+In `pallet-acurast-compute`, several staking flows paid an accrued delegation reward **twice**.
+The internal helper `end_delegation_for` (via `withdraw_delegation_for`) already transferred the
+delegator's accrued reward from the distribution account to the delegator, and then **returned that
+same amount as a plain `Balance`**. Three callers — `delegate_more_for`, `redelegate_for`, and the
+`kick_out` path — treated the returned value as "still owed" and transferred it a **second** time
+from the distribution account. A delegator who ended/topped-up a delegation therefore received
+double their accrued reward, at the expense of the shared compute distribution (staking pot)
+account.
+
+### Detection:
+Reported by a user who found the issue, while reviewing the compute pallet's
+reward-accounting code paths (the delegation lifecycle `delegate` → `delegate_more` / `redelegate` /
+`kick_out` / `withdraw_delegation`). The ambiguity of a function that both performs a transfer **and**
+returns the transferred amount for event emmission made the duplicate payout possible.
+
+### When it was introduced:
+The double payout was introduced in commit `0775beed` "feat: RedelegationBlockingPeriod"
+(2025-10-30), a large staking refactor that moved the reward transfer **into**
+`withdraw_delegation_for` / `end_delegation_for` but added a **redundant second transfer** in the
+`delegate_more_for` and `redelegate_for` callers. The same duplicate-transfer pattern was then copied
+into the new kick-out helper in `06168e9b` "feat: impl kick_out" (same day, 2025-10-30). The bug was
+therefore live from 2025-10-30 until the fix on 2026-07-20 (~8.5 months). Before `0775beed`,
+`delegate_more_for` called `end_delegation_for` and discarded its result, so no duplicate occurred.
+
+### Root causes:
+1. **Primary cause — type ambiguity between "already paid" and "still owed":**
+   Reward-producing functions returned a plain, `Copy` `BalanceFor<T, I>` while also performing the
+   transfer internally. Nothing in the type distinguished a value that had already been paid from a
+   value the caller still had to pay, so callers re-paid it:
+   ```rust
+   // withdraw_delegation_for (pre-fix): transfers AND returns the amount
+   let reward = Self::withdraw_delegator_accrued(who, commitment_id)?;
+   T::Currency::transfer(&distribution_account, who, reward, KeepAlive)?; // paid here
+   Ok(reward)                                                             // ...and returned
+
+   // delegate_more_for / redelegate_for / kick_out (pre-fix): pay it again
+   let reward = Self::end_delegation_for(who, commitment_id, false, false)?;
+   T::Currency::transfer(&distribution_account, who, reward, KeepAlive)?; // DUPLICATE payout
+   ```
+2. **Contributing cause — side effects buried in a helper:** the transfer happened deep inside
+   `withdraw_delegation_for`/`end_delegation_for`, so at the call site it was not obvious the money
+   had already moved.
+3. **Contributing cause — no regression test** covered the equivalence of the reward paid across the
+   different exit paths (`withdraw_delegation` vs `delegate_more` vs `redelegate` vs `kick_out`).
+
+### Impact:
+- **Nature:** Duplicate payout of accrued delegation rewards from the compute distribution (staking
+  pot) account to the delegator.
+- **Trigger:** Any delegator calling `delegate_more`, `redelegate`, or being `kick_out`-ed with a
+  non-zero accrued reward received 2× that reward. `withdraw_delegation` / `withdraw_commitment`
+  (the "plain claim" paths) were **not** affected.
+- **Exploitability:** Reachable by any delegator via ordinary, permissionless extrinsics; no special
+  privileges required.
+- **Bounded to once per epoch (key limiting factor):** the duplicated amount is the delegator's
+  `accrued_reward`, and `withdraw_delegator_accrued` **zeroes** `accrued_reward` as part of the claim.
+  A delegation's `accrued_reward` only grows when the pool's `reward_per_weight` increases, which
+  happens **exclusively at epoch boundaries** (`on_initialize` → `advance_epoch` → inflation
+  `distribute`). The abusing calls (`delegate_more` / `redelegate` / `kick_out`) end the delegation —
+  claiming and zeroing the accrued reward while paying it twice — and re-delegate fresh with
+  `reward_debt` reset to the current accumulator. Immediately repeating the call therefore finds
+  `accrued_reward ≈ 0` and doubles nothing. To extract another duplicate the attacker must wait for
+  the next epoch's distribution to accrue new rewards. Consequently the **extra (fraudulent) payout
+  is capped at roughly one epoch's worth of the delegator's legitimate reward, and can be repeated at
+  most once per epoch** — it is not an unbounded, repeat-in-a-single-block drain, which materially
+  limited the maximum extractable value and the rate of pot depletion.
+- **Realized loss:** Material. An on-chain reconstruction (see below) puts the total wrongly-received
+  reward at **≈ 571,875 ACU** across 421 addresses. An earlier manual review had found "no large
+  scale abuse"; that conclusion was **wrong** — it missed that the `redelegate` path carried by far
+  the largest accrued rewards.
+
+### Realized loss (measured on-chain):
+Reconstructed from the mainnet indexer + the fact that each affected call paid the reward via **two
+equal `Transfer`s from the compute distribution account** (`PalletId("cmptepid")`,
+`0x6d6f646c636d707465706964…`) to the recipient within one extrinsic. For every event of the five
+vulnerable paths we take the recipient's `cmptepid` transfers in that exact extrinsic; the wrongly
+received amount is `total_paid − largest_single_payment` (0 for a correct single-transfer call).
+This is an upper bound. Tool: `scripts/dm-loss`. Measured 2026-07-23; detected
+double-claims span 2026-01-20 → 2026-07-21 (1,840 events).
+
+**By path:**
+
+| Path | Duplicate loss | Notes |
+|------|---------------:|-------|
+| `redelegate` | 522,960 ACU | dominant — largest accrued rewards |
+| `delegate_more` | 48,916 ACU | |
+| `kick_out` | 0 ACU | extrinsic never called on mainnet |
+| `compound_delegation` | 0 ACU | never double-paid¹ |
+| `compound_stake` | 0 ACU | never double-paid¹ |
+| **Total** | **≈ 571,875 ACU** | 421 addresses, 1,840 double-claims |
+
+¹ The `compound_*` paths claim via `withdraw_delegation_for` **first**, which zeroes
+`accrued_reward`; the subsequent internal `delegate_more_for` / `stake_more_for` then re-pays ≈ 0.
+Verified on-chain: across ~10,800 compound anchors, none ever produced two transfers. The bug only
+realizes when the double-paying helper is the first thing to touch the accrued reward — i.e. the
+explicit `delegate_more` / `redelegate` / `kick_out` extrinsics.
+
+**Top 10 recipients (98.6% of the total; the remaining 411 addresses account for ≈ 8,093 ACU):**
+
+| # | Address (SS58) | Wrongly received | Events | Path(s) |
+|---|---------|-----------------:|-------:|---------|
+|   | **From here are all known vesters**.
+| 1 | `5G1hb3aG4EvqshKAgZy5qTQHgVZZUEEgRvHczZ8zUjgXzfKK` | 212,687.83 ACU | 1 | redelegate |
+| 2 | `5ChwtgueM1qg3HEM59B8kLT7d5ipyJUgof2i46SohB1Z4rWi` | 174,623.16 ACU | 1 | redelegate |
+| 3 | `5Dcff2aGrPY3E99F5H66MyjfGnVEZe3VM8J5ePX92yA8ud8M` | 114,899.68 ACU | 5 | delegate_more + redelegate |
+| 4 | `5DhN5RKJiCGmkburNX7nuar8CUUiXYXmhoNvDrrgF1UqfmRJ` | 42,174.40 ACU | 1 | delegate_more |
+|   | **Until here all known vesters**.
+| 5 | `5EYydM9EA7RbXNrB6mP5WHg3XDobZQ7gJMgdJ14QAhPjT8cN` | 8,849.35 ACU | 1 | redelegate |
+| 6 | `5CAjErHxCfr9n6RTEbzffX83g4ft1KDc8axBizm5goTeKYc2` | 3,445.28 ACU | 1 | redelegate |
+| 7 | `5EfeQTU8WYLmJ6c44FSXsCR53CCi2mN3yMXGErmErLnjEiqe` | 3,162.84 ACU | 2 | delegate_more + redelegate |
+| 8 | `5EtNFo1uTGqvnVJVrCqXmCwKSwyC8mfwzUj6gha7TQaSZnhk` | 1,561.28 ACU | 1 | redelegate |
+| 9 | `5CRYfosnAHVik5SbzkpXvqpGVKtK2j16e8NQS2qPu7pbEFjN` | 1,215.77 ACU | 19 | delegate_more + redelegate |
+| 10 | `5GjiL6UP1spfTtaoiNRBfEQ8m7ibxXnAndN8usj2HrLEDNCN` | 1,162.22 ACU | 4 | delegate_more + redelegate |
+
+The top two entries are single `redelegate` calls (212,688 + 174,623 ACU), and the top three
+recipients alone account for ≈ 89% of the loss — consistent with a few very large stakers whose
+per-epoch accrued reward was doubled, rather than broad small-scale abuse.
+
+### Theoretical worst case:
+**Model.** The extra payout per abusing call equals the delegator's `accrued_reward`, which
+`withdraw_delegator_accrued` **zeroes** on claim and which only regrows at epoch boundaries (see
+*Impact → Bounded to once per epoch*). So a single delegator can double at most **one epoch's worth
+of their reward, once per epoch**. The maximum possible over the whole live window is therefore the
+case where **every delegator routes every epoch's reward through a doubling path** — i.e. the extra
+(fraudulent) payout ceiling equals **the total delegation rewards distributed to delegators over the
+bug's live window**. (Committer/`stake_more` rewards are excluded: that path was not vulnerable and
+double-paid 0 on-chain.)
+
+**Computation.** Summing every realized delegator reward over the window — the amount-bearing claim
+events plus the legit reward of each `delegate_more`/`redelegate` (whose events carry no amount):
+
+| Reward stream | Amount | Events |
+|---------------|-------:|-------:|
+| `DelegatorWithdrew` (plain claim, safe path) | 4,594,529 ACU | 25,684 |
+| `delegate_more` + `redelegate` (legit portion) | 571,877 ACU | — |
+| `DelegatorCompounded` | 10,098 ACU | 2,514 |
+| `DelegationEnded` | 236 ACU | 538 |
+| `KickedOut` | 0 ACU | 0 |
+| **Total delegator rewards distributed** | **≈ 5,176,740 ACU** | |
+
+**Theoretical worst-case extra payout ≈ 5.18M ACU.** The bulk (4.59M) is rewards that were actually
+claimed via the *safe* `withdraw_delegation` path — money that **would** have been doubled had those
+delegators instead claimed through `delegate_more`/`redelegate`. Against this ceiling, the
+**realized loss of ≈ 571,875 ACU is ≈ 11%** of the maximum: roughly one-ninth of all delegator
+rewards in the window were actually run through a doubling path.
+
+*Caveats.* This is the mechanism ceiling and ignores pot liquidity — draining the full 5.18M would
+require the distribution pot to hold ~2× the delegator reward each epoch (it is refilled by
+inflation per epoch, so the true constraint is per-epoch, not cumulative). It also excludes rewards
+that accrued but were never claimed (a small tail still legitimately claimable), and assumes stakes
+large enough to have been worth exploiting. Reproduced by `scripts/dm-loss`.
+
+### Timeline:
+(all times UTC+01:00, from commit history)
+
+| Time | Event |
+|------|-------|
+| 2025-10-30 | Double payout introduced: staking refactor moves the transfer into `withdraw_delegation_for`/`end_delegation_for` but adds a redundant second transfer in `delegate_more_for`/`redelegate_for` (`0775beed`) |
+| 2025-10-30 | Same duplicate-transfer pattern copied into the new kick-out helper (`06168e9b`) |
+| 2026-07-20 | Reported by a user |
+| 2026-07-20 16:52 | Fix committed: redundant second transfers removed from `delegate_more_for` / `redelegate_for` / kick-out path; regression test `test_delegate_more_does_not_double_transfer_reward` added (`a67a8f2b`) |
+| 2026-07-22 07:57 | Type-level hardening: rewards now flow through a move-only `Credit` (`RewardCreditOf`) that must be consumed exactly once (`969b30d5`) |
+
+## Lessons Learned
+
+### What went wrong
+- A single value (`Balance`) was overloaded to mean two different things — money already moved vs.
+  money to move — and the compiler could not catch the resulting double spend.
+- Money-moving side effects were hidden inside helpers whose return value looked like a pure
+  computation.
+
+### What went well
+
+### Where we got lucky
+- The bug was caught by honest user.
+- The exploit was time and real-reward bound.
+- Only the top-up / exit paths were affected; the most common claim path (`withdraw_delegation`) was
+  correct, limiting the blast radius.
+
+### Conclusion
+**Actions taken:**
+- Removed the duplicate transfers and added a regression test (`a67a8f2b`).
+- Hardened the reward path at the **type system level** (`969b30d5`): reward-producing functions now
+  return a move-only `Credit` (`RewardCreditOf`) instead of transferring internally and returning a
+  `Balance`. A `Credit` is not `Copy`/`Clone`, is consumed exactly once via a single `payout` helper
+  (`resolve`), and is burned on drop — so paying a reward twice is now a **compile error**. Developer/LLM guidelines have been updated to "prevent double transfers with `Imbalance`/`Credit`" mechanics.
+
+**Follow-ups:**
+- Note that upon event-shape change: reward payouts now emit `Balances::Withdraw` + `Balances::Deposit`
+  instead of a single `Balances::Transfer`; downstream indexers (e.g. acurast-explorer) must be
+  updated accordingly.

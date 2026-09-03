@@ -1,0 +1,183 @@
+---
+title: Post Mortem - 2026-07-20 - Acurast Token Conversion — replay of conversion messages
+slug: /incidents/post-mortem-20260720-2
+---
+
+# Post mortem: Acurast Token Conversion — replay of conversion messages
+
+## `Enabled` guard intentionally left out on retry and inbound-message paths (bridge could still mint locked funds while disabled) but deduplication state cleared on eventual user unlock
+
+#### Date: 2026-07-20
+
+#### Authors: Simon
+
+#### Status: FIXED (bridge also deactivated as containment)
+
+### Summary:
+`pallet-token-conversion` migrates the native token from the source ("canary") chain to an Acurast
+chain: a user burns balance on the source side, a cross-chain message is delivered, and on the
+receiving side the pallet funds the target account from the pallet account and places a vesting hold
+that the user later `unlock`s. The pallet has a governance master switch, `Enabled`, toggled via
+`set_enabled` — the intended emergency lever to stop the bridge.
+
+The core issue is that the pallet's inbound replay protection is only a transient, per-account check
+(`LockedConversion` existence) that is **cleared when the user eventually `unlock`s**, and it was
+designed without accounting for the **weak delivery guarantees of the underlying message protocol**:
+IBC provides at-least-once, not exactly-once, delivery (a message with the same nonce can be re-sent
+after its TTL). A conversion message replayed after the user has unlocked is therefore no longer
+deduplicated and re-runs `fund` + `hold`, re-minting the "migrated" funds from the pallet account.
+This was compounded by the `Enabled` kill switch being **intentionally** limited to `convert` — the
+retry and inbound `process_conversion` paths were deliberately left runnable so in-flight conversions
+could complete, and `unlock` deliberately stays open — so setting `Enabled = false` could not act as
+an emergency backstop against the replay.
+
+### Detection:
+Reported by a user who found the issue, while reviewing the cross-chain bridge
+stack (hyperdrive / IBC / token-conversion) — specifically which state-changing entry points honored
+the `Enabled` kill switch and how inbound conversion messages are deduplicated.
+
+### Root causes:
+1. **Primary cause — replay protection is transient and cleared on unlock.** The only inbound dedup
+   is the `LockedConversion[account]` existence check (a duplicate is silently ignored *while a lock
+   exists*), keyed by account rather than by a durable message id/nonce. That state is **removed once
+   the user `unlock`s** their migrated funds. The design also **overlooked that the underlying message
+   protocol only guarantees at-least-once (not exactly-once) delivery** — by design, a message with
+   the same nonce can be legitimately re-sent after its TTL. As a result, a conversion message
+   **replayed after the user has unlocked** is no longer recognized as a duplicate and re-runs
+   `fund` + `hold`, re-minting the migrated funds.
+2. **Contributing cause — the kill switch was intentionally limited, so it could not backstop the
+   replay.** By design, `ensure_enabled()` guarded only `convert`, and `unlock` is deliberately kept
+   callable even when disabled (so users can always release already-migrated funds); the retry
+   extrinsics and the inbound `process_conversion` path were intentionally left runnable so in-flight
+   conversions could still complete. The consequence was that `Enabled = false` did not halt the
+   fund-creating path and therefore could not serve as an emergency backstop against the replay
+   above. The fix adds the guard anyway, so disabling now stops every path except `unlock`:
+   ```rust
+   fn ensure_enabled() -> Result<(), Error<T>> {
+       if !Self::enabled() { return Err(Error::<T>::NotEnabled); }
+       Ok(())
+   }
+   ```
+3. **Contributing cause — the fund-creating path is origin-less.** `process_conversion` is reached
+   from `MessageProcessor::process` (a decoded inbound message), not from a signed extrinsic, so the
+   replay can be triggered purely by message delivery, without any attacker-controlled account action.
+
+### Impact:
+- **Nature:** The primary emergency control (`set_enabled(false)`) did not halt the fund-creating
+  path. While disabled, an inbound or replayed conversion message could still mint locked funds from
+  the pallet account to the target account.
+- **Replay window:** Because inbound dedup is per-account (`LockedConversion` existence) and IBC does
+  not guarantee exactly-once delivery after TTL, a conversion message could in principle be
+  reprocessed to re-credit an account (e.g. one that had already `unlock`-ed its prior lock),
+  drawing repeatedly on the pallet account.
+- **Exploitability / realized loss:** Not quantified here — see "Actions taken" for the on-chain
+  review needed to determine whether any conversion was processed while disabled or replayed on a
+  live network.
+- **`unlock` deliberately unaffected:** the fix intentionally leaves `unlock` callable while
+  disabled so users can always release already-migrated, legitimately-held funds; `unlock` touches
+  only the caller's own hold and mints nothing.
+
+### Theoretical worst case:
+The naive ceiling was the whole pallet account, but the vesting-slash and slot-freeing mechanics
+throttled and taxed the attack heavily. Three nested bounds applied:
+
+**1. Gross ceiling — the till.** The replay re-ran `process_conversion` → `fund`, and `fund` was a
+plain `T::Currency::transfer(pallet_account → target, amount, Preservation::Protect)` — it **moved
+funds out of the token-conversion pallet account**, it did not mint, and `Protect` kept the account
+above its existential deposit. So every replay drew down that one account and, once empty, `fund`
+would have failed. The gross ceiling was therefore its drainable balance. The mainnet pallet account
+was `PalletId(*b"tcmaipid").into_account_truncating()` = `0x6d6f646c74636d61697069640000…`
+(SS58 `5EYCAe5jXDUbcYZWt8V1v6rWXGtjSsJzuHEnpy2kXtx3N8tu`); its `System::Account` at the finalized
+head on 2026-07-23 (`0xb97d1fd58bf8faaff26b33bc8ef90eb02cdcb1f0ac5c5edf57a1a559b756e0f7`) held
+**free 6,663,034.33 ACU, reserved 0, frozen 0 → gross ≈ 6.66M ACU** (for reference, 3,426
+conversions totalling 58.3M ACU had been processed over 2025-12-01 → 2026-05-11; most had since
+been withdrawn, leaving 6.66M in the till).
+
+**2. The slot had to be re-opened, and re-opening it was taxed.** A replay to an account was deduped
+while that account's `LockedConversion` slot existed, so to replay again the holder first had to
+`unlock` to clear it. But `unlock` was gated by `MinLockDuration` (**84 days**) and applied a
+vesting slash: it kept `amount_factor = lock_progress / MaxLockDuration` and slashed the rest to the
+**Treasury** (`OnSlash = ResolveTo<Treasury>`). At the earliest possible unlock
+(`lock_progress = MinLockDuration`), with `MaxLockDuration = 1344 days`:
+
+```
+keep factor f = MinLock / MaxLock = 84 / 1344 = 1/16 = 6.25%
+```
+
+So to recycle a slot for the next replay the holder **forfeited 15/16 (93.75%) of the amount to the
+Treasury and kept 1/16**. Per min-lock cycle: pallet −`amount`, attacker +`amount/16`, Treasury
++`15·amount/16`. Draining the entire till this way would have netted the attacker only
+**≈ 6,663,034 / 16 ≈ 416,440 ACU**, with **≈ 6,246,595 ACU slashed back to the Treasury** (i.e. the
+protocol would have recovered it — drained from the bridge but not stolen).
+
+**3. It was rate-limited, and the rate cap was strategy-independent.** Net gain per replayed message
+was `f · amount` and the wait between replays was `lock_progress ≥ MinLock`, so the net extraction
+rate was `f · amount / lock_progress = amount / MaxLockDuration` — **independent of the chosen lock
+duration**. Unlocking early (min lock) drained the *gross* till faster but yielded the same *net*
+per unit time; holding to full `MaxLock` avoided the slash but took 1344 days. Either way an
+attacker would have netted at most **`amount / MaxLockDuration` ≈ 27% of a replayed amount per
+year**, and the recipient was fixed to the message's own account (funds could not be redirected), so
+this was per self-owned migration, not a free-for-all.
+
+**Realistic pre-containment window.** Replay only became possible ≥ `MinLockDuration` after a
+migration (earliest unlock ≈ 2026-02-23, 84 days after the first conversion) and ended at
+containment on 2026-07-20 — a window of ≈ 147 days ≈ 1.75 min-lock cycles. In that window an
+attacker could have completed at most ~1–2 replay cycles per slot, extracting ≤ `147/1344 ≈ 11%` of
+a migrated amount per slot net (the rest slashed to Treasury).
+
+**Bottom line.** Gross bridge-till exposure was ≈ **6.66M ACU**, but net attacker profit was bounded
+by the vesting slash to **≤ ~416k ACU** (1/16, only if the whole till were cycled) with the
+remainder recovered by the Treasury, and was further throttled to `amount / MaxLock` (~27%/yr) — so
+in the realistic ~147-day pre-containment window the extractable net was a low-single-digit-percent
+fraction of migrated value. As of `9b84db3d` the inbound `MessageProcessor::process` path was gutted
+to a no-op, so the replay path was closed and the live exploitable amount dropped to **0** (it would
+return only if the bridge were re-activated). Realized loss (whether any replay actually executed)
+is a separate on-chain review, still outstanding — see *Follow-ups*.
+
+### Timeline:
+(all times UTC+01:00, from commit history)
+
+| Time | Event |
+|------|-------|
+| 2026-07-20 | Reported by a user |
+| 2026-07-20 10:00 | Miti |
+| 2026-07-20 17:14 | Fix: `Self::ensure_enabled()?;` added to `retry_convert`, `retry_convert_for`, `retry_process_conversion`, `retry_process_conversion_for`, and `process_conversion` (`df3f0f07`) |
+| 2026-07-20 18:07 | Containment: hyperdrive `send_to_proxy` (outbound) and `MessageProcessor::process` (inbound `ActionExecutor` dispatch) gutted to no-ops — bridge deactivated (`9b84db3d`) |
+
+## Lessons Learned
+
+### What went wrong
+- The **weak delivery guarantees of the message protocol were overlooked.** The underlying transport
+  provides at-least-once (not exactly-once) delivery by design — a message can legitimately be
+  re-delivered after its TTL — but the pallet's replay protection was not built to withstand that. It
+  relied on transient, per-account state (`LockedConversion`) that is cleared on `unlock`, instead of
+  durable per-message (id/nonce) accounting. The protocol behaving as specified is not the fault;
+  designing dedup as if delivery were exactly-once is.
+- The emergency kill switch was intentionally scoped to `convert` only (a deliberate trade-off to let
+  in-flight conversions complete), which left it unable to halt the replay path. A kill switch is only
+  as strong as the state-changing paths it actually covers.
+
+### What went well
+- A defense-in-depth response was available: closing the specific guard gap (`df3f0f07`) **and**
+  deactivating the whole bridge (`9b84db3d`) as containment while the incident was assessed.
+- The fix correctly preserved user access to funds by keeping `unlock` open when disabled.
+
+### Where we got lucky
+- The strongest fund-creating path (`process_conversion`) still had the per-account
+  `LockedConversion` idempotency check and the `ReceiveFrom` sender check, which limited trivial
+  duplication while a lock was live and constrained who could originate messages.
+
+### Conclusion
+**Actions taken:**
+- Enforced `ensure_enabled()` on every state-changing conversion path except `unlock` (`df3f0f07`).
+- Deactivated hyperdrive send/receive as containment so no cross-chain action executes while the
+  incident is contained (`9b84db3d`).
+- Shipped as `0.26.3` / `spec_version` 14 (`7cacdc07`).
+
+**Follow-ups:**
+- Move inbound replay protection to durable **per-message (id/nonce)** dedup in token-conversion,
+  rather than relying on `LockedConversion` existence plus the IBC TTL behavior.
+- Add tests asserting that, with `Enabled = false`, every path except `unlock` rejects, including the
+  inbound `process_conversion` message path.
+- Define and document the re-activation procedure for hyperdrive (reverting `9b84db3d`) once the
+  cross-chain stack has been re-reviewed.
