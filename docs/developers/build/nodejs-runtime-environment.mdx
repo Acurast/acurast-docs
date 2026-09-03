@@ -251,10 +251,18 @@ _STD_.signers.ed25519.sign(payload);
 
 A SHA-256 helper is available at `_STD_.chains.bitcoin.signer.sha256(hex)` (see [Bitcoin message signing](#bitcoin-message-signing)). Since deployments run in Node.js you can also use `require('crypto').createHash('sha256')`.
 
-### **Websocket**
+### **Websocket (deprecated)** {#websocket}
+
+:::warning Deprecated
+The Websocket API is deprecated. Use the [P2P API](#p2p) instead, which covers the same
+processor-to-processor messaging. Existing deployments continue to work, but new deployments
+should not use `_STD_.ws`.
+:::
 
 ```javascript
 /**
+ * @deprecated Use `_STD_.p2p` instead.
+ *
  * @param {string | string[]} url to the acurast websocket service.
  * @param {WsSuccess} success the success callback.
  * @param {WsError} error the error callback.
@@ -262,17 +270,23 @@ A SHA-256 helper is available at `_STD_.chains.bitcoin.signer.sha256(hex)` (see 
 _STD_.ws.open(url, success, error);
 
 /**
+ * @deprecated Use `_STD_.p2p` instead.
+ *
  * @param {WsSuccess} success the success callback.
  * @param {WsError} error the error callback.
  */
 _STD_.ws.close(success, error);
 
 /**
+ * @deprecated Use `_STD_.p2p` instead.
+ *
  * @param {WsHandler} handler the handler called on every incoming message.
  */
 _STD_.ws.registerPayloadHandler(handler);
 
 /**
+ * @deprecated Use `_STD_.p2p` instead.
+ *
  * @param {string} recipient the public key in hex format of the recipient.
  * @param {string} payload the payload to send as a hex string.
  * @param {WsSuccess} success the success callback.
@@ -663,6 +677,30 @@ _STD_.webview.useProxy(url, config, onSuccess, onError);
 _STD_.webview.removeProxy(onSuccess, onError);
 
 /**
+ * @since 1.27.0 (Android)
+ * 
+ * Sets the size of the surface the browser paints its pages to. Only takes effect if called
+ * before any tab is open - the surface is created at this size when the first tab opens.
+ * Without this call the surface is created at the device's display size.
+ * @param {WebViewSurfaceSizeRequest} size the requested surface size.
+ * @param {WebViewVoidSuccess} onSuccess the success callback.
+ * @param {WebViewError} onError the error callback. Fails if the surface size has already been
+ * initialized, if a surface already exists, or if `size` is outside the supported bounds: each
+ * side between 240 and 2560 device pixels, total pixel count no more than 2560x1440, and
+ * `deviceScaleFactor` between 0.5 and 4.
+ */
+_STD_.webview.initSurface(size, onSuccess, onError);
+
+/**
+ * @since 1.27.0 (Android)
+ * 
+ * Returns the size of the surface the browser paints its pages to.
+ * @param {WebViewGetSurfaceSizeSuccess} onSuccess the success callback.
+ * @param {WebViewError} onError the error callback.
+ */
+_STD_.webview.getSurfaceSize(onSuccess, onError);
+
+/**
  * @since 1.9.2 (Android)
  * 
  * Returns the debug URL of the WebView.
@@ -808,6 +846,40 @@ type WebViewProxyConfig = {
   username?: string;
   password?: string;
   fallback?: boolean;
+}
+
+/**
+ * @since 1.27.0 (Android)
+ * 
+ * @callback WebViewGetSurfaceSizeSuccess
+ * @param {WebViewSurfaceSize | null} size the surface size, or `null` if the browser currently has no surface.
+ */
+type WebViewGetSurfaceSizeSuccess = (size) => void;
+
+/**
+ * @since 1.27.0 (Android)
+ * 
+ * @property {number} width the surface width in device pixels.
+ * @property {number} height the surface height in device pixels.
+ * @property {number} deviceScaleFactor the number of device pixels per CSS pixel.
+ */
+type WebViewSurfaceSize = {
+  width: number;
+  height: number;
+  deviceScaleFactor: number;
+}
+
+/**
+ * @since 1.27.0 (Android)
+ * 
+ * @property {number} width the requested surface width in device pixels.
+ * @property {number} height the requested surface height in device pixels.
+ * @property {number|undefined} deviceScaleFactor the requested number of device pixels per CSS pixel. If not provided, the default of `1` is used.
+ */
+type WebViewSurfaceSizeRequest = {
+  width: number;
+  height: number;
+  deviceScaleFactor?: number;
 }
 
 ```
