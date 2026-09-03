@@ -90,7 +90,7 @@ equal `Transfer`s from the compute distribution account** (`PalletId("cmptepid")
 `0x6d6f646c636d707465706964…`) to the recipient within one extrinsic. For every event of the five
 vulnerable paths we take the recipient's `cmptepid` transfers in that exact extrinsic; the wrongly
 received amount is `total_paid − largest_single_payment` (0 for a correct single-transfer call).
-This is an upper bound. Tool: [`scripts/dm-loss`](scripts/dm-loss). Measured 2026-07-23; detected
+This is an upper bound. Tool: `scripts/dm-loss`. Measured 2026-07-23; detected
 double-claims span 2026-01-20 → 2026-07-21 (1,840 events).
 
 **By path:**
@@ -163,7 +163,7 @@ rewards in the window were actually run through a doubling path.
 require the distribution pot to hold ~2× the delegator reward each epoch (it is refilled by
 inflation per epoch, so the true constraint is per-epoch, not cumulative). It also excludes rewards
 that accrued but were never claimed (a small tail still legitimately claimable), and assumes stakes
-large enough to have been worth exploiting. Reproduced by [`scripts/dm-loss`](scripts/dm-loss).
+large enough to have been worth exploiting. Reproduced by `scripts/dm-loss`.
 
 ### Timeline:
 (all times UTC+01:00, from commit history)
