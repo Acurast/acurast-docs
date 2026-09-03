@@ -373,6 +373,10 @@ Returns the public key for the given curve. Pass `derivationPath` for HD key der
 
 Signs a hex-encoded byte string with the given curve key. Pass `derivationPath` for HD signing.
 
+:::warning ECDSA curves sign a digest, not a message
+For `p256` and `secp256k1` the input is **not hashed**: the processor performs a raw ECDSA signature over exactly the bytes you pass. Hash your message first (usually SHA-256) and pass the 32-byte digest. The result is raw `r || s` (64 bytes), not DER; `secp256k1` signatures are low-`s` normalized with no recovery byte. `ed25519` hashes internally, so pass the full message. See [Signing requests from a deployment](/developers/examples/signing-requests).
+:::
+
 ```ts title="Request"
 {
   "jsonrpc": "2.0",

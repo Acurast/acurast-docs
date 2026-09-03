@@ -152,14 +152,29 @@ _STD_.device.getAddress();
 
 ### **Signers**
 
+Each deployment gets its own set of keys on every processor it runs on, one per curve. The public keys are returned by `_STD_.job.getPublicKeys()` and are also recorded on-chain in the deployment's match record (`assignment.pubKeys`). The signing functions below use the matching private key, which never leaves the processor.
+
+:::info Key naming
+The same P-256 key shows up under three names: `getPublicKeys().p256`, `_STD_.signers.secp256r1`, and the on-chain `SECP256r1` entry. P-256, secp256r1 and prime256v1 are all the same curve.
+:::
+
+:::warning ECDSA signers sign a digest, not a message
+`secp256r1.sign()` and `secp256k1.sign()` do **not** hash their input. They perform a raw ECDSA signature over exactly the bytes you pass, so you must hash the message yourself (usually SHA-256) and pass the 32-byte digest. If you pass the message itself, a standard `verify('sha256', message, signature)` on the server will fail. `ed25519.sign()` is different: Ed25519 hashes internally, so pass the full message.
+
+The ECDSA signature is returned as raw `r || s` (64 bytes, hex), **not** DER. `secp256k1` signatures are low-`s` normalized and carry no recovery byte. Convert to DER if your verifier needs it (Node: `crypto.verify(..., { key, dsaEncoding: 'ieee-p1363' }, ...)` accepts `r || s` directly).
+
+See [Signing requests from a deployment](/developers/examples/signing-requests) for a full hash → sign → verify walkthrough.
+:::
+
 ```javascript
 /**
- * Signs the given payload with the secp256r1 key generated for the current deployment.
+ * Signs the given digest with the secp256r1 (P-256) key generated for the current deployment.
+ * The matching public key is `_STD_.job.getPublicKeys().p256`.
  *
  * @since 1.9.2 (version code 58)
  *
- * @param {string} payload Hex string representing the bytes to sign.
- * @return {string} Hex string representing the signature.
+ * @param {string} payload Hex string of the bytes to sign. This is NOT hashed: pass a 32-byte digest (e.g. sha256 of your message).
+ * @return {string} Hex string of the raw `r || s` signature (64 bytes, not DER).
  */
 _STD_.signers.secp256r1.sign(payload);
 
@@ -188,12 +203,13 @@ _STD_.signers.secp256r1.encrypt(publicKey, salt, payload);
 _STD_.signers.secp256r1.decrypt(publicKey, salt, payload);
 
 /**
- * Signs the given payload with the secp256k1 key generated for the current deployment.
+ * Signs the given digest with the secp256k1 key generated for the current deployment.
+ * The matching public key is `_STD_.job.getPublicKeys().secp256k1`.
  *
  * @since 1.9.2 (version code 58)
  *
- * @param {string} payload Hex string representing the bytes to sign.
- * @return {string} Hex string representing the signature.
+ * @param {string} payload Hex string of the bytes to sign. This is NOT hashed: pass a 32-byte digest.
+ * @return {string} Hex string of the raw `r || s` signature (64 bytes, low-s, no recovery byte, not DER).
  */
 _STD_.signers.secp256k1.sign(payload);
 
@@ -222,15 +238,18 @@ _STD_.signers.secp256k1.encrypt(publicKey, salt, payload);
 _STD_.signers.secp256k1.decrypt(publicKey, salt, payload);
 
 /**
- * Signs the given payload with the ed25519 key generated for the current deployment.
+ * Signs the given message with the ed25519 key generated for the current deployment.
+ * The matching public key is `_STD_.job.getPublicKeys().ed25519`.
  *
  * @since 1.9.2 (version code 58)
  *
- * @param {string} payload Hex string representing the bytes to sign.
- * @return {string} Hex string representing the signature.
+ * @param {string} payload Hex string of the message to sign. Unlike the ECDSA signers, Ed25519 hashes internally: pass the full message, not a digest.
+ * @return {string} Hex string representing the 64-byte signature.
  */
 _STD_.signers.ed25519.sign(payload);
 ```
+
+A SHA-256 helper is available at `_STD_.chains.bitcoin.signer.sha256(hex)` (see [Bitcoin message signing](#bitcoin-message-signing)). Since deployments run in Node.js you can also use `require('crypto').createHash('sha256')`.
 
 ### **Websocket**
 
@@ -891,10 +910,16 @@ type SubstrateError = (message) => void;
 
 ### **Substrate signer functions**
 
+These functions select and use the key that signs **Substrate extrinsics** submitted by `_STD_.chains.substrate.fulfill(...)` and friends. To sign arbitrary data (e.g. authenticating HTTP requests from your deployment) use the [Signers](#signers) API instead.
+
+:::caution `Unknown Substrate signer SECP256R1`
+`setSigner` accepts the curve ids `'P256'`, `'SECP256K1'` and `'ED25519'`. Passing `'SECP256R1'` throws `Unknown Substrate signer SECP256R1` at startup. The P-256 / secp256r1 key is selected with `'P256'`. For general-purpose signing prefer `_STD_.signers.secp256r1.sign(...)`.
+:::
+
 ```javascript
 /**
- * Sets the curve type to use when signing.
- * @param {'SECP256K1' | 'SECP256R1'} curveType
+ * Sets the curve type to use when signing extrinsics.
+ * @param {'P256' | 'SECP256K1' | 'ED25519'} curveType Note: the P-256 (secp256r1) key is selected with 'P256'.
  */
 _STD_.chains.substrate.signer.setSigner(curveType);
 
