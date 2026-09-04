@@ -54,7 +54,7 @@ therefore live from 2025-10-30 until the fix on 2026-07-20 (~8.5 months). Before
    T::Currency::transfer(&distribution_account, who, reward, KeepAlive)?; // DUPLICATE payout
    ```
 2. **Contributing cause — side effects buried in a helper:** the transfer happened deep inside
-   `withdraw_delegation_for`/`end_delegation_for`, so at the call site it was not obvious the money
+   `withdraw_delegation_for`/`end_delegation_for`, so at the call site it was not obvious the tokens
    had already moved.
 3. **Contributing cause — no regression test** covered the equivalence of the reward paid across the
    different exit paths (`withdraw_delegation` vs `delegate_more` vs `redelegate` vs `kick_out`).
@@ -154,7 +154,7 @@ events plus the legit reward of each `delegate_more`/`redelegate` (whose events 
 | **Total delegator rewards distributed** | **≈ 5,176,740 ACU** | |
 
 **Theoretical worst-case extra payout ≈ 5.18M ACU.** The bulk (4.59M) is rewards that were actually
-claimed via the *safe* `withdraw_delegation` path — money that **would** have been doubled had those
+claimed via the *safe* `withdraw_delegation` path — tokens that **would** have been doubled had those
 delegators instead claimed through `delegate_more`/`redelegate`. Against this ceiling, the
 **realized loss of ≈ 571,875 ACU is ≈ 11%** of the maximum: roughly one-ninth of all delegator
 rewards in the window were actually run through a doubling path.
@@ -179,9 +179,9 @@ large enough to have been worth exploiting. Reproduced by `scripts/dm-loss`.
 ## Lessons Learned
 
 ### What went wrong
-- A single value (`Balance`) was overloaded to mean two different things — money already moved vs.
-  money to move — and the compiler could not catch the resulting double spend.
-- Money-moving side effects were hidden inside helpers whose return value looked like a pure
+- A single value (`Balance`) was overloaded to mean two different things — tokens already moved vs.
+  tokens to move — and the compiler could not catch the resulting double spend.
+- Token-moving side effects were hidden inside helpers whose return value looked like a pure
   computation.
 
 ### What went well
