@@ -92,7 +92,6 @@ The configuration above will start the Acurast node with the following options:
 - `--rpc-port` - specifies the RPC port for the node
 - `--rpc-external` - allows access to the RPC interface from outside the container; the Docker port mapping above restricts host access to localhost
 - `--rpc-methods safe` - allows only safe RPC methods
-- `--rpc-cors all` - allows all CORS requests
 - `--name` - the name of the node
 - `--telemetry-url` - The telemetry URL, the node will send telemetry data to [telemetry.polkadot.io](https://telemetry.polkadot.io/#/0xce7681fb12aa8f7265d229a9074be0ea1d5e99b53eedcec2deade43857901808) under the configured `name`
 - `--database=rocksdb` - specifies the database type
@@ -198,7 +197,7 @@ The output of the above command should be something like:
 }
 ```
 
-Immediately after the call succeeds, change `--rpc-methods unsafe` back to `--rpc-methods safe` and recreate the container with `docker compose up -d`. Confirm that the RPC endpoint is not publicly accessible before continuing. The node can then be restarted with the `--collator` flag.
+Immediately after the call succeeds, change `--rpc-methods unsafe` back to `--rpc-methods safe` and recreate the container with `docker compose up -d`. Confirm that the RPC endpoint is not publicly accessible before continuing.
 
 The node is now setup as a collator, but it will not start authoring blocks yet. **At this stage, the Acurast team manages the list of preselected collators that can actually author blocks.**
 
