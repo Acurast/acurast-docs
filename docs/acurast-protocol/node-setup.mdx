@@ -3,6 +3,8 @@ title: Node Setup
 slug: /acurast-protocol/node-setup
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 import ThemedImage from "@theme/ThemedImage";
 import useBaseUrl from "@docusaurus/useBaseUrl";
 
@@ -12,8 +14,18 @@ The recommended way to run the Acurast node is by using the published Docker ima
 
 Download the Acurast chain spec from the Acurast GitHub repository: 
 
-- [Acurast Canary chain spec](https://github.com/Acurast/acurast-substrate/blob/acurast-v0.21.0/chain-specs/acurast-kusama-parachain-2239-raw.json)
-- [Acurast Mainnet chain spec](https://github.com/Acurast/acurast-substrate/blob/acurast-v0.21.0/chain-specs/acurast-mainnet-parachain-3396-raw.json)
+<Tabs groupId="network">
+  <TabItem value="mainnet" label="Mainnet" default>
+
+[Acurast Mainnet chain spec](https://github.com/Acurast/acurast-substrate/blob/acurast-v0.21.0/chain-specs/acurast-mainnet-parachain-3396-raw.json)
+
+  </TabItem>
+  <TabItem value="canary" label="Canary">
+
+[Acurast Canary chain spec](https://github.com/Acurast/acurast-substrate/blob/acurast-v0.21.0/chain-specs/acurast-kusama-parachain-2239-raw.json)
+
+  </TabItem>
+</Tabs>
 
 ## Configure the node
 
@@ -24,7 +36,38 @@ Create an `acurast-node` folder. Inside this folder, the following 2 folders and
 
 In the `docker-compose.yml` file, put the following content:
 
-For Acurast Canary:
+<Tabs groupId="network">
+  <TabItem value="mainnet" label="Mainnet" default>
+
+```yml
+services:
+  node:
+    image: "acurast/node-mainnet:acurast-v0.25.5"
+    command: "--chain /node/chain-specs/acurast-mainnet-parachain-3396-raw.json \
+      --base-path /node/data \
+      --bootnodes /ip4/82.220.91.112/tcp/30335/ws/p2p/12D3KooWMJM3htCon6tQ6FzRuWkxtwEkd3i5awZitdTviWwJX3KY \
+      --port 30334 \
+      --rpc-port 9934 \
+      --rpc-external \
+      --rpc-methods safe \
+      --rpc-cors all \
+      --name MyNode \ # choose an appropriate name here
+      --telemetry-url \"wss://telemetry.polkadot.io/submit/ 0\" \
+      --database=rocksdb \
+      --pruning=archive"
+    ports:
+      - "30334:30334"
+      - "9934:9934"
+    volumes:
+      - ./:/node
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+```
+
+  </TabItem>
+  <TabItem value="canary" label="Canary">
 
 ```yml
 services:
@@ -53,34 +96,8 @@ services:
         max-file: "3"
 ```
 
-For Acurast Mainnet:
-
-```yml
-services:
-  node:
-    image: "acurast/node-mainnet:acurast-v0.25.5"
-    command: "--chain /node/chain-specs/acurast-mainnet-parachain-3396-raw.json \
-      --base-path /node/data \
-      --bootnodes /ip4/82.220.91.112/tcp/30335/ws/p2p/12D3KooWMJM3htCon6tQ6FzRuWkxtwEkd3i5awZitdTviWwJX3KY \
-      --port 30334 \
-      --rpc-port 9934 \
-      --rpc-external \
-      --rpc-methods safe \
-      --rpc-cors all \
-      --name MyNode \ # choose an appropriate name here
-      --telemetry-url \"wss://telemetry.polkadot.io/submit/ 0\" \
-      --database=rocksdb \
-      --pruning=archive"
-    ports:
-      - "30334:30334"
-      - "9934:9934"
-    volumes:
-      - ./:/node
-    logging:
-      options:
-        max-size: "10m"
-        max-file: "3"
-```
+  </TabItem>
+</Tabs>
 
 The configuration above will start the Acurast node with the following options:
 - `--chain` - specifies the chain spec file
@@ -171,14 +188,20 @@ The node is now setup as a collator, but it will not start authoring blocks yet.
 
 ### Set session key
 
-A session key needs to be registered. To do that, first perform the `author_rotateKeys` RPC call in order to generate a new session key:
+A session key needs to be registered. To do that, first perform the `author_rotateKeysWithOwner` RPC call in order to generate a new session key together with the proof of possession required by `session.setKeys`.
+
+The RPC takes one parameter: the public key (hex, 32 bytes, `0x`-prefixed) of the collator account that will submit the `session.setKeys` extrinsic. It is the raw public key, not the SS58 address, and it is not the aura key inserted via `author_insertKey`. It can be obtained with `subkey inspect <SS58 address>`, which prints it on the "Public key (hex)" line, or from the account details in the polkadotjs UI.
+
+> **_NOTE:_** `author_rotateKeysWithOwner` is an unsafe RPC method, so the node must be started with `--rpc-methods unsafe` for the call to succeed. Do not expose the RPC interface to the internet while the node runs in unsafe mode.
 
 ```bash
 curl -H "Content-Type: application/json" \
 --data '{
   "jsonrpc":"2.0",
-  "method":"author_rotateKeys",
-  "params":[],
+  "method":"author_rotateKeysWithOwner",
+  "params":[
+    "INSERT_COLLATOR_ACCOUNT_PUBLIC_KEY_HEX"
+  ],
   "id":1
 }' \
 http://localhost:9934
@@ -190,20 +213,35 @@ The output of the above command should be something like:
 {
   "jsonrpc": "2.0",
   "id": 1,
-  "result": "0xcc038816bd81c238bd1d163c48cea9c5e3b62899b8f193863f68268a719cca44"
+  "result": {
+    "keys": "0xcc038816bd81c238bd1d163c48cea9c5e3b62899b8f193863f68268a719cca44",
+    "proof": "0x8a3f1c92e47b05d6aa19f3c84e7d2b60915ac73e4f81d2ca6b0e59d73f4a1c8825d90b7e36af14c05e82d9b7130fa64c9e5b28d14f7a36c0b9e142d85fa63c07"
+  }
 }
 ```
 
-> **_WARNING:_** If the node exposes the RPC port to the internet, directly or through a reverse proxy, please make sure to restart the node with the argument `--rpc-methods safe` so that RPC methods related to the collator keys cannot be called anymore. For more information, see the [RPC Deployment](https://paritytech.github.io/devops-guide/guides/rpc_index.html?#important-flags-for-running-an-rpc-node) page of the Parachain Devops guide.
+> **_WARNING:_** Once the keys have been rotated, restart the node with the argument `--rpc-methods safe` so that RPC methods related to the collator keys cannot be called anymore. For more information, see the [RPC Deployment](https://paritytech.github.io/devops-guide/guides/rpc_index.html?#important-flags-for-running-an-rpc-node) page of the Parachain Devops guide.
 
-Next, submit the extrinsic `session.setKeys` with the collator account to the Acurast Canary or Acurast Mainnet chain. The first parameter of the extrinsic call is the `result` hex string in the output of the previous RPC call.
+Next, submit the extrinsic `session.setKeys` with the collator account to the Acurast Canary or Acurast Mainnet chain. The first argument of the extrinsic call is the `keys` value of the previous RPC response, the second argument (the proof) is the `proof` value of the same response.
+
+Submitting with a wrong or empty proof, for example `0x00`, fails with `session.InvalidProof`. The proof is bound to the account passed to the RPC, so `setKeys` must be signed by that same account.
 
 Any tool can be used to submit the extrinsic call, the important thing is that it is submitted by the collator account.
 
 One option is to use the polkadotjs UI web app:
 
-- [Acurast Canary](https://dotapps-io.ipns.dweb.link/?rpc=wss%3A%2F%2Fpublic-rpc.canary.acurast.com#/extrinsics)
-- [Acurast Mainnet](https://dotapps-io.ipns.dweb.link/?rpc=wss%3A%2F%2Fpublic-rpc.mainnet.acurast.com#/extrinsics)
+<Tabs groupId="network">
+  <TabItem value="mainnet" label="Mainnet" default>
+
+[Acurast Mainnet](https://dotapps-io.ipns.dweb.link/?rpc=wss%3A%2F%2Fpublic-rpc.mainnet.acurast.com#/extrinsics)
+
+  </TabItem>
+  <TabItem value="canary" label="Canary">
+
+[Acurast Canary](https://dotapps-io.ipns.dweb.link/?rpc=wss%3A%2F%2Fpublic-rpc.canary.acurast.com#/extrinsics)
+
+  </TabItem>
+</Tabs>
 
 <ThemedImage
   width="1000px"
@@ -215,9 +253,11 @@ One option is to use the polkadotjs UI web app:
 
 The screenshot above show how to call the `session.setKeys` extrinsic, where the first drop down menu selects the account submitting the extrinsic (in this example, the account comes from the PolkadotJS Chrome extension).
 
-Then the `submit the following extrinsic` box, the `session` pallet and the `setKeys` extrinsic are selected. Finally, provide the arguments: first the key, which corresponds to the result of the previous RPC call, and a `0x00` for the proof argument.
+Then the `submit the following extrinsic` box, the `session` pallet and the `setKeys` extrinsic are selected. Finally, provide the arguments: first the keys, which correspond to the `keys` value of the previous RPC call, then the proof, which corresponds to the `proof` value of the same call.
 
 ### Register as candidate
+
+The collator account must first be added to the candidate preselection list by the Acurast team, otherwise the extrinsic below fails with `collatorSelection.ValidatorNotRegistered`. Please get in touch with the Acurast team before this step.
 
 Once the session key is registered, the collator can be registered as a candidate, this is done through the extrinsic `collatorSelection.registerAsCandidate`, as before, the important thing is that the extrinsic is submitted by the collator account:
 
