@@ -154,11 +154,6 @@ const sidebars = {
             "token-holders/staking/staking-glossary",
           ],
         },
-        {
-          type: "link",
-          label: "Governance",
-          href: "/acurast-protocol/governance",
-        },
       ],
     },
     {
@@ -171,16 +166,6 @@ const sidebars = {
         "discover/tokenomics",
         "discover/roadmap",
         "discover/metrics",
-        {
-          type: "link",
-          label: "Audits",
-          href: "/acurast-protocol/audits",
-        },
-        {
-          type: "link",
-          label: "Whitepapers",
-          href: "/acurast-protocol/whitepapers",
-        },
       ],
     },
     {
