@@ -12,17 +12,17 @@ The recommended way to run the Acurast node is by using the published Docker ima
 
 ## Get the chain spec
 
-Download the Acurast chain spec from the Acurast GitHub repository: 
+Download the Acurast chain spec from the Acurast GitHub repository:
 
 <Tabs groupId="network">
   <TabItem value="mainnet" label="Mainnet" default>
 
-[Acurast Mainnet chain spec](https://github.com/Acurast/acurast-substrate/blob/acurast-v0.21.0/chain-specs/acurast-mainnet-parachain-3396-raw.json)
+[Acurast Mainnet chain spec](https://github.com/Acurast/acurast-substrate/blob/acurast-v0.26.5/chain-specs/acurast-mainnet-parachain-3396-raw.json)
 
   </TabItem>
   <TabItem value="canary" label="Canary">
 
-[Acurast Canary chain spec](https://github.com/Acurast/acurast-substrate/blob/acurast-v0.21.0/chain-specs/acurast-kusama-parachain-2239-raw.json)
+[Acurast Canary chain spec](https://github.com/Acurast/acurast-substrate/blob/acurast-v0.26.5/chain-specs/acurast-kusama-parachain-2239-raw.json)
 
   </TabItem>
 </Tabs>
@@ -50,14 +50,13 @@ services:
       --rpc-port 9934 \
       --rpc-external \
       --rpc-methods safe \
-      --rpc-cors all \
       --name MyNode \ # choose an appropriate name here
       --telemetry-url \"wss://telemetry.polkadot.io/submit/ 0\" \
       --database=rocksdb \
       --pruning=archive"
     ports:
       - "30334:30334"
-      - "9934:9934"
+      - "127.0.0.1:9934:9934"
     volumes:
       - ./:/node
     logging:
@@ -80,14 +79,13 @@ services:
       --rpc-port 9934 \
       --rpc-external \
       --rpc-methods safe \
-      --rpc-cors all \
       --name MyNode \ # choose an appropriate name here
       --telemetry-url \"wss://telemetry.polkadot.io/submit/ 0\" \
       --database=rocksdb \
       --pruning=archive"
     ports:
       - "30334:30334"
-      - "9934:9934"
+      - "127.0.0.1:9934:9934"
     volumes:
       - ./:/node
     logging:
@@ -105,13 +103,16 @@ The configuration above will start the Acurast node with the following options:
 - `--bootnodes` - specifies the bootnodes to connect to
 - `--port` - specifies the p2p port for the node
 - `--rpc-port` - specifies the RPC port for the node
-- `--rpc-external` - allows external access to the RPC interface
+- `--rpc-external` - allows access to the RPC interface from outside the container; the Docker port mapping above restricts host access to localhost
 - `--rpc-methods safe` - allows only safe RPC methods
-- `--rpc-cors all` - allows all CORS requests
 - `--name` - the name of the node
 - `--telemetry-url` - The telemetry URL, the node will send telemetry data to [telemetry.polkadot.io](https://telemetry.polkadot.io/#/0xce7681fb12aa8f7265d229a9074be0ea1d5e99b53eedcec2deade43857901808) under the configured `name`
 - `--database=rocksdb` - specifies the database type
 - `--pruning=archive` - specifies the pruning mode, change `archive` to the number of blocks to keep if you want to prune the database
+
+:::info RPC access is local by default
+The `127.0.0.1:9934:9934` port mapping exposes RPC only on the node host's loopback interface. Do not replace it with `9934:9934`, which listens on all host interfaces. If remote RPC access is required, use an authenticated reverse proxy and firewall, and keep `--rpc-methods safe` enabled.
+:::
 
 ## Start the node
 
@@ -126,9 +127,28 @@ This will start the Acurast node in detached mode. You can check the logs by run
 docker compose logs -f
 ```
 
-## Run a Collator
+## Collator Onboarding
 
-A node can be turned into a collator configuring its identity. One way to do so is to use a tool like [subkey](https://docs.rs/crate/subkey/latest).
+The steps below describe how to onboard a collator on Acurast Canary or Acurast Mainnet.
+
+### Pre registration checks
+
+- Make sure the node is fully synced.
+- Make sure the node is running on hardware that meets the minimum requirements. It is possible to check by looking at the node logs when it first starts:
+
+<ThemedImage
+  width="1000px"
+  sources={{
+    light: useBaseUrl("/img/node-hardware-checks.png"),
+    dark: useBaseUrl("/img/node-hardware-checks.png"),
+  }}
+/>
+
+If the hardware is good enough, there should not be any warning log message after the benchmarks logs shown in the screenshot above.
+
+### Generate the collator account
+
+A collator account is needed. One way to create it is to use a tool like [subkey](https://docs.rs/crate/subkey/latest).
 
 ```bash
 subkey generate
@@ -146,53 +166,27 @@ Secret phrase:       <MNEMONIC>
   SS58 Address:      5F7Cm8Kt57dX3SkdtYYDGdMn3yiPvC8dr3oSratmGjjLmSss
 ```
 
-Then configure the node with the generated key by calling the following RPC:
+This account is the collator account. It signs the `session.setKeys` and `collatorSelection.registerAsCandidate` extrinsics, so it needs to be funded and its secret kept safe.
+
+Any wallet can be used instead of subkey, for example an account from the PolkadotJS browser extension. What is needed in the next steps is the public key of the account in hex format, the "Public key (hex)" line above, which is 32 bytes and `0x`-prefixed. For an existing account it can be obtained with `subkey inspect <SS58 address>`. Note that the SS58 address is not what the RPC expects.
+
+### Generate the session key
+
+Generating the session key requires temporarily enabling unsafe RPC methods.
+
+:::warning Keep unsafe RPC private
+Never enable `--rpc-methods unsafe` while RPC is reachable from the internet. Keep the `127.0.0.1:9934:9934` mapping, do not forward port `9934` through a reverse proxy, and use a firewall to block inbound access as defense in depth. CORS is not an access control mechanism.
+
+For remote administration, connect to the node host over SSH and run the RPC call there, or create an SSH tunnel with `ssh -L 9934:127.0.0.1:9934 user@node-host` and call `http://localhost:9934` from the administration machine.
+:::
+
+With these protections in place, temporarily change `--rpc-methods safe` to `--rpc-methods unsafe` in `docker-compose.yml` and recreate the container:
 
 ```bash
-curl -H "Content-Type: application/json" \
---data '{
-  "jsonrpc":"2.0",
-  "method":"author_insertKey",
-  "params":[
-    "aura",
-    "INSERT_SECRET_PHRASE",
-    "INSERT_PUBLIC_KEY_HEX_FORMAT"
-  ],
-  "id":1
-}' \
-http://localhost:9934
+docker compose up -d
 ```
 
-In order for the above call to succeed, the node needs to be started with `--rpc-methods unsafe`. Once the key has been registered, the node can be restarted with the `--collator` flag.
-
-The node is now setup as a collator, but it will not start authoring blocks yet. At this stage, the Acurast team manages the list of collators that can actually author blocks.
-
-## Collator Onboarding
-
-### Pre registration checks
-
-- Make sure the node is setup with an identity as described above.
-- Make sure the node is fully synced.
-- Make sure the node was started with the `--collator` flag.
-- Make sure the node is running on hardware that meet the minimum requirements. It is possible to check by looking at the node logs when it first starts:
-
-<ThemedImage
-  width="1000px"
-  sources={{
-    light: useBaseUrl("/img/node-hardware-checks.png"),
-    dark: useBaseUrl("/img/node-hardware-checks.png"),
-  }}
-/>
-
-  If  the hardware is good enough, there should not be any warning log message after the benchmarks logs shown in the screenshot above.
-
-### Set session key
-
-A session key needs to be registered. To do that, first perform the `author_rotateKeysWithOwner` RPC call in order to generate a new session key together with the proof of possession required by `session.setKeys`.
-
-The RPC takes one parameter: the public key (hex, 32 bytes, `0x`-prefixed) of the collator account that will submit the `session.setKeys` extrinsic. It is the raw public key, not the SS58 address, and it is not the aura key inserted via `author_insertKey`. It can be obtained with `subkey inspect <SS58 address>`, which prints it on the "Public key (hex)" line, or from the account details in the polkadotjs UI.
-
-> **_NOTE:_** `author_rotateKeysWithOwner` is an unsafe RPC method, so the node must be started with `--rpc-methods unsafe` for the call to succeed. Do not expose the RPC interface to the internet while the node runs in unsafe mode.
+The `author_rotateKeysWithOwner` RPC call generates a new session key together with the proof of possession required by `session.setKeys`. It takes one parameter: the public key (hex, 32 bytes, `0x`-prefixed) of the collator account that will submit the `session.setKeys` extrinsic. It is the raw public key, not the SS58 address.
 
 ```bash
 curl -H "Content-Type: application/json" \
@@ -207,6 +201,10 @@ curl -H "Content-Type: application/json" \
 http://localhost:9934
 ```
 
+:::info
+`author_rotateKeysWithOwner` must be used instead of `author_rotateKeys` since Acurast node v0.26.4 (Mainnet spec version 15), because `session.setKeys` now verifies the proof of possession returned by this call.
+:::
+
 The output of the above command should be something like:
 
 ```json
@@ -220,13 +218,17 @@ The output of the above command should be something like:
 }
 ```
 
-> **_WARNING:_** Once the keys have been rotated, restart the node with the argument `--rpc-methods safe` so that RPC methods related to the collator keys cannot be called anymore. For more information, see the [RPC Deployment](https://paritytech.github.io/devops-guide/guides/rpc_index.html?#important-flags-for-running-an-rpc-node) page of the Parachain Devops guide.
+Immediately after the call succeeds, edit `docker-compose.yml` again: change `--rpc-methods unsafe` back to `--rpc-methods safe` and add the `--collator` flag to the command, then recreate the container with `docker compose up -d`. Confirm that the RPC endpoint is not publicly accessible before continuing.
 
-Next, submit the extrinsic `session.setKeys` with the collator account to the Acurast Canary or Acurast Mainnet chain. The first argument of the extrinsic call is the `keys` value of the previous RPC response, the second argument (the proof) is the `proof` value of the same response.
+For more information about securing RPC access, see the [RPC Deployment](https://paritytech.github.io/devops-guide/guides/rpc_index.html?#important-flags-for-running-an-rpc-node) page of the Parachain Devops guide.
+
+### Set session key
+
+Next, submit the extrinsic `session.setKeys` with the collator account to the Acurast Canary or Acurast Mainnet chain. The first argument is the `keys` value of the RPC response, the second argument (the proof) is the `proof` value.
 
 Submitting with a wrong or empty proof, for example `0x00`, fails with `session.InvalidProof`. The proof is bound to the account passed to the RPC, so `setKeys` must be signed by that same account.
 
-Any tool can be used to submit the extrinsic call, the important thing is that it is submitted by the collator account.
+Any tool can be used to submit the extrinsic call, the important thing is that it is submitted by the collator account whose public key was passed to the RPC.
 
 One option is to use the polkadotjs UI web app:
 
@@ -243,6 +245,16 @@ One option is to use the polkadotjs UI web app:
   </TabItem>
 </Tabs>
 
+Then follow the steps below to set the session key:
+
+1. Go to the Extrinsics page: `Developer` > `Extrinsics`
+2. In `using the selected account`, select the collator account
+3. In `submit the following extrinsic`, select the `session` pallet and the `setKeys` extrinsic
+4. Provide the arguments: `keys` from `result.keys` and `proof` from `result.proof` of the previous RPC call
+5. Click `Submit Transaction`, then confirm and sign the transaction in the pop-up window
+
+The screenshot below shows the filled in form:
+
 <ThemedImage
   width="1000px"
   sources={{
@@ -250,10 +262,6 @@ One option is to use the polkadotjs UI web app:
     dark: useBaseUrl("/img/set-session-keys.png"),
   }}
 />
-
-The screenshot above show how to call the `session.setKeys` extrinsic, where the first drop down menu selects the account submitting the extrinsic (in this example, the account comes from the PolkadotJS Chrome extension).
-
-Then the `submit the following extrinsic` box, the `session` pallet and the `setKeys` extrinsic are selected. Finally, provide the arguments: first the keys, which correspond to the `keys` value of the previous RPC call, then the proof, which corresponds to the `proof` value of the same call.
 
 ### Register as candidate
 
