@@ -7,17 +7,19 @@ Cargo deployments run as native binaries inside a Linux distro image on the proc
 
 ## Prerequisites
 
-### A 64-bit Android Core processor
+### A 64-bit Android processor
 
-Cargo deployments require a **64-bit (aarch64) Android device** running as an **Acurast Processor Core**. The Lite processor and iOS devices are not supported.
+Cargo deployments require a **64-bit (aarch64) Android device** running as an Acurast Processor (Core or Lite). iOS devices are not supported.
 
 To set one up yourself:
 
 1. Factory-reset a 64-bit Android phone (Android 12+).
 2. Visit [Acurast Hub ↗](https://hub.acurast.com/) and connect your wallet.
-3. Follow the **Processor Core** setup flow - the device will be locked down as a dedicated compute provider.
+3. Follow the **Processor** setup flow - the device will be locked down as a dedicated compute provider.
 
 Full guide: **[Become a Compute Provider](/processors/become-compute-provider)**.
+
+If you are using a **Lite processor**, you will also be prompted to install the **Acurast Cargo Executor** after setup - follow the on-screen instructions to complete it. If you skip this step, you can install it later from the processor app under **Settings > Install Executor**.
 
 :::note
 After onboarding, there is a warmup period of up to 3 epochs (~4.5 hours) before the device becomes eligible for public assignment matching. If you want to deploy on your freshly onboarded device before the warmup completes, it can be skipped by targeting the device directly with [Instant deploy](#instant-deploy).
