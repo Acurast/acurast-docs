@@ -80,12 +80,12 @@ Use the following docker image:
 <Tabs groupId="tunnel-docker-image">
   <TabItem value="mainnet" label="Mainnet" default>
 
-  `acurast/node-mainnet:acurast-v0.26.2`
+  `acurast/node-mainnet:acurast-v0.26.7`
   
   </TabItem>
   <TabItem value="canary" label="Canary">
 
-  `acurast/node-canary:acurast-v0.26.2`
+  `acurast/node-canary:acurast-v0.26.7`
 
   </TabItem>
 </Tabs>
@@ -98,7 +98,7 @@ An example `docker-compose.yml` for a Acurast Tunnel enabled deployment:
 ```yaml
 services:
   node:
-    image: acurast/node-mainnet:acurast-v0.26.2
+    image: acurast/node-mainnet:acurast-v0.26.7
     restart: always
     command: "--chain /node/chain-specs/acurast-mainnet-parachain-3396-raw.json \
       --base-path /node/data \
@@ -144,7 +144,7 @@ services:
 ```yaml
 services:
   node:
-    image: acurast/node-canary:acurast-v0.26.2
+    image: acurast/node-canary:acurast-v0.26.7
     restart: always
     command: "--chain /node/chain-specs/acurast-kusama-parachain-2239-raw.json \
       --base-path /node/data \
