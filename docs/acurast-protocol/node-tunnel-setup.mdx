@@ -1,5 +1,6 @@
 ---
 title: Node Tunnel Setup
+description: "Run an Acurast node with the built-in Acurast Tunnel service enabled: CLI flags, ports, certificate modes, and proxy rules for relaying end-user TCP traffic to processors."
 slug: /acurast-protocol/node-tunnel-setup
 ---
 
@@ -37,7 +38,7 @@ P-256 public key appears in that assignment's `pub_keys`.
 
 ### Prerequisites
 
-- A running Acurast Node, see [Node Setup](./node-setup).
+- A running Acurast Node, see [Node Setup](/acurast-protocol/node-setup).
 - DNS A record for the relay hostname (e.g. `relay.acurast.example.com`)
   pointing at the host's public IP.
 - TCP port 443 reachable from the public internet, with **no TLS terminator**
