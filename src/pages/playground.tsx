@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import classnames from "classnames"; // TODO: Remove because it's not needed?
 import Layout from "@theme/Layout";
+import BrowserOnly from "@docusaurus/BrowserOnly";
 import useWindowSize from "@site/src/hooks/useWindowSize";
 import Monaco from "@site/src/components/Monaco/Monaco";
 import styles from "./styles.module.css";
@@ -19,10 +20,6 @@ console.log('generateSecureRandomHex', generateSecureRandomHex())
 `;
 
 function Playground() {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
   const urlParams = new URLSearchParams(window.location.search);
   const initialCode = urlParams.has("code")
     ? atob(urlParams.get("code"))
@@ -130,4 +127,6 @@ function Playground() {
   );
 }
 
-export default Playground;
+export default function PlaygroundPage() {
+  return <BrowserOnly>{() => <Playground />}</BrowserOnly>;
+}

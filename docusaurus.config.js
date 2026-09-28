@@ -2,14 +2,18 @@
 // Note: type annotations allow type checking and IDEs autocompletion
 const path = require("path");
 
-const math = require("remark-math");
-const katex = require("rehype-katex");
+const { themes } = require("prism-react-renderer");
 
-const lightCodeTheme = require("prism-react-renderer/themes/github");
-const darkCodeTheme = require("prism-react-renderer/themes/dracula");
+const lightCodeTheme = themes.github;
+const darkCodeTheme = themes.dracula;
 
-/** @type {import('@docusaurus/types').Config} */
-const config = {
+/** @returns {Promise<import('@docusaurus/types').Config>} */
+module.exports = async function createConfig() {
+  // remark-math and rehype-katex are ESM-only
+  const math = (await import("remark-math")).default;
+  const katex = (await import("rehype-katex")).default;
+
+  return {
   title: "Acurast Docs",
   tagline: "Real Decentralized Compute Network - Powered by Phones",
   url: "https://docs.acurast.com",
@@ -17,7 +21,12 @@ const config = {
   trailingSlash: true,
   // GitHub pipeline throws a broken link that doesn't appear on a local build for some reason.
   onBrokenLinks: "throw",
-  onBrokenMarkdownLinks: "throw",
+  onBrokenAnchors: "throw",
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: "throw",
+    },
+  },
   favicon: "img/favicon.svg",
 
   // GitHub pages deployment config.
@@ -45,6 +54,7 @@ const config = {
           remarkPlugins: [math],
           rehypePlugins: [katex],
         },
+        blog: false,
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
         },
@@ -54,10 +64,10 @@ const config = {
 
   stylesheets: [
     {
-      href: "https://cdn.jsdelivr.net/npm/katex@0.13.24/dist/katex.min.css",
+      href: "https://cdn.jsdelivr.net/npm/katex@0.16.47/dist/katex.min.css",
       type: "text/css",
       integrity:
-        "sha384-odtC+0UGzzFL/6PNoE8rX/SPcQDXBJ+uRepguP4QkPCm2LBxH3FA3y+fKSiJ+AmM",
+        "sha384-nH0MfJ44wi1dd7w6jinlyBgljjS8EJAh2JBoRad8a3VDw2K69vfaaqm4WnR+gXtA",
       crossorigin: "anonymous",
     },
   ],
@@ -310,6 +320,5 @@ const config = {
       },
     ],
   ],
+  };
 };
-
-module.exports = config;
