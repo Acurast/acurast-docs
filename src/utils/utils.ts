@@ -1,4 +1,4 @@
-import * as ts from "typescript";
+import { transpile } from "./monaco";
 import { predefinedMethods } from "./predefined-methods-string";
 
 function replaceAll(string: string, search: string | RegExp, replace: string) {
@@ -27,7 +27,7 @@ const removeImports = (code: string) => {
     .join("\n");
 };
 
-export const runCoinlibCode = (
+export const runCoinlibCode = async (
   rawCode: string,
   setOutput: (str: string) => void
 ) => {
@@ -56,13 +56,15 @@ const coinlib = {}
   code = replaceAll(code, "console.log(", "progress(");
   code = code.replace(/(^|\s+)(print[(])/g, "progress(");
   code = removeImports(code);
-  code = ts.transpile(`({
+  // The predefined methods are inlined into a function body, where `export` is invalid.
+  const inlinedMethods = predefinedMethods.replace(/^export /gm, "");
+  code = await transpile(`({
       run: async (coinlib: any, progress: any): string => {
         Object.keys(coinlib).forEach(key => {
           window[key] = coinlib[key]
         })
         return (async () => {
-          ${predefinedMethods};
+          ${inlinedMethods};
           ${code};
           if (typeof result !== 'undefined') {
             return result
@@ -88,7 +90,7 @@ const coinlib = {}
           resolve(err);
         });
     } catch (e) {
-      appendOutput(e);
+      appendOutput(String(e));
       console.error(e);
       resolve(e);
     }

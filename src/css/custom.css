@@ -45,3 +45,9 @@ a.menu__link.menu__link--sublist.menu__link--sublist-caret {
 .navbar__title {
   margin-bottom: 3px;
 }
+
+/* Docusaurus 3 wraps a doc's h1 in <header>, so Infima's `h1:first-child` size also hits
+   headings that follow other content (e.g. the logo on the intro page). Keep those at 2rem. */
+.markdown > :not(:first-child) > h1:first-child {
+  --ifm-h1-font-size: 2rem;
+}

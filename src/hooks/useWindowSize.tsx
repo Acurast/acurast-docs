@@ -1,13 +1,7 @@
 import { useState, useEffect } from "react";
 
+// Browser only: callers must render inside <BrowserOnly>.
 function useWindowSize() {
-  if (typeof window === "undefined") {
-    return {
-      width: 999,
-      height: 999,
-    };
-  }
-
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,

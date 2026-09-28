@@ -1,7 +1,23 @@
 {
-  // This file is not used in compilation. It is here just for a nice editor experience.
-  "extends": "@tsconfig/docusaurus/tsconfig.json",
+  // This file is not used in compilation. It is here for `yarn typecheck` and editor support.
+  // Mirrors @docusaurus/tsconfig without `baseUrl`, which TypeScript 7 removed.
   "compilerOptions": {
-    "baseUrl": "."
-  }
+    "allowJs": true,
+    "jsx": "preserve",
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "paths": {
+      "@site/*": ["./*"]
+    },
+    "skipLibCheck": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true
+  },
+  "exclude": [".docusaurus", "build"]
 }

@@ -19,24 +19,24 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: "24.x"
-          cache: npm
-      - uses: actions/configure-pages@v5
+          cache: yarn
+      - uses: actions/configure-pages@v6
       - name: Install
-        run: |
-          if [ -e yarn.lock ]; then
-            yarn install --frozen-lockfile
-          elif [ -e package-lock.json ]; then
-            npm ci --legacy-peer-deps
-          else
-            npm i --legacy-peer-deps
-          fi
+        run: yarn install --frozen-lockfile
+      - name: Typecheck
+        run: yarn process-predefined-methods && yarn typecheck
       - name: Build
-        run: npm run build
-      - uses: actions/upload-pages-artifact@v3
+        run: yarn build
+      - name: Check baseline URLs
+        run: |
+          npx docusaurus serve --port 3000 --no-open &
+          for i in $(seq 1 30); do curl -sf -o /dev/null http://localhost:3000/ && break; sleep 1; done
+          yarn check-links
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: ./build
 
@@ -49,4 +49,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

@@ -1,6 +1,6 @@
 # Acurast Docs
 
-Acurast Docs is built using [Docusaurus 2](https://docusaurus.io/).
+Acurast Docs is built using [Docusaurus 3](https://docusaurus.io/). It needs Node.js 20 or newer and Yarn 1.
 
 ### Installation
 
@@ -23,3 +23,11 @@ $ yarn build
 ```
 
 This command generates static content into the `build` directory and can be served using any static contents hosting service.
+
+The build fails on broken links, anchors, images and duplicate routes.
+
+### Typecheck
+
+```
+$ yarn process-predefined-methods && yarn typecheck
+```

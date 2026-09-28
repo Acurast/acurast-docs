@@ -213,7 +213,7 @@ What do you want to deploy (and pay for) at deploy.acu.run?
 </details>
 
 
-## Programmatically deploy a job {#programmatically-deploy}
+## Programmatically deploy a job {/* #programmatically-deploy */}
 
 This approach uses Coinbase's `awal` tool directly, instead of via the LLM. This is a deterministic approach for dApps and backends.
 
@@ -330,7 +330,7 @@ Example response:
     The deploy agent has deployed the job under [`5H3ChM1QgrYyGwzmyQ1QkdFCJxzakjWsbQN5tSGP8dkn2VCR`](https://hub.acurast.com/explorer/address/5H3ChM1QgrYyGwzmyQ1QkdFCJxzakjWsbQN5tSGP8dkn2VCR).
 
 
-## Programmatically deploy a VPS (SSH tunnel) {#deploy-a-vps-ssh-tunnel}
+## Programmatically deploy a VPS (SSH tunnel) {/* #deploy-a-vps-ssh-tunnel */}
 
 Instead of a job spec, send `{ "vps": { "sshKey": "..." } }`. The deploy agent
 generates a P-256 tunnel keypair, precomputes the `<hash>.acu.run` subdomain,

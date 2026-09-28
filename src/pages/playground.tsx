@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import classnames from "classnames"; // TODO: Remove because it's not needed?
 import Layout from "@theme/Layout";
+import BrowserOnly from "@docusaurus/BrowserOnly";
 import useWindowSize from "@site/src/hooks/useWindowSize";
 import Monaco from "@site/src/components/Monaco/Monaco";
 import styles from "./styles.module.css";
@@ -19,14 +19,9 @@ console.log('generateSecureRandomHex', generateSecureRandomHex())
 `;
 
 function Playground() {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
   const urlParams = new URLSearchParams(window.location.search);
-  const initialCode = urlParams.has("code")
-    ? atob(urlParams.get("code"))
-    : defaultCode;
+  const sharedCode = urlParams.get("code");
+  const initialCode = sharedCode !== null ? atob(sharedCode) : defaultCode;
 
   const [input, setInput] = useState(initialCode);
   const [output, setOutput] = useState("");
@@ -34,7 +29,7 @@ function Playground() {
 
   const windowSize = useWindowSize();
 
-  const inputChanged = (str) => {
+  const inputChanged = (str: string) => {
     setInput(str);
   };
 
@@ -86,7 +81,7 @@ function Playground() {
 
   return (
     <Layout title="Acurast" description="Acurast Playground" noFooter={true}>
-      <div className={classnames(styles.runbox)}>
+      <div className={styles.runbox}>
         <button
           onClick={execute}
           className="button button--primary margin-bottom--lg margin-right--xs"
@@ -107,7 +102,7 @@ function Playground() {
         </button>
       </div>
 
-      <div className={classnames(styles.row)}>
+      <div className={styles.row}>
         <Monaco
           {...(windowSize.width > 600 ? editorLayout.lg : editorLayout.xs)}
           language="typescript"
@@ -117,7 +112,7 @@ function Playground() {
         />
         <Monaco
           {...(windowSize.width > 600 ? outputLayout.lg : outputLayout.xs)}
-          language="bash"
+          language="plaintext"
           value={output}
           options={{
             readOnly: true,
@@ -130,4 +125,6 @@ function Playground() {
   );
 }
 
-export default Playground;
+export default function PlaygroundPage() {
+  return <BrowserOnly>{() => <Playground />}</BrowserOnly>;
+}

@@ -79,7 +79,7 @@ That's the whole trick. There is no special integration — `apt`, `curl`, and `
 
 The repository ships the same webhook program in each language below. Same `acurast.json` shape, same `start.sh` skeleton — only the toolchain line differs. Pick the one closest to your stack, swap in your own program, and deploy.
 
-### C++ {#cpp}
+### C++ {/* #cpp */}
 
 Installs `g++` from apt, compiles `main.cpp` on the device, and runs the binary.
 
@@ -89,7 +89,7 @@ apt-get install -y g++ libcurl4-openssl-dev
 
 Example: [`app-cargo-cpp`](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-cargo-cpp)
 
-### C# {#csharp}
+### C# {/* #csharp */}
 
 Uses the Mono compiler and runtime from apt.
 
@@ -99,7 +99,7 @@ apt-get install -y mono-mcs mono-runtime
 
 Example: [`app-cargo-csharp`](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-cargo-csharp)
 
-### Go {#go}
+### Go {/* #go */}
 
 Installs the Go toolchain from apt and compiles on the device. `CGO_ENABLED=0` keeps it pure-Go, so no C toolchain is needed.
 
@@ -111,7 +111,7 @@ go run "$SCRIPT_DIR/main.go"
 
 Example: [`app-cargo-go`](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-cargo-go)
 
-### Java {#java}
+### Java {/* #java */}
 
 Installs the default JDK and runs a single source file directly (`java Main.java`).
 
@@ -122,7 +122,7 @@ java "$SCRIPT_DIR/Main.java"
 
 Example: [`app-cargo-java`](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-cargo-java)
 
-### Node.js {#nodejs}
+### Node.js {/* #nodejs */}
 
 Cargo can also run Node.js as an ordinary Linux workload — install it from apt like any other toolchain.
 
@@ -132,7 +132,7 @@ apt-get install -y nodejs
 
 Example: [`app-cargo-nodejs`](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-cargo-nodejs)
 
-### PHP {#php}
+### PHP {/* #php */}
 
 Installs the PHP CLI and cURL extension from apt.
 
@@ -142,7 +142,7 @@ apt-get install -y php-cli php-curl
 
 Example: [`app-cargo-php`](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-cargo-php)
 
-### Python {#python}
+### Python {/* #python */}
 
 Installs the interpreter (with `requests`) from apt and runs the script — the simplest possible case.
 
@@ -153,7 +153,7 @@ python3 "$SCRIPT_DIR/main.py"
 
 Example: [`app-cargo-python`](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-cargo-python)
 
-### Ruby {#ruby}
+### Ruby {/* #ruby */}
 
 Installs Ruby from apt and runs the script.
 
@@ -163,7 +163,7 @@ apt-get install -y ruby
 
 Example: [`app-cargo-ruby`](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-cargo-ruby)
 
-### Rust {#rust}
+### Rust {/* #rust */}
 
 Installs current stable Rust via `rustup` (apt's `rustc` is too old for some crates), then builds and runs.
 
@@ -173,7 +173,7 @@ curl -fsSL https://sh.rustup.rs | sh -s -- -y
 
 Example: [`app-cargo-rust`](https://github.com/Acurast/acurast-example-apps/tree/main/apps/app-cargo-rust)
 
-### Zig {#zig}
+### Zig {/* #zig */}
 
 apt doesn't carry Zig, so the example fetches the official prebuilt tarball, then compiles and runs.
 

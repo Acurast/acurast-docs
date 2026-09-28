@@ -1,15 +1,17 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
-const path = require("path");
+const { themes } = require("prism-react-renderer");
 
-const math = require("remark-math");
-const katex = require("rehype-katex");
+const lightCodeTheme = themes.github;
+const darkCodeTheme = themes.dracula;
 
-const lightCodeTheme = require("prism-react-renderer/themes/github");
-const darkCodeTheme = require("prism-react-renderer/themes/dracula");
+/** @returns {Promise<import('@docusaurus/types').Config>} */
+module.exports = async function createConfig() {
+  // remark-math and rehype-katex are ESM-only
+  const math = (await import("remark-math")).default;
+  const katex = (await import("rehype-katex")).default;
 
-/** @type {import('@docusaurus/types').Config} */
-const config = {
+  return {
   title: "Acurast Docs",
   tagline: "Real Decentralized Compute Network - Powered by Phones",
   url: "https://docs.acurast.com",
@@ -17,7 +19,20 @@ const config = {
   trailingSlash: true,
   // GitHub pipeline throws a broken link that doesn't appear on a local build for some reason.
   onBrokenLinks: "throw",
-  onBrokenMarkdownLinks: "throw",
+  onBrokenAnchors: "throw",
+  onDuplicateRoutes: "throw",
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: "throw",
+      onBrokenMarkdownImages: "throw",
+    },
+  },
+
+  future: {
+    // Opt into all Docusaurus v4 behavior now, incl. strict MDX (no MDX 1 compat) and Rspack/SWC builds.
+    v4: true,
+    faster: true,
+  },
   favicon: "img/favicon.svg",
 
   // GitHub pages deployment config.
@@ -45,21 +60,15 @@ const config = {
           remarkPlugins: [math],
           rehypePlugins: [katex],
         },
+        blog: false,
         theme: {
-          customCss: require.resolve("./src/css/custom.css"),
+          customCss: [
+            require.resolve("./src/css/custom.css"),
+            require.resolve("katex/dist/katex.min.css"),
+          ],
         },
       }),
     ],
-  ],
-
-  stylesheets: [
-    {
-      href: "https://cdn.jsdelivr.net/npm/katex@0.13.24/dist/katex.min.css",
-      type: "text/css",
-      integrity:
-        "sha384-odtC+0UGzzFL/6PNoE8rX/SPcQDXBJ+uRepguP4QkPCm2LBxH3FA3y+fKSiJ+AmM",
-      crossorigin: "anonymous",
-    },
   ],
 
   themeConfig:
@@ -161,7 +170,6 @@ const config = {
       image: "img/social-preview.png",
     }),
   plugins: [
-    path.join(__dirname, "/plugins/monaco-editor"),
     [
       'docusaurus-plugin-llms',
       {
@@ -188,6 +196,14 @@ const config = {
             from: "/acurast-transmitters",
           },
           { to: "/processors/acurast-processors", from: "/acurast-processors" },
+          {
+            to: "/acurast-protocol/node-setup#collator-onboarding",
+            from: "/acurast-protocol/collator-onboarding",
+          },
+          {
+            to: "/acurast-protocol/architecture/application-layer#use-case-examples",
+            from: "/integrations",
+          },
           { to: "/processors/benchmarks", from: "/acurast-processors/benchmarks" },
           { to: "/processors/multiple-processors", from: "/acurast-processors/multiple-processors" },
           {
@@ -310,6 +326,5 @@ const config = {
       },
     ],
   ],
+  };
 };
-
-module.exports = config;
