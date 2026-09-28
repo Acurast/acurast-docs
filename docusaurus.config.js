@@ -196,6 +196,14 @@ module.exports = async function createConfig() {
             from: "/acurast-transmitters",
           },
           { to: "/processors/acurast-processors", from: "/acurast-processors" },
+          {
+            to: "/acurast-protocol/node-setup#collator-onboarding",
+            from: "/acurast-protocol/collator-onboarding",
+          },
+          {
+            to: "/acurast-protocol/architecture/application-layer#use-case-examples",
+            from: "/integrations",
+          },
           { to: "/processors/benchmarks", from: "/acurast-processors/benchmarks" },
           { to: "/processors/multiple-processors", from: "/acurast-processors/multiple-processors" },
           {

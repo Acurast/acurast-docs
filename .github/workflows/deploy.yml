@@ -31,6 +31,11 @@ jobs:
         run: yarn process-predefined-methods && yarn typecheck
       - name: Build
         run: yarn build
+      - name: Check baseline URLs
+        run: |
+          npx docusaurus serve --port 3000 --no-open &
+          for i in $(seq 1 30); do curl -sf -o /dev/null http://localhost:3000/ && break; sleep 1; done
+          yarn check-links
       - uses: actions/upload-pages-artifact@v5
         with:
           path: ./build
