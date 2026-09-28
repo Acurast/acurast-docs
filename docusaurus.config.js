@@ -14,6 +14,7 @@ const config = {
   tagline: "Real Decentralized Compute Network - Powered by Phones",
   url: "https://docs.acurast.com",
   baseUrl: "/",
+  trailingSlash: true,
   // GitHub pipeline throws a broken link that doesn't appear on a local build for some reason.
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "throw",
@@ -166,7 +167,7 @@ const config = {
       {
         generateLLMsTxt: true,
         generateLLMsFullTxt: true,
-        docsDir: 'docs',
+        docsDir: [{ path: 'docs', routeBasePath: '/' }],
         title: 'Acurast Documentation',
         description: 'Complete reference documentation for Acurast - the Real Decentralized Compute Network powered by smartphones.',
         includeBlog: false,
@@ -216,10 +217,6 @@ const config = {
           {
             to: "/acurast-protocol/architecture/instances",
             from: "/acurast-protocol/architecture/networks",
-          },
-          {
-            to: "/token-holders/wallets/wallet-overview",
-            from: "/developers/create-address",
           },
           {
             to: "/developers/deploy-first-app",
