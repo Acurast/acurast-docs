@@ -17,7 +17,7 @@ export const httpGET = async (
   url: string,
   headers: any,
   successCallback: (response: any, certificate?: any, payload?: any) => string,
-  errorCallback: (error: Error) => void
+  _errorCallback: (error: Error) => void
 ) => {
   console.log("httpGET");
   const response = await fetch(
@@ -48,7 +48,7 @@ export const httpPOST = async (
   body: any,
   headers: any,
   successCallback: (payload: any, certificate?: any, response?: any) => string,
-  errorCallback: (error: Error) => void
+  _errorCallback: (error: Error) => void
 ) => {
   console.log("httpPOST");
   const response = await fetch(url, {
@@ -68,9 +68,9 @@ export const httpPOST = async (
 };
 
 export const attest = (
-  nonce: string,
-  successCallback: (payload: any, certificate: any, response: any) => string,
-  errorCallback: (error: Error) => void
+  _nonce: string,
+  _successCallback: (payload: any, certificate: any, response: any) => string,
+  _errorCallback: (error: Error) => void
 ) => {
   console.log("attest");
 };
@@ -90,7 +90,7 @@ export const generateSecureRandomHex = (): string => {
 export const _STD_ = {
   chains: {
     ethereum: {
-      fulfill: async (rpc: string, destination: string, payload: string, extra: Record<string, any>, onSuccess: (opHash: string) => void, onError: (err: any) => void) => {
+      fulfill: async (_rpc: string, _destination: string, _payload: string, _extra: Record<string, any>, onSuccess: (opHash: string) => void, _onError: (err: any) => void) => {
         onSuccess("0x0123456789");
       }
     }

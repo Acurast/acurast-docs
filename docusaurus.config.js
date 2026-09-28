@@ -1,7 +1,5 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
-const path = require("path");
-
 const { themes } = require("prism-react-renderer");
 
 const lightCodeTheme = themes.github;
@@ -22,10 +20,18 @@ module.exports = async function createConfig() {
   // GitHub pipeline throws a broken link that doesn't appear on a local build for some reason.
   onBrokenLinks: "throw",
   onBrokenAnchors: "throw",
+  onDuplicateRoutes: "throw",
   markdown: {
     hooks: {
       onBrokenMarkdownLinks: "throw",
+      onBrokenMarkdownImages: "throw",
     },
+  },
+
+  future: {
+    // Opt into all Docusaurus v4 behavior now, incl. strict MDX (no MDX 1 compat) and Rspack/SWC builds.
+    v4: true,
+    faster: true,
   },
   favicon: "img/favicon.svg",
 
@@ -56,20 +62,13 @@ module.exports = async function createConfig() {
         },
         blog: false,
         theme: {
-          customCss: require.resolve("./src/css/custom.css"),
+          customCss: [
+            require.resolve("./src/css/custom.css"),
+            require.resolve("katex/dist/katex.min.css"),
+          ],
         },
       }),
     ],
-  ],
-
-  stylesheets: [
-    {
-      href: "https://cdn.jsdelivr.net/npm/katex@0.16.47/dist/katex.min.css",
-      type: "text/css",
-      integrity:
-        "sha384-nH0MfJ44wi1dd7w6jinlyBgljjS8EJAh2JBoRad8a3VDw2K69vfaaqm4WnR+gXtA",
-      crossorigin: "anonymous",
-    },
   ],
 
   themeConfig:
@@ -171,7 +170,6 @@ module.exports = async function createConfig() {
       image: "img/social-preview.png",
     }),
   plugins: [
-    path.join(__dirname, "/plugins/monaco-editor"),
     [
       'docusaurus-plugin-llms',
       {

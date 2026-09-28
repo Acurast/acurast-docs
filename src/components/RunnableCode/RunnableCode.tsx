@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, type ReactElement, type ReactNode } from "react";
 import BrowserWindow from "../BrowserWindow/BrowserWindow";
 import Monaco from "../Monaco/Monaco";
 import LoadingAnimation from "../LoadingAnimation/LoadingAnimation";
 import { copyShareUrl, runCoinlibCode } from "../../utils/utils";
 import { ExecutionState } from "../../utils/ExecutionState";
 
-const Child = ({ code }) => {
+// `code` is the MDX code block element: <pre><code>{source}</code></pre>.
+type CodeBlock = ReactElement<{ children: ReactElement<{ children: string }> }>;
+
+const Child = ({ code }: { code: CodeBlock }) => {
   const [runnableCode, setRunnableCode] = useState<string>(
     code.props.children.props.children
   );
@@ -122,6 +125,6 @@ const Child = ({ code }) => {
   );
 };
 
-export const RunnableCode = (x) => {
-  return <Child code={x.children}></Child>;
+export const RunnableCode = (x: { children: ReactNode }) => {
+  return <Child code={x.children as CodeBlock}></Child>;
 };

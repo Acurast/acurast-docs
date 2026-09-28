@@ -1,8 +1,14 @@
-import React from "react";
+import React, { type ReactNode } from "react";
 
 import styles from "./styles.module.css";
 
-function BrowserWindow({ children, minHeight, url }) {
+type Props = {
+  children: ReactNode;
+  minHeight: string;
+  url: string;
+};
+
+function BrowserWindow({ children, minHeight, url }: Props) {
   return (
     <div className={styles.browserWindow} style={{ minHeight }}>
       <div className={styles.browserWindowHeader}>

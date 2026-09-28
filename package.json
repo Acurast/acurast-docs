@@ -18,27 +18,25 @@
   },
   "dependencies": {
     "@docusaurus/core": "3.10.2",
+    "@docusaurus/faster": "3.10.2",
     "@docusaurus/plugin-client-redirects": "3.10.2",
     "@docusaurus/preset-classic": "3.10.2",
     "@mdx-js/react": "^3.1.1",
-    "classnames": "^2.3.1",
     "clsx": "^2.1.1",
-    "hast-util-is-element": "^1.1.0",
-    "monaco-editor": "^0.33.0",
+    "katex": "^0.18.9",
+    "monaco-editor": "^0.57.0",
     "prism-react-renderer": "^2.4.1",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-monaco-editor": "^0.49.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0"
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "3.10.2",
-    "@docusaurus/tsconfig": "3.10.2",
     "@docusaurus/types": "3.10.2",
+    "@types/react": "^19.2.6",
     "docusaurus-plugin-llms": "^0.6.0",
-    "monaco-editor-webpack-plugin": "^7.0.1",
-    "typescript": "~5.9.3"
+    "typescript": "^7.0.2"
   },
   "browserslist": {
     "production": [
@@ -53,6 +51,9 @@
     ]
   },
   "engines": {
-    "node": ">=18.0"
+    "node": ">=20.0"
+  },
+  "resolutions": {
+    "katex": "^0.18.9"
   }
 }

@@ -1,66 +1,79 @@
-import React, { Suspense, lazy } from "react";
+import React, { useEffect, useRef } from "react";
 import { useColorMode } from "@docusaurus/theme-common";
-// import { libs } from "./monaco-types";
-const libs = []
-const MonacoEditor = lazy(() => import("react-monaco-editor"));
+import type * as MonacoApi from "monaco-editor";
+import { loadMonaco } from "@site/src/utils/monaco";
 
-function Monaco(props) {
-  let monacoRef;
+type Props = {
+  value: string;
+  language: string;
+  width: number;
+  height: number;
+  onChange?: (value: string) => void;
+  options?: MonacoApi.editor.IStandaloneEditorConstructionOptions;
+};
+
+function Monaco({ value, language, width, height, onChange, options }: Props) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const editorRef = useRef<MonacoApi.editor.IStandaloneCodeEditor>(null);
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
   const { colorMode } = useColorMode();
+  const theme = colorMode === "dark" ? "acurast-dark" : "vs";
 
-  function onEditorWillMount(monaco) {
-    monacoRef = monaco;
-    const vsDarkTheme = {
-      base: "vs-dark",
-      inherit: true,
-      rules: [{ background: "121212" }],
-      colors: {
-        "editor.background": "#121212",
-      },
+  // The editor is created once; later prop changes are applied by the effects below.
+  useEffect(() => {
+    let disposed = false;
+
+    loadMonaco().then((monaco) => {
+      if (disposed || !containerRef.current) {
+        return;
+      }
+      // TypeScript models need a file URI so the TS worker can resolve them.
+      const model = monaco.editor.createModel(
+        value,
+        language,
+        language === "typescript"
+          ? monaco.Uri.parse(`file:///main-${crypto.randomUUID()}.ts`)
+          : undefined
+      );
+      const editor = monaco.editor.create(containerRef.current, {
+        ...options,
+        model,
+        theme,
+        dimension: { width, height },
+      });
+      editor.onDidChangeModelContent(() => {
+        onChangeRef.current?.(editor.getValue());
+      });
+      editorRef.current = editor;
+    });
+
+    return () => {
+      disposed = true;
+      editorRef.current?.getModel()?.dispose();
+      editorRef.current?.dispose();
+      editorRef.current = null;
     };
+  }, []);
 
-    monaco.editor.defineTheme("vs-dark", vsDarkTheme);
-
-    monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
-      target: monaco.languages.typescript.ScriptTarget.ES2017,
-      allowNonTsExtensions: true,
-      moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
-      module: monaco.languages.typescript.ModuleKind.ESNext,
-      typeRoots: ["node_modules/@types"],
-    });
-
-    libs.forEach((lib) => {
-      const MONACO_LIB_PREFIX = "file:///node_modules/";
-      const path = `${MONACO_LIB_PREFIX}${lib.name}`;
-      monaco.languages.typescript.typescriptDefaults.addExtraLib(lib.dts, path);
-    });
-
-    if (props.editorWillMount) {
-      props.editorWillMount(monaco);
+  useEffect(() => {
+    const editor = editorRef.current;
+    if (editor && editor.getValue() !== value) {
+      editor.setValue(value);
     }
-  }
+  }, [value]);
 
-  function onEditorDidMount(editor) {
-    editor.setModel(
-      monacoRef.editor.createModel(
-        props.value,
-        "typescript",
-        monacoRef.Uri.parse(`file:///main-${Math.random()}.ts`)
-      )
-    );
-  }
+  useEffect(() => {
+    editorRef.current?.layout({ width, height });
+  }, [width, height]);
 
-  return (
-    <Suspense fallback={<div>Loading</div>}>
-      <MonacoEditor
-        {...props}
-        editorWillMount={onEditorWillMount}
-        editorWillUnmount={() => undefined}
-        editorDidMount={onEditorDidMount}
-        theme={colorMode === 'dark' ? "vs-dark" : "vs-light"}
-      />
-    </Suspense>
-  );
+  useEffect(() => {
+    if (editorRef.current) {
+      loadMonaco().then((monaco) => monaco.editor.setTheme(theme));
+    }
+  }, [theme]);
+
+  return <div ref={containerRef} style={{ width, height }} />;
 }
 
 export default Monaco;
