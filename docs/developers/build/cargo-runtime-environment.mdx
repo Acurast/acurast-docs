@@ -12,8 +12,10 @@ Each Cargo deployment must specify a Linux distro image in its manifest, along w
 
 ```json title=manifest.json
 {
-  "version": "1",
-  "entrypoint": "example.sh",
+  "name": "example",
+  "version": 1,
+  "entrypoint": "acurast.sh",
+  "restartPolicy": "no",
   "image": {
     "url": "https://example.com/distro.tar.xz",
     "sha256": "abc123..."
@@ -915,9 +917,9 @@ def verification_hash(source: str, host: str) -> str:
 
 ### Tunnel
 
-Opens a reverse tunnel that forwards inbound TLS connections from a public URL (`https://<clientId>.<domainSuffix>:8443`) to a local address inside the deployment. Only one tunnel may be active per deployment.
+Opens a reverse tunnel that forwards inbound TLS connections from a public URL (`https://<clientId>.<domainSuffix>`, port `443`) to a local address inside the deployment. Only one tunnel may be active per deployment.
 
-Before calling `tunnel_start`, the `<domainSuffix>` must have the required wildcard and verification TXT records — see the [tunnel quick start](https://github.com/Acurast/quic-tunnel/blob/main/QUICKSTART.md) for details.
+Before calling `tunnel_start`, the `<domainSuffix>` must have the required wildcard and verification TXT records — see the [quic-tunnel README](https://github.com/Acurast/quic-tunnel#readme) for details.
 
 <span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.26.0+</span>
 
@@ -951,7 +953,7 @@ Opens the tunnel and returns the public URL it serves.
 {
   "jsonrpc": "2.0",
   "result": {
-    "url": string,                  // https://<clientId>.<domainSuffix>:8443
+    "url": string,                  // https://<clientId>.<domainSuffix> (port 443)
     "clientId": string,             // the deployment's tunnel identifier
     "secondaryUrl"?: string,
     "secondaryClientId"?: string

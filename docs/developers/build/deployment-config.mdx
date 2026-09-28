@@ -54,7 +54,7 @@ You can create it interactively with `acurast init` — see the **[CLI docs](/de
 | `onlyAttestedDevices` | Only allow attested devices to run the app |
 | `enableDevtools` | Enable [DevTools](/developers/tools/devtools) for the deployment. Defaults to `false` |
 | `startAt` | Start time — either `{ msFromNow: number }` or `{ timestamp: number }` |
-| `assignmentStrategy` | `"Single"` (one set of processors) or `"Competing"` (new processors per execution) |
+| `assignmentStrategy` | `"Single"` (one set of processors) or `"Competing"` (new processors per execution). With `"Single"`, an optional `instantMatch: [{ processor, maxAllowedStartDelayInMs }]` array targets specific processors by SS58 address; its length must equal `numberOfReplicas` |
 | `execution` | `"onetime"` or `"interval"` with `intervalInMs`, `numberOfExecutions`, and `maxExecutionTimeInMs` |
 | `maxAllowedStartDelayInMs` | Maximum allowed start delay in milliseconds |
 | `usageLimit` | Limits for `maxMemory`, `maxNetworkRequests`, and `maxStorage` (in bytes) |
@@ -63,7 +63,7 @@ You can create it interactively with `acurast init` — see the **[CLI docs](/de
 | `runtime` | Runtime used to execute the deployment. `"NodeJSWithBundle"` (default), `"NodeJS"`, or `"Shell"`. See [Shell Runtime](/developers/tools/cli#shell-runtime) |
 | `image` | Linux distro image used by the Shell runtime. Required when `runtime` is `"Shell"`. Object: `{ url, sha256 }` (HTTPS `.tar.xz` URL + SHA256). Ignored otherwise |
 | `entrypoint` | Script or binary the processor runs after extracting the Shell image (e.g. `acurast.sh`) |
-| `restartPolicy` | `"no"` (default — run once, no retry) or `"onFailure"` (retry up to 3 times on failure; only the third failure is reported) |
+| `restartPolicy` | `"no"` (run once, no retry), `"onFailure"` (default — retry up to 3 times on failure; only the last failure is reported), or `"always"` (restart after the execution ends unexpectedly, including on success) |
 | `minProcessorReputation` | Minimum required processor reputation |
 | `maxCostPerExecution` | Maximum cost per execution in the smallest denomination of ACU |
 | `includeEnvironmentVariables` | Environment variables from `.env` to pass to the deployment. See [Environment Variables](/developers/build/environment-variables) |

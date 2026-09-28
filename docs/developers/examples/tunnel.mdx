@@ -137,7 +137,7 @@ SSH rides the secondary (self-signed) connection, so it's wrapped in TLS via an
 ```bash
 ssh -o ProxyCommand='openssl s_client -quiet \
   -servername <secondaryClientId>.acu.run \
-  -connect <secondaryClientId>.acu.run:8443' \
+  -connect <secondaryClientId>.acu.run:443' \
   root@<secondaryClientId>
 ```
 

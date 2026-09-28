@@ -41,11 +41,16 @@ acurast deploy
 | --- | --- |
 | `new <project-name>` | Create a new Acurast project from a template |
 | `deploy [project]` | Deploy the current project to the Acurast platform |
+| `deploy vps` | Deploy an SSH-able VPS on an Acurast processor, exposed via the Acurast tunnel |
 | `estimate-fee [project]` | Estimate the fee for the current project |
 | `deployments [arg]` | List, view, and manage deployments |
+| `cancel <deployment-id>` | Cancel (deregister) a deployment on-chain and return any unused locked funds |
 | `live [project]` | Run your project on a live-code-processor in real time |
 | `init` | Create an `acurast.json` and `.env` file |
 | `devtools <deployment-id>` | Request a DevTools view key and open the DevTools URL |
+| `login` | Log in with your browser wallet (signs a challenge and stores the address) |
+| `logout` | Log out of the CLI (forget the stored browser-wallet address) |
+| `whoami` | Show the wallet address the CLI is logged in with |
 | `open` | Open Acurast resources in your browser |
 | `help [command]` | Display help for a command |
 
@@ -107,7 +112,7 @@ This file defines your deployment parameters. Example:
 | `onlyAttestedDevices` | Only allow attested devices to run the app |
 | `enableDevtools` | Enable [DevTools](/developers/tools/devtools) for the deployment. Defaults to `false` |
 | `startAt` | Start time — either `{ msFromNow: number }` or `{ timestamp: number }` |
-| `assignmentStrategy` | `"Single"` (one set of processors) or `"Competing"` (new processors per execution) |
+| `assignmentStrategy` | `"Single"` (one set of processors) or `"Competing"` (new processors per execution). With `"Single"`, an optional `instantMatch: [{ processor, maxAllowedStartDelayInMs }]` array targets specific processors by SS58 address; its length must equal `numberOfReplicas` |
 | `execution` | `"onetime"` or `"interval"` with `intervalInMs`, `numberOfExecutions`, and `maxExecutionTimeInMs` |
 | `maxAllowedStartDelayInMs` | Maximum allowed start delay in milliseconds |
 | `usageLimit` | Limits for `maxMemory`, `maxNetworkRequests`, and `maxStorage` (in bytes) |
@@ -116,7 +121,7 @@ This file defines your deployment parameters. Example:
 | `runtime` | Runtime used to execute the deployment. `"NodeJSWithBundle"` (default), `"NodeJS"`, or `"Shell"`. See [Shell Runtime](#shell-runtime) |
 | `image` | Linux distro image used by the Shell runtime. Required when `runtime` is `"Shell"`. Object: `{ url, sha256 }` (HTTPS `.tar.xz` URL + SHA256). Ignored otherwise |
 | `entrypoint` | Script or binary the processor runs after extracting the Shell image (e.g. `acurast.sh`) |
-| `restartPolicy` | `"no"` (default — run once, no retry) or `"onFailure"` (retry up to 3 times on failure; only the third failure is reported) |
+| `restartPolicy` | `"no"` (run once, no retry), `"onFailure"` (default — retry up to 3 times on failure; only the last failure is reported), or `"always"` (restart after the execution ends unexpectedly, including on success) |
 | `minProcessorReputation` | Minimum required processor reputation |
 | `maxCostPerExecution` | Maximum cost per execution in the smallest denomination of ACU |
 | `includeEnvironmentVariables` | Environment variables from `.env` to pass to the deployment |
@@ -164,7 +169,7 @@ API_KEY=your-api-key
 **3. Access them in your code:**
 
 ```typescript
-const API_KEY = _STD_.env[API_KEY];
+const API_KEY = _STD_.env["API_KEY"];
 ```
 
 For interval-based deployments, you can update environment variables between executions:
@@ -205,7 +210,7 @@ Deployments created with `"mutability": "Mutable"` can be updated after creation
 #### Update Script
 
 ```bash
-acurast deployments update script <deployment-id> <script-ipfs> [--dry-run] [--force]
+acurast deployments update script <deployment-id> <script-ipfs> [--dry-run] [--network <network>]
 ```
 
 Example:
@@ -219,7 +224,7 @@ acurast deployments update script \
 #### Transfer Editor Permissions
 
 ```bash
-acurast deployments update editor <deployment-id> <new-editor-address> [--dry-run] [--force]
+acurast deployments update editor <deployment-id> <new-editor-address> [--dry-run] [--network <network>]
 ```
 
 ### Deployment ID Format
