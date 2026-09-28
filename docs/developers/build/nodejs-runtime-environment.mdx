@@ -52,6 +52,13 @@ type HttpError = (message) => void;
  * @return {string} The string value for the given key or undefined.
  */
 function environment(key);
+
+/**
+ * Generates random bytes. Top-level alias of `_STD_.random.generateSecureRandomHex()`.
+ * @return {string} Hex string representing random bytes.
+ */
+function generateSecureRandomHex();
+
 ```
 
 ## **The \_STD\_ object**
@@ -126,6 +133,50 @@ _STD_.job.getSlot();
 _STD_.job.getPublicKeys();
 
 type PublicKeys = { p256: string, secp256k1: string, ed25519: string };
+
+/**
+ * @return {EncryptionPublicKeys} Object containing the deployment specific encryption public keys.
+ * Only the curves that have an encryption key are included.
+ *
+ * Example:
+ * {
+ *  p256: "03aa8fa2bfe5a5d6789637c3b82b322b617f8c19e29a4b7d3eede17a2583312891",
+ *  secp256k1: "02fcf1a928bab608989a0218831efd585d1e771669756e1033c60cff4bef6f28e5"
+ * }
+ */
+_STD_.job.getEncryptionKeys();
+
+type EncryptionPublicKeys = { p256?: string, secp256k1?: string };
+
+/**
+ * @return {AssignedProcessors} Object mapping each processor's SS58 address assigned to this
+ * deployment to that processor's public keys for the deployment. Invoked via the callbacks.
+ *
+ * Example:
+ * {
+ *  "5F3sa2TJAWMqDhXG6jhV4N2u9pzgD4T7o4Zz4Z4Z4Z4Z4Z4Z": {
+ *    p256: "03aa8fa2bfe5a5d6789637c3b82b322b617f8c19e29a4b7d3eede17a2583312891",
+ *    secp256k1: "02fcf1a928bab608989a0218831efd585d1e771669756e1033c60cff4bef6f28e5",
+ *    ed25519: "7ce9f9b96a0f898ad109a594ab2c30a1682e7e6425910427c9390fdf16b11dd6",
+ *    encP256: "02494aaeede92ac8f27e1c32549019bb3e6f6d0b2a24049be577ed0487ca7975b6",
+ *    encSecp256k1: "032a2218033d5e690b19c067db4e6e885f304a39e5c1a037c8cfd3742511817c36"
+ *  }
+ * }
+ */
+_STD_.job.getAssignedProcessors(success, error);
+
+type AssignedProcessors = Record<string, { p256?: string, secp256k1?: string, ed25519?: string, encP256?: string, encSecp256k1?: string }>;
+
+/**
+ * @return {string} Absolute path to the writable storage directory for this deployment.
+ * Use it for any files that must persist for the lifetime of the execution (`/tmp` may not be writable).
+ */
+_STD_.job.storageDir;
+
+/**
+ * @return {string} The IPFS hash of the deployment script, as registered on-chain.
+ */
+_STD_.scriptHash;
 ```
 
 ### **Device Info**
@@ -500,7 +551,7 @@ type P2PStreamClose = () => Promise<void>;
 
 ### **Tunnel**
 
-Exposes the deployment's reverse tunnel to job scripts. The tunnel forwards inbound TLS connections (terminated at `https://<clientId>.<domainSuffix>:8443`) to a local address inside the deployment. See [Tunnel quick start](/developers/getting-started/quickstart-tunnel) for the DNS records that must be in place on `<domainSuffix>` before calling `start`.
+Exposes the deployment's reverse tunnel to job scripts. The tunnel forwards inbound TLS connections (terminated at `https://<clientId>.<domainSuffix>`, port `443`) to a local address inside the deployment. See [Tunnel quick start](/developers/getting-started/quickstart-tunnel) for the DNS records that must be in place on `<domainSuffix>` before calling `start`.
 
 ```javascript
 /**
@@ -584,7 +635,7 @@ type TunnelPrimaryKey = { algorithm: 'Secp256r1', bytes: string };
 
 /**
  * @typedef TunnelInfo
- * @property {string} url public URL of the form `https://<clientId>.<domainSuffix>:8443`.
+ * @property {string} url public URL of the form `https://<clientId>.<domainSuffix>` (port 443).
  * @property {string} clientId the deployment's tunnel identifier.
  * @property {string} [secondaryUrl] optional secondary tunnel URL.
  * @property {string} [secondaryClientId] optional secondary tunnel identifier.
@@ -954,6 +1005,135 @@ def verification_hash(source: str, host: str) -> str:
     return base64.b64encode(digest).decode()
 ```
 
+### **Util**
+
+```javascript
+/**
+ * Computes the Keccak-256 hash of the given bytes.
+ * @param {string} bytes an hex string representing the bytes to hash.
+ * @return {string} Hex string representing the Keccak-256 hash.
+ */
+_STD_.util.keccak(bytes);
+```
+
+### **Llama**
+
+```javascript
+/**
+ * Starts the bundled llama.cpp server with the given command-line arguments.
+ * The completion callback is invoked once the server has started.
+ *
+ * @param {string[]} [argv] arguments passed to the llama.cpp server, e.g. ["--model", "/path/model.gguf", "--ctx-size", "2048"].
+ * @param {LlamaSuccess} onCompletion the completion callback.
+ * @param {LlamaError} onError the error callback.
+ */
+_STD_.llama.server.start(argv, onCompletion, onError);
+
+/**
+ * Stops the running llama.cpp server. No-op if no server is running.
+ * @param {LlamaSuccess} onSuccess the success callback.
+ * @param {LlamaError} onError the error callback.
+ */
+_STD_.llama.server.stop(onSuccess, onError);
+
+/**
+ * @callback LlamaSuccess
+ */
+type LlamaSuccess = () => void;
+
+/**
+ * @callback LlamaError
+ * @param {string} message an error message.
+ */
+type LlamaError = (message) => void;
+```
+
+### **Benchmark**
+
+```javascript
+/**
+ * Runs the single-core CPU benchmark.
+ * @param {CpuBenchmarkConfig} [config] optional benchmark configuration.
+ * @return {CpuBenchmarkReport}
+ */
+_STD_.benchmark.cpu(config);
+
+/**
+ * Runs the multi-core CPU benchmark.
+ * @param {CpuBenchmarkConfig} [config] optional benchmark configuration.
+ * @return {CpuBenchmarkReport}
+ */
+_STD_.benchmark.cpuMulticore(config);
+
+/**
+ * Runs the RAM benchmark.
+ * @param {RamBenchmarkConfig} [config] optional benchmark configuration.
+ * @return {RamBenchmarkReport}
+ */
+_STD_.benchmark.ram(config);
+
+/**
+ * Runs the storage benchmark.
+ * @param {StorageBenchmarkConfig} [config] optional benchmark configuration.
+ * @return {StorageBenchmarkReport}
+ */
+_STD_.benchmark.storage(config);
+
+/**
+ * @typedef CpuBenchmarkConfig
+ * @property {number} [duration] total test duration in milliseconds, split across the crypto, math and sort tests.
+ * @property {number} [cryptoDataSize] data size for the crypto test.
+ * @property {number} [mathDataSize] matrix size for the math test.
+ * @property {boolean} [mathSimd] whether to enable SIMD optimizations.
+ * @property {number} [sortDataSize] data size for the sort test.
+ */
+type CpuBenchmarkConfig = { duration?: number, cryptoDataSize?: number, mathDataSize?: number, mathSimd?: boolean, sortDataSize?: number };
+
+/**
+ * @typedef CpuBenchmarkReport
+ * @property {number} cryptoTps crypto throughput.
+ * @property {number} mathTps math throughput.
+ * @property {number} sortTps sort throughput.
+ * @property {number} score the CPU score.
+ */
+type CpuBenchmarkReport = { cryptoTps: number, mathTps: number, sortTps: number, score: number };
+
+/**
+ * @typedef RamBenchmarkConfig
+ * @property {number} [iterations] number of iterations for the allocation and access tests.
+ * @property {number} [allocDataSize] size of memory to allocate per iteration.
+ * @property {number} [accessDataSize] size of data for the access tests.
+ */
+type RamBenchmarkConfig = { iterations?: number, allocDataSize?: number, accessDataSize?: number };
+
+/**
+ * @typedef RamBenchmarkReport
+ * @property {number} totalMemory total available memory.
+ * @property {number} allocAvgTime average allocation time.
+ * @property {number} accessSequentialAvgTime average sequential access time.
+ * @property {number} accessRandomAvgTime average random access time.
+ * @property {number} accessConcurrentAvgTime average concurrent access time.
+ * @property {number} score the RAM score.
+ */
+type RamBenchmarkReport = { totalMemory: number, allocAvgTime: number, accessSequentialAvgTime: number, accessRandomAvgTime: number, accessConcurrentAvgTime: number, score: number };
+
+/**
+ * @typedef StorageBenchmarkConfig
+ * @property {number} [iterations] number of iterations for the read/write tests.
+ * @property {number} [accessDataSizeMB] size in MB of data for the access tests.
+ */
+type StorageBenchmarkConfig = { iterations?: number, accessDataSizeMB?: number };
+
+/**
+ * @typedef StorageBenchmarkReport
+ * @property {number} availableStorage available storage capacity.
+ * @property {number} accessSequentialAvgTime average sequential read/write time.
+ * @property {number} accessRandomAvgTime average random read/write time.
+ * @property {number} score the storage score.
+ */
+type StorageBenchmarkReport = { availableStorage: number, accessSequentialAvgTime: number, accessRandomAvgTime: number, score: number };
+```
+
 ### **Substrate functions**
 
 ```javascript
@@ -1058,6 +1238,22 @@ _STD_.chains.substrate.codec.encodeAddress(value);
  * @return {string} Hex string representing the SCALE encoded multi address.
  */
 _STD_.chains.substrate.codec.encodeMultiAddress(value: string);
+
+/**
+ * Encodes a value to SCALE encoding given its type descriptor.
+ * @param {string} type the SCALE type descriptor.
+ * @param {any} data the value to encode.
+ * @return {string} Hex string representing the SCALE encoded value.
+ */
+_STD_.chains.substrate.codec.encode(type, data);
+
+/**
+ * Decodes a SCALE-encoded value given its type descriptor.
+ * @param {string} type the SCALE type descriptor.
+ * @param {string} data hex string representing the encoded bytes.
+ * @return {[any, string]} The decoded value and the hex string of the remaining bytes.
+ */
+_STD_.chains.substrate.codec.decode(type, data);
 ```
 
 ### **Substrate contract functions**
@@ -1180,6 +1376,14 @@ _STD_.chains.tezos.encoding.pack(value);
  * @return {string} Hex string representing the script hash encoded value.
  */
 _STD_.chains.tezos.encoding.encodeExpr(value);
+
+/**
+ * Unpacks the given packed bytes into a micheline structure.
+ * @param {string} bytes an hex string representing the packed bytes.
+ * @param {object} schema the micheline schema describing the packed value.
+ * @return {object} an object representing the unpacked micheline structure.
+ */
+_STD_.chains.tezos.encoding.unpack(bytes, schema);
 ```
 
 ### **Tezos message signing**
@@ -1455,6 +1659,32 @@ _STD_.chains.aeternity.fulfill(
 );
 
 /**
+ * Performs a dry-run (static call) of an aeternity contract without submitting a transaction.
+ *
+ * The `extra` argument is an object that can provide the following:
+ * - `functionName`: an optional string representing the method name, if not provided `fulfill` is used.
+ * - `gasLimit`: a string representing the transaction's gas limit, if not provided '25000' is used.
+ * - `gasPrice`: a string representing the transaction's gas price, if not provided '1000000000' is used.
+ *
+ * @since 1.3.32
+ *
+ * @param {string} url the node URL.
+ * @param {string} destination the contract's address.
+ * @param {[object]} payload an array of encoded values. The objects inside this array need to be constructed using the functions found under `_STD_.chains.aeternity.data`.
+ * @param {object} extra object with extra arguments.
+ * @param {AeternitySuccess} success the success callback.
+ * @param {AeternityError} error the error callback.
+ */
+_STD_.chains.aeternity.staticCall(
+  url,
+  destination,
+  payload,
+  extra,
+  success,
+  error
+);
+
+/**
  * Returns the Aeternity address.
  *
  * @since 1.3.34 (version code 19)
@@ -1488,6 +1718,16 @@ type AeternityError = (message) => void;
  * @return {object} an object representing an integer that can be used as payload in the `fulfill` call.
  */
 _STD_.chains.aeternity.data.int(value);
+
+/**
+ * Returns an object representing a boolean that can be used as payload in the `fulfill` call.
+ *
+ * @since 1.3.32
+ *
+ * @param {boolean} value a boolean value.
+ * @return {object} an object representing a boolean that can be used as payload in the `fulfill` call.
+ */
+_STD_.chains.aeternity.data.bool(value);
 
 /**
  * Returns an object representing a string that can be used as payload in the `fulfill` call.

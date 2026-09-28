@@ -23,7 +23,7 @@ Acurast's cloud architecture transforms the way applications are designed and de
 
 ### Consensus Layer
 
-The consensus layer is the permissionless foundation of Acurast, where the Matcher pairs developer's deployments with processors, as outlined in the End-to-End flow (_c.f.,_ [End-to-End Deployment Execution](/acurast-protocol/architecture/end-to-end) ). The second core part of the consensus layer is the reputation engine (_c.f.,_ ), which as sures that the reputation scores of processors are correctly updated and incentivize honest behavior.
+The consensus layer is the permissionless foundation of Acurast, where the Matcher pairs developer's deployments with processors, as outlined in the End-to-End flow (_c.f.,_ [End-to-End Deployment Execution](/acurast-protocol/architecture/end-to-end) ). The second core part of the consensus layer is the reputation engine, which ensures that the reputation scores of processors are correctly updated and incentivize honest behavior.
 
 ### Execution Layer
 
@@ -31,7 +31,7 @@ The Execution Layer has two significant components. The first one is composed of
 
 ### Application Layer
 
-The third layer is the application layer, where Web2 or Web3 applications run (\cf Sec.~\ref{sec:application_layer}). Although a host of DeFi protocols already make use of Acurast, Acurast will infuse the development of a wide range of use cases that were previously not possible to implement in a confidential and decentralized manner.
+The third layer is the application layer, where Web2 or Web3 applications run. Although a host of DeFi protocols already make use of Acurast, Acurast will infuse the development of a wide range of use cases that were previously not possible to implement in a confidential and decentralized manner.
 
 ## Matcher
 
@@ -47,7 +47,7 @@ When scheduling a deployment, the developer defines the compute cost for the exe
 
 :::info
 
-**All compute costs are paid as gas (transaction) fees. There is no direct reward flow from developers to processors.**
+**Compute costs are burned when a deployment executes. There is no direct reward flow from developers to processors.**
 
 :::
 
