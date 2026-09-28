@@ -61,7 +61,7 @@ Depending on the type of token you get (EVM or Acurast native), you might need t
 
 ### Why is my balance decreasing sometimes?
 
-Your balance may decrease slightly due to transaction fees when your Processor interacts with the Acurast network. Whenever the Processor reports to the chain (heartbeats, deployment acknowledgements, execution reports), minimal gas fees have to be paid, which can result in a decreasing balance. These fees are typically minimal, usually around 0.01 ACU per transaction.
+Your balance may decrease slightly due to transaction fees when your Processor interacts with the Acurast network. Whenever the Processor reports to the chain (heartbeats, deployment acknowledgements, execution reports), minimal gas fees have to be paid, which can result in a decreasing balance. These fees are typically minimal, usually around 0.0013 ACU per transaction.
 
 ### What is the cACU to ACU conversion mechanism?
 
@@ -73,7 +73,7 @@ Your balance may decrease slightly due to transaction fees when your Processor i
    e.g., 1000 cACU = 1000 ACU
 4. On Mainnet the lock can be updated once between 3 to 48 cycles:  
    4.1. Default: Unlocked after 48x cycles at 28 days (3.7 years) = 1 to 1 ratio  
-   4.2. Minimum: Unlocked after 3x cycles (2.8 months) = 6.5% ACU  
+   4.2. Minimum: Unlocked after 3x cycles (2.8 months) = 6.25% ACU  
    4.3. Example: Unlocked after 24x cycles (1.75 years) = 50% ACU
 
 #### Features
