@@ -109,6 +109,51 @@ gcc -shared -fPIC -o /usr/local/lib/getifaddrs_override.so getifaddrs_override.c
 export LD_PRELOAD=/usr/local/lib/getifaddrs_override.so
 ```
 
+## Container Reset
+
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.29.0+</span>
+
+A running deployment can reset its own container: the processor stops every process of the run, puts the rootfs back to the image from the manifest, and runs the entrypoint again with the same environment variables. It works like `docker rm -f` followed by `docker run` of the same image, without volumes. The execution keeps going - a reset is not a restart, and the time it takes counts against the execution's time.
+
+There are two ways to ask for a reset:
+
+- **Exit code**: declare a `resetExitCode` between 1 and 125 in the manifest and exit the entrypoint with it. This works in any image, without a socket client. Only the entrypoint's own exit status counts, so a background process has to make the entrypoint exit with the code.
+- **RPC**: call [`container_reset`](#container_reset) from any process in the container.
+
+```json title=manifest.json
+{
+  "name": "example",
+  "version": 1,
+  "entrypoint": "acurast.sh",
+  "restartPolicy": "no",
+  "image": {
+    "url": "https://example.com/distro.tar.xz",
+    "sha256": "abc123..."
+  },
+  "resetExitCode": 82
+}
+```
+
+```sh title=acurast.sh
+#!/bin/sh
+# ...
+exit 82  # reset the container and run this script again
+```
+
+What a reset keeps:
+
+| | After a reset |
+| --- | --- |
+| Files in the rootfs (installed packages, config, changes to the app) | Back to the image |
+| Running processes | Stopped |
+| Network whitelist, browser tabs, open tunnel | Gone - the entrypoint sets them up again |
+| Tunnel ACME account and certificate | Kept |
+| Deployment keys | Unchanged |
+
+A reset never downloads the image again: the processor unpacks the archive it already has. If that archive is no longer available, `container_reset` returns an error and the run keeps going, while an exit-code reset fails the execution.
+
+Resets that quickly follow each other are delayed. The first reset, and any reset after a run that stayed up for 10 minutes, happens right away. Each further reset waits twice as long as the one before, starting at 10 seconds, up to 5 minutes.
+
 ---
 
 ## RPC API
@@ -1039,6 +1084,35 @@ Returns the PEM-encoded full certificate chain currently issued for the tunnel.
   "result": {
     "pem"?: string     // omitted if no certificate has been issued yet (or no tunnel is active)
   },
+  "id": string
+}
+```
+
+---
+
+### Container
+
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.29.0+</span>
+
+#### `container_reset`
+
+Resets the container: stops every process of the run, puts the rootfs back to its image and runs the entrypoint again. See [Container Reset](#container-reset) for what a reset keeps.
+
+The response is sent before the run is stopped. Fails with error code `-32000` if the container can't be reset because the image archive is no longer available - the run then keeps going.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "container_reset",
+  "params": [],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {},
   "id": string
 }
 ```
