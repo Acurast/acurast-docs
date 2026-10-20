@@ -9,9 +9,9 @@ import TabItem from '@theme/TabItem';
 The Acurast reverse tunnel exposes a service running inside a deployment to the public internet, without the processor needing an inbound public IP or open ports. 
 The processor only makes **outbound** connections to a relay node, the relay then routes incoming traffic from external users back to the processor.
 
-Once the tunnel is up, the deployment is reachable at `https://<clientId>.acu.run` with a valid Let's Encrypt certificate provisioned automatically.
+Once the tunnel is up, the deployment is reachable at `https://<clientId>.mainnet.acu.run` with a valid Let's Encrypt certificate provisioned automatically.
 
-Optionally, it is possible to use a different domain instead of the `acu.run` suffix when properly configured.
+Optionally, it is possible to use a different domain instead of the `mainnet.acu.run` suffix when properly configured.
 
 ## Prerequisites
 
@@ -72,7 +72,7 @@ This creates `acurast.json` (deployment config) and `.env` (secrets). See the **
 
 ## (Optional) Step 2 - Configure DNS
 
-In case of using a custom domain instead of `acu.run`, pick an owned subdomain (`tunnel.example.com` in the examples below) and add records at your DNS provider.
+In case of using a custom domain instead of `mainnet.acu.run`, pick an owned subdomain (`tunnel.example.com` in the examples below) and add records at your DNS provider.
 
 The domain needs to point to one or more relay nodes:
 
@@ -82,6 +82,19 @@ The domain needs to point to one or more relay nodes:
 | Domain | IP |
 | --- | --- |
 | relay-1.mainnet.acurast.com | 82.220.91.110 |
+| relay-mainnet-acurast.5elementsnodes.com | 79.63.227.114 |
+| acurast-mainnet-relay.dishich.com | 176.111.109.135 |
+| relay-mainnet.el9-acurast.com | 5.189.129.135 |
+| mainnet-relay.vincent-acurast.xyz | 213.136.93.36 |
+| relay.acurast.rubynodes.io | 185.136.158.234 |
+| acurast-relay.paradoxxllc.com | 148.113.228.97 |
+| tunnel-acurast.ultraops.dev | 51.91.30.174 |
+| acurast-mainnet-relay.icebergnodes.io | 142.132.212.243 |
+| relay-mainnet.oulurecords.com | 86.60.179.20 |
+| acurast-relay-mainnet.certhum.com | 138.201.201.167 |
+| mainnet-relay.acurast.online | 51.79.163.176 |
+| tunnel-mainnet.acurastpulse.com | 135.148.5.76 |
+| relay.mainnet.dposkingdom.com | 51.255.216.12 |
   
   </TabItem>
   <TabItem value="canary" label="Canary">
@@ -166,9 +179,22 @@ import time
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 
-DOMAIN_SUFFIX = "acu.run"
+DOMAIN_SUFFIX = "mainnet.acu.run"
 TUNNEL_RELAYS = [
   "relay-1.mainnet.acurast.com:4433",
+  "relay-mainnet-acurast.5elementsnodes.com:4433",
+  "acurast-mainnet-relay.dishich.com:4433",
+  "relay-mainnet.el9-acurast.com:4433",
+  "mainnet-relay.vincent-acurast.xyz:4433",
+  "relay.acurast.rubynodes.io:4433",
+  "acurast-relay.paradoxxllc.com:4433",
+  "tunnel-acurast.ultraops.dev:4433",
+  "acurast-mainnet-relay.icebergnodes.io:4433",
+  "relay-mainnet.oulurecords.com:4433",
+  "acurast-relay-mainnet.certhum.com:4433",
+  "mainnet-relay.acurast.online:4433",
+  "tunnel-mainnet.acurastpulse.com:4433",
+  "relay.mainnet.dposkingdom.com:4433",
 ]
 LOCAL_ADDR = "127.0.0.1:8080"   # point at your local service
 
@@ -229,9 +255,22 @@ The Node.js runtime exposes the tunnel via `_STD_.tunnel.*` global callbacks. Th
 ```javascript title="index.js"
 const http = require('http');
 
-const DOMAIN_SUFFIX = 'acu.run';
+const DOMAIN_SUFFIX = 'mainnet.acu.run';
 const TUNNEL_RELAYS = [
   'relay-1.mainnet.acurast.com:4433',
+  'relay-mainnet-acurast.5elementsnodes.com:4433',
+  'acurast-mainnet-relay.dishich.com:4433',
+  'relay-mainnet.el9-acurast.com:4433',
+  'mainnet-relay.vincent-acurast.xyz:4433',
+  'relay.acurast.rubynodes.io:4433',
+  'acurast-relay.paradoxxllc.com:4433',
+  'tunnel-acurast.ultraops.dev:4433',
+  'acurast-mainnet-relay.icebergnodes.io:4433',
+  'relay-mainnet.oulurecords.com:4433',
+  'acurast-relay-mainnet.certhum.com:4433',
+  'mainnet-relay.acurast.online:4433',
+  'tunnel-mainnet.acurastpulse.com:4433',
+  'relay.mainnet.dposkingdom.com:4433',
 ];
 const LOCAL_ADDR = '127.0.0.1:3000';
 
@@ -357,15 +396,15 @@ Once the deployment is up and running, connect from anywhere.
 For HTTP/HTTPS services:
 
 ```bash
-curl https://<clientId>.acu.run
+curl https://<clientId>.mainnet.acu.run
 ```
 
 The tunnel does TLS pass-through, so any protocol you can wrap in TLS works. For raw-TCP services like SSH, prefix with `openssl s_client` as a `ProxyCommand`:
 
 ```bash
 ssh -o ProxyCommand='openssl s_client -quiet \
-  -servername <clientId>.acu.run \
-  -connect <clientId>.acu.run:443' \
+  -servername <clientId>.mainnet.acu.run \
+  -connect <clientId>.mainnet.acu.run:443' \
   root@<clientId>
 ```
 
