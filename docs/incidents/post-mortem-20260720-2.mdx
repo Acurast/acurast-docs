@@ -47,7 +47,7 @@ could complete, and `unlock` deliberately stays open — so setting `Enabled = f
 an emergency backstop against the replay.
 
 ### Detection:
-Reported by a user who found the issue, while reviewing the cross-chain bridge
+Reported by a user who found the issue while reviewing the cross-chain bridge
 stack (hyperdrive / IBC / token-conversion) — specifically which state-changing entry points honored
 the `Enabled` kill switch and how inbound conversion messages are deduplicated.
 
@@ -155,7 +155,7 @@ top).
 | Time | Event |
 |------|-------|
 | 2026-07-20 | Reported by a user |
-| 2026-07-20 10:00 | Miti |
+| 2026-07-20 10:00 | Mitigation |
 | 2026-07-20 17:14 | Fix: `Self::ensure_enabled()?;` added to `retry_convert`, `retry_convert_for`, `retry_process_conversion`, `retry_process_conversion_for`, and `process_conversion` (`df3f0f07`) |
 | 2026-07-20 18:07 | Containment: hyperdrive `send_to_proxy` (outbound) and `MessageProcessor::process` (inbound `ActionExecutor` dispatch) gutted to no-ops — bridge deactivated (`9b84db3d`) |
 
