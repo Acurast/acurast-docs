@@ -12,7 +12,21 @@ slug: /incidents/post-mortem-20260720-2
 
 #### Authors: Simon
 
-#### Status: FIXED (bridge also deactivated as containment)
+#### Status: FIXED (bridge fully operational again)
+
+### Realized loss: none
+**The replay was never successfully exploited; the realized loss is 0 ACU.** Each of the 3,426
+conversions processed on mainnet is the only one for its account and matches exactly one canary
+conversion of the same amount (3,444 were initiated on canary).
+
+*How this was established*, verified independently in two ways:
+
+- We matched every canary `ConversionInitiated` against mainnet `ConversionProcessed` per account,
+  using the canary and mainnet indexers. A replay would show up as an account processed on mainnet
+  more often than it initiated on canary.
+- We read the mainnet pallet account balance from the archive node every 150k blocks. It fell from
+  65,000,000 to 6,663,034 ACU, a drop that exactly equals the sum of the indexed conversions, with
+  nothing unexplained in any interval. It has not moved since the last conversion on 2026-05-11.
 
 ### Summary:
 `pallet-token-conversion` migrates the native token from the source ("canary") chain to an Acurast
@@ -71,9 +85,8 @@ the `Enabled` kill switch and how inbound conversion messages are deduplicated.
   not guarantee exactly-once delivery after TTL, a conversion message could in principle be
   reprocessed to re-credit an account (e.g. one that had already `unlock`-ed its prior lock),
   drawing repeatedly on the pallet account.
-- **Exploitability / realized loss:** Not quantified here — see "Actions taken" for the on-chain
-  review needed to determine whether any conversion was processed while disabled or replayed on a
-  live network.
+- **Exploitability / realized loss:** 0 ACU. No conversion was replayed on mainnet; see
+  "Realized loss" at the top.
 - **`unlock` deliberately unaffected:** the fix intentionally leaves `unlock` callable while
   disabled so users can always release already-migrated, legitimately-held funds; `unlock` touches
   only the caller's own hold and mints nothing.
@@ -131,9 +144,10 @@ by the vesting slash to **≤ ~416k ACU** (1/16, only if the whole till were cyc
 remainder recovered by the Treasury, and was further throttled to `amount / MaxLock` (~27%/yr) — so
 in the realistic ~147-day pre-containment window the extractable net was a low-single-digit-percent
 fraction of migrated value. As of `9b84db3d` the inbound `MessageProcessor::process` path was gutted
-to a no-op, so the replay path was closed and the live exploitable amount dropped to **0** (it would
-return only if the bridge were re-activated). Realized loss (whether any replay actually executed)
-is a separate on-chain review, still outstanding — see *Follow-ups*.
+to a no-op, so the replay path was closed and the exploitable amount dropped to **0** for the
+duration of the containment; the bridge has since been re-activated with the `ensure_enabled()` guard
+fix in place. The realized loss was 0: no replay was ever executed (see "Realized loss" at the
+top).
 
 ### Timeline:
 (all times UTC+01:00, from commit history)
@@ -171,8 +185,8 @@ is a separate on-chain review, still outstanding — see *Follow-ups*.
 ### Conclusion
 **Actions taken:**
 - Enforced `ensure_enabled()` on every state-changing conversion path except `unlock` (`df3f0f07`).
-- Deactivated hyperdrive send/receive as containment so no cross-chain action executes while the
-  incident is contained (`9b84db3d`).
+- Temporarily deactivated hyperdrive send/receive as containment so no cross-chain action executed
+  while the incident was assessed (`9b84db3d`); the bridge has since been re-activated.
 - Shipped as `0.26.3` / `spec_version` 14 (`7cacdc07`).
 
 **Follow-ups:**
@@ -180,5 +194,5 @@ is a separate on-chain review, still outstanding — see *Follow-ups*.
   rather than relying on `LockedConversion` existence plus the IBC TTL behavior.
 - Add tests asserting that, with `Enabled = false`, every path except `unlock` rejects, including the
   inbound `process_conversion` message path.
-- Define and document the re-activation procedure for hyperdrive (reverting `9b84db3d`) once the
-  cross-chain stack has been re-reviewed.
+- Document the hyperdrive deactivation/re-activation procedure (as used with `9b84db3d`) so it can
+  be applied quickly in future incidents.
