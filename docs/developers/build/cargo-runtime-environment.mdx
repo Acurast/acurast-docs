@@ -151,6 +151,34 @@ Returns the version of the processor runtime.
 
 ---
 
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.29.0+</span>
+
+#### `processor_identity`
+
+Returns the identity of the processor: the SS58 address of its account and the account's public key. Unlike [`deployment_publicKeys`](#deployment_publickeys), these identify the processor itself rather than its keys for the active deployment.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "processor_identity",
+  "params": [],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "address": string,   // SS58
+    "publicKey": string  // hex, compressed P256
+  },
+  "id": string
+}
+```
+
+---
+
 ### Deployment
 
 <span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.25.0+</span>
