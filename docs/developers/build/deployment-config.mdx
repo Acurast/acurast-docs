@@ -64,6 +64,7 @@ You can create it interactively with `acurast init` — see the **[CLI docs](/de
 | `image` | Linux distro image used by the Shell runtime. Required when `runtime` is `"Shell"`. Object: `{ url, sha256 }` (HTTPS `.tar.xz` URL + SHA256). Ignored otherwise |
 | `entrypoint` | Script or binary the processor runs after extracting the Shell image (e.g. `acurast.sh`) |
 | `restartPolicy` | `"no"` (run once, no retry), `"onFailure"` (default — retry up to 3 times on failure; only the last failure is reported), or `"always"` (restart after the execution ends unexpectedly, including on success) |
+| `resetExitCode` | Exit code (1-125) with which the Shell entrypoint asks for its container to be reset. Not set by default. See [Container Reset](/developers/build/cargo-runtime-environment#container-reset). Ignored for other runtimes |
 | `minProcessorReputation` | Minimum required processor reputation |
 | `maxCostPerExecution` | Maximum cost per execution in the smallest denomination of ACU |
 | `includeEnvironmentVariables` | Environment variables from `.env` to pass to the deployment. See [Environment Variables](/developers/build/environment-variables) |
