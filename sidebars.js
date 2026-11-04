@@ -215,6 +215,33 @@ const sidebars = {
             },
           ],
         },
+        {
+          type: "category",
+          label: "Incidents",
+          collapsed: true,
+          items: [
+            {
+              type: "doc",
+              id: "incidents/post-mortem-20260720-2",
+              label: "2026-07-20 Token Conversion Replay",
+            },
+            {
+              type: "doc",
+              id: "incidents/post-mortem-20260720-1",
+              label: "2026-07-20 Double Claiming of Staking Rewards",
+            },
+            {
+              type: "doc",
+              id: "incidents/post-mortem-20260127",
+              label: "2026-01-27 Air Drop",
+            },
+            {
+              type: "doc",
+              id: "incidents/post-mortem-20251104",
+              label: "2025-11-04 Canary Chain Stall",
+            },
+          ],
+        },
       ],
     },
     "faq",

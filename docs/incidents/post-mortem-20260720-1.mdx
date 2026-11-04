@@ -15,20 +15,26 @@ slug: /incidents/post-mortem-20260720-1
 #### Status: FIXED
 
 ### Summary:
-In `pallet-acurast-compute`, several staking flows paid an accrued delegation reward **twice**.
+In `pallet-acurast-compute`, several staking flows paid an accrued delegation reward **twice** from a fixed pool of rewards, without increasing the total inflation.
 The internal helper `end_delegation_for` (via `withdraw_delegation_for`) already transferred the
 delegator's accrued reward from the distribution account to the delegator, and then **returned that
 same amount as a plain `Balance`**. Three callers — `delegate_more_for`, `redelegate_for`, and the
 `kick_out` path — treated the returned value as "still owed" and transferred it a **second** time
-from the distribution account. A delegator who ended/topped-up a delegation therefore received
+from the distribution account. A delegator who ended or topped up a delegation therefore received
 double their accrued reward, at the expense of the shared compute distribution (staking pot)
 account.
 
+**Mitigated:** the incident caused **no additional inflation**: it misdistributed already-scheduled
+staking rewards in favor of some staking accounts while the bug was live. The full over-distributed
+amount of **≈ 571,875 ACU** (all 421 addresses) was
+[burned on-chain on 2026-11-04](https://hub.acurast.com/explorer/extrinsic/0xf51d80ff529de209fa0bc403f841c95b72b8dbcbe01927e255804c3e41392a21),
+neutralizing the financial impact. See [Mitigation](#mitigation).
+
 ### Detection:
-Reported by a user who found the issue, while reviewing the compute pallet's
+Reported by a user who found the issue while reviewing the compute pallet's
 reward-accounting code paths (the delegation lifecycle `delegate` → `delegate_more` / `redelegate` /
 `kick_out` / `withdraw_delegation`). The ambiguity of a function that both performs a transfer **and**
-returns the transferred amount for event emmission made the duplicate payout possible.
+returns the transferred amount for event emission made the duplicate payout possible.
 
 ### When it was introduced:
 The double payout was introduced in commit `0775beed` "feat: RedelegationBlockingPeriod"
@@ -80,12 +86,16 @@ therefore live from 2025-10-30 until the fix on 2026-07-20 (~8.5 months). Before
   is capped at roughly one epoch's worth of the delegator's legitimate reward, and can be repeated at
   most once per epoch** — it is not an unbounded, repeat-in-a-single-block drain, which materially
   limited the maximum extractable value and the rate of pot depletion.
-- **Realized loss:** Material. An on-chain reconstruction (see below) puts the total wrongly-received
+- **Financial impact:** Material. An on-chain reconstruction (see below) puts the total wrongly-received
   reward at **≈ 571,875 ACU** across 421 addresses. An earlier manual review had found "no large
   scale abuse"; that conclusion was **wrong** — it missed that the `redelegate` path carried by far
-  the largest accrued rewards.
+  the largest accrued rewards. This was **not additional inflation**: no tokens were minted beyond the
+  regular per-epoch inflation. It was a wrong distribution of staking rewards that favored the
+  accounts using the affected paths while the bug was live. The full amount has since been burned:
+  the four largest recipients returned their share, and the remainder was covered from the
+  operation funds pallet account (see [Mitigation](#mitigation)).
 
-### Realized loss (measured on-chain):
+### Financial impact (measured on-chain):
 Reconstructed from the mainnet indexer + the fact that each affected call paid the reward via **two
 equal `Transfer`s from the compute distribution account** (`PalletId("cmptepid")`,
 `0x6d6f646c636d707465706964…`) to the recipient within one extrinsic. For every event of the five
@@ -96,7 +106,7 @@ double-claims span 2026-01-20 → 2026-07-21 (1,840 events).
 
 **By path:**
 
-| Path | Duplicate loss | Notes |
+| Path | Over-distributed | Notes |
 |------|---------------:|-------|
 | `redelegate` | 522,960 ACU | dominant — largest accrued rewards |
 | `delegate_more` | 48,916 ACU | |
@@ -115,12 +125,12 @@ explicit `delegate_more` / `redelegate` / `kick_out` extrinsics.
 
 | # | Address (SS58) | Wrongly received | Events | Path(s) |
 |---|---------|-----------------:|-------:|---------|
-|   | **From here are all known vesters**.
+|   | **Known Delegators**:
 | 1 | `5G1hb3aG4EvqshKAgZy5qTQHgVZZUEEgRvHczZ8zUjgXzfKK` | 212,687.83 ACU | 1 | redelegate |
 | 2 | `5ChwtgueM1qg3HEM59B8kLT7d5ipyJUgof2i46SohB1Z4rWi` | 174,623.16 ACU | 1 | redelegate |
 | 3 | `5Dcff2aGrPY3E99F5H66MyjfGnVEZe3VM8J5ePX92yA8ud8M` | 114,899.68 ACU | 5 | delegate_more + redelegate |
 | 4 | `5DhN5RKJiCGmkburNX7nuar8CUUiXYXmhoNvDrrgF1UqfmRJ` | 42,174.40 ACU | 1 | delegate_more |
-|   | **Until here all known vesters**.
+|   | **Other Delegators**:
 | 5 | `5EYydM9EA7RbXNrB6mP5WHg3XDobZQ7gJMgdJ14QAhPjT8cN` | 8,849.35 ACU | 1 | redelegate |
 | 6 | `5CAjErHxCfr9n6RTEbzffX83g4ft1KDc8axBizm5goTeKYc2` | 3,445.28 ACU | 1 | redelegate |
 | 7 | `5EfeQTU8WYLmJ6c44FSXsCR53CCi2mN3yMXGErmErLnjEiqe` | 3,162.84 ACU | 2 | delegate_more + redelegate |
@@ -129,17 +139,17 @@ explicit `delegate_more` / `redelegate` / `kick_out` extrinsics.
 | 10 | `5GjiL6UP1spfTtaoiNRBfEQ8m7ibxXnAndN8usj2HrLEDNCN` | 1,162.22 ACU | 4 | delegate_more + redelegate |
 
 The top two entries are single `redelegate` calls (212,688 + 174,623 ACU), and the top three
-recipients alone account for ≈ 89% of the loss — consistent with a few very large stakers whose
+recipients alone account for ≈ 89% of the over-distribution — consistent with a few very large stakers whose
 per-epoch accrued reward was doubled, rather than broad small-scale abuse.
 
 ### Theoretical worst case:
 **Model.** The extra payout per abusing call equals the delegator's `accrued_reward`, which
 `withdraw_delegator_accrued` **zeroes** on claim and which only regrows at epoch boundaries (see
 *Impact → Bounded to once per epoch*). So a single delegator can double at most **one epoch's worth
-of their reward, once per epoch**. The maximum possible over the whole live window is therefore the
+of their reward, once per epoch**. The maximum possible over the whole period the bug was live is therefore the
 case where **every delegator routes every epoch's reward through a doubling path** — i.e. the extra
 (fraudulent) payout ceiling equals **the total delegation rewards distributed to delegators over the
-bug's live window**. (Committer/`stake_more` rewards are excluded: that path was not vulnerable and
+period the bug was live**. (Committer/`stake_more` rewards are excluded: that path was not vulnerable and
 double-paid 0 on-chain.)
 
 **Computation.** Summing every realized delegator reward over the window — the amount-bearing claim
@@ -157,7 +167,7 @@ events plus the legit reward of each `delegate_more`/`redelegate` (whose events 
 **Theoretical worst-case extra payout ≈ 5.18M ACU.** The bulk (4.59M) is rewards that were actually
 claimed via the *safe* `withdraw_delegation` path — tokens that **would** have been doubled had those
 delegators instead claimed through `delegate_more`/`redelegate`. Against this ceiling, the
-**realized loss of ≈ 571,875 ACU is ≈ 11%** of the maximum: roughly one-ninth of all delegator
+**measured financial impact of ≈ 571,875 ACU is ≈ 11%** of the maximum: roughly one-ninth of all delegator
 rewards in the window were actually run through a doubling path.
 
 *Caveats.* This is the mechanism ceiling and ignores pot liquidity — draining the full 5.18M would
@@ -176,6 +186,30 @@ large enough to have been worth exploiting. Reproduced by `scripts/dm-loss`.
 | 2026-07-20 | Reported by a user |
 | 2026-07-20 16:52 | Fix committed: redundant second transfers removed from `delegate_more_for` / `redelegate_for` / kick-out path; regression test `test_delegate_more_does_not_double_transfer_reward` added (`a67a8f2b`) |
 | 2026-07-22 07:57 | Type-level hardening: rewards now flow through a move-only `Credit` (`RewardCreditOf`) that must be consumed exactly once (`969b30d5`) |
+| 2026-11-03 16:35 – 2026-11-04 08:55 | Over-distributed rewards returned by the four largest recipients; remainder covered from the operation funds pallet account (see [Mitigation](#mitigation)) |
+| 2026-11-04 09:00 | Full over-distributed amount of 571,875 ACU [burned](https://hub.acurast.com/explorer/extrinsic/0xf51d80ff529de209fa0bc403f841c95b72b8dbcbe01927e255804c3e41392a21) |
+
+### Mitigation:
+The full over-distributed amount was collected in a single account
+([`5DtrrNthJ6QxRUcKTQnW4LVcwqAsmVgXbU99nuqkugDkNWgE`](https://hub.acurast.com/explorer/address/5DtrrNthJ6QxRUcKTQnW4LVcwqAsmVgXbU99nuqkugDkNWgE))
+and then burned, so the duplicate payouts no longer exist in the token supply. The four largest
+recipients (#1–#4 in the table above) each returned exactly the amount they wrongly received. The
+remainder, spread across the other 417 addresses (#5–#421), was covered by an `OperationFunds.payout`
+from the operation funds pallet account.
+
+| Time (UTC+01:00) | From | Amount | Covers | Extrinsic |
+|------------------|------|-------:|--------|-----------|
+|   | **Return by known Delegators**:
+| 2026-11-03 16:35 | [`5ChwtgueM…SohB1Z4rWi`](https://hub.acurast.com/explorer/address/5ChwtgueM1qg3HEM59B8kLT7d5ipyJUgof2i46SohB1Z4rWi) | 174,623.16 ACU | recipient #2 | [`0x82c53d47…`](https://hub.acurast.com/explorer/extrinsic/0x82c53d4726b0d2e0b119374fb0a0686e8930d64768e2b2ec352008b510d895a6) |
+| 2026-11-03 16:40 | [`5Dcff2aGr…2yA8ud8M`](https://hub.acurast.com/explorer/address/5Dcff2aGrPY3E99F5H66MyjfGnVEZe3VM8J5ePX92yA8ud8M) | 114,899.68 ACU | recipient #3 | [`0xd45c1554…`](https://hub.acurast.com/explorer/extrinsic/0xd45c15542aea1102e7045df494d46daf35c3e5ebea0ce9dee8ced4f8ca643280) |
+| 2026-11-03 16:44 | [`5DhN5RKJi…F1UqfmRJ`](https://hub.acurast.com/explorer/address/5DhN5RKJiCGmkburNX7nuar8CUUiXYXmhoNvDrrgF1UqfmRJ) | 42,174.40 ACU | recipient #4 | [`0x88a79585…`](https://hub.acurast.com/explorer/extrinsic/0x88a795854d1ed1a26b6e9b29e9465bad85d1c90cdf059b150125abde9e1a0c55) |
+| 2026-11-04 08:55 | [`5G1hb3aG…zUjgXzfKK`](https://hub.acurast.com/explorer/address/5G1hb3aG4EvqshKAgZy5qTQHgVZZUEEgRvHczZ8zUjgXzfKK) | 212,687.83 ACU | recipient #1 | [`0x6387e674…`](https://hub.acurast.com/explorer/extrinsic/0x6387e674fa7182f97d1138e6b7b6d5512ef45399b011046b1984843cd91c93a3) |
+|   | **Covering the remainder**:
+| 2026-11-03 17:38 | [Operation funds pallet account](https://hub.acurast.com/explorer/address/5EYCAe5iXhV27TdQGKANjpKWqMirf6zwK1wcMJnQLwWfQggS) | 27,490.20 ACU | recipients #5–#421 | [`0x901dae09…`](https://hub.acurast.com/explorer/extrinsic/0x901dae0970969ea1ca4b5a808eaf2dadd8b145416347710c45286c4188683a93) |
+|   | **Final burn**:
+| **2026-11-04 09:00** | [**`5DtrrNthJ…ugDkNWgE`**](https://hub.acurast.com/explorer/address/5DtrrNthJ6QxRUcKTQnW4LVcwqAsmVgXbU99nuqkugDkNWgE) | **571,875 ACU** | **full over-distribution** | [**`0xf51d80ff…`**](https://hub.acurast.com/explorer/extrinsic/0xf51d80ff529de209fa0bc403f841c95b72b8dbcbe01927e255804c3e41392a21) |
+
+The burned amount of 571,875 ACU equals the on-chain measured over-distribution above.
 
 ## Lessons Learned
 
@@ -188,7 +222,7 @@ large enough to have been worth exploiting. Reproduced by `scripts/dm-loss`.
 ### What went well
 
 ### Where we got lucky
-- The bug was caught by honest user.
+- The bug was caught by an honest user.
 - The exploit was time and real-reward bound.
 - Only the top-up / exit paths were affected; the most common claim path (`withdraw_delegation`) was
   correct, limiting the blast radius.
@@ -202,6 +236,6 @@ large enough to have been worth exploiting. Reproduced by `scripts/dm-loss`.
   (`resolve`), and is burned on drop — so paying a reward twice is now a **compile error**. Developer/LLM guidelines have been updated to "prevent double transfers with `Imbalance`/`Credit`" mechanics.
 
 **Follow-ups:**
-- Note that upon event-shape change: reward payouts now emit `Balances::Withdraw` + `Balances::Deposit`
+- Event-shape change: reward payouts now emit `Balances::Withdraw` + `Balances::Deposit`
   instead of a single `Balances::Transfer`; downstream indexers (e.g. acurast-explorer) must be
   updated accordingly.
