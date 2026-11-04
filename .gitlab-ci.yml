@@ -1,0 +1,39 @@
+# GitLab CI/CD for acurast-docs
+#
+# Mirrors the checks in .github/workflows/deploy.yml; deployment stays on
+# GitHub Pages. Having this file also stops GitLab Auto DevOps from running
+# `npm test` (there is no test script).
+
+stages:
+  - build
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    # Avoid a duplicate branch pipeline when an MR is open for the same commit.
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+
+build:
+  stage: build
+  # Full image (not -slim): the link check needs curl.
+  image: node:24
+  variables:
+    YARN_CACHE_FOLDER: "$CI_PROJECT_DIR/.yarn-cache"
+  cache:
+    key:
+      files:
+        - yarn.lock
+    paths:
+      - .yarn-cache/
+  script:
+    - yarn install --frozen-lockfile
+    - yarn process-predefined-methods && yarn typecheck
+    - yarn build
+    - |
+      # Bind to IPv4 explicitly: in the runner container `localhost` resolves to
+      # ::1 first, but check-links connects to 127.0.0.1.
+      npx docusaurus serve --host 127.0.0.1 --port 3000 --no-open &
+      for i in $(seq 1 60); do curl -sf -o /dev/null http://127.0.0.1:3000/ && break; sleep 1; done
+      yarn check-links
