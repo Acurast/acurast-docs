@@ -188,6 +188,10 @@ module.exports = async function createConfig() {
       {
         redirects: [
           {
+            to: "/incidents/post-mortem-20260127",
+            from: "/post-mortem/2026-01-27-airdrop",
+          },
+          {
             to: "/developers/examples",
             from: "/developers/getting-started/examples",
           },
