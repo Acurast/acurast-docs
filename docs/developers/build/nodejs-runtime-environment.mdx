@@ -761,8 +761,9 @@ _STD_.webview.getSurfaceSize(onSuccess, onError);
  * who has it can control the browser.
  * 
  * Call it before opening the first tab. From the first call on, DevTools are no longer served at
- * the URL of `getDebugUrl`; tabs opened before the first call are served there, without a token,
- * until then. On processors older than 1.30.0 this function is undefined; fall back to `getDebugUrl`.
+ * the fixed `ws://localhost:3000`, and `getDebugUrl` returns this URL instead; tabs opened before
+ * the first call are served at the fixed URL, without a token, until then. On processors older
+ * than 1.30.0 this function is undefined; fall back to `getDebugUrl`.
  * @param {WebViewGetDevToolsUrlSuccess} onSuccess the success callback.
  * @param {WebViewError} onError the error callback.
  */
@@ -774,6 +775,11 @@ _STD_.webview.getDevToolsUrl(onSuccess, onError);
  * 
  * Returns the fixed debug URL of the WebView, `ws://localhost:3000`. DevTools are served there
  * without a token while tabs are open, until `getDevToolsUrl` is called.
+ * 
+ * Once `getDevToolsUrl` has answered, returns the same URL as it did. Code that still reads
+ * `getDebugUrl` then keeps reaching DevTools, as long as it reads it after that and keeps the URL's
+ * path, and the URL it gets carries the token: it has to be kept as secret as the
+ * `getDevToolsUrl` URL.
  * @return {string} the debug URL.
  */
 _STD_.webview.getDebugUrl(): string;
