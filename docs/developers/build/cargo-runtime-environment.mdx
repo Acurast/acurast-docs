@@ -147,6 +147,7 @@ What a reset keeps:
 | Files in the rootfs (installed packages, config, changes to the app) | Back to the image |
 | Running processes | Stopped |
 | Network whitelist, browser tabs, open tunnel | Gone - the entrypoint sets them up again |
+| DevTools URL ([`browser_devToolsUrl`](#browser_devtoolsurl)) | Replaced - ask for it again before opening a tab |
 | Tunnel ACME account and certificate | Kept |
 | Deployment keys | Unchanged |
 
@@ -545,11 +546,44 @@ Decrypts bytes using ECDH key agreement with the sender's public key. Supported 
 
 These methods control an embedded WebView on the processor device and are only available on Android processors.
 
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.30.0+</span>
+
+#### `browser_devToolsUrl`
+
+Returns the Chrome DevTools URL of the WebView, of the form `ws://127.0.0.1:<port>/<token>`. Append a DevTools path to it to reach that path, for example `<url>/json/version`. The DevTools URLs in the answers, such as `webSocketDebuggerUrl`, carry the token too. Requests without the token are answered `404 Not Found`. Treat the URL as a secret: anyone on the device who has it can control the browser.
+
+Ask for it before opening the first tab. From the first call on, the browser no longer serves DevTools at the [`browser_debugUrl`](#browser_debugurl) URL; tabs opened before the first call are served there, without a token, until then. The URL is the same on every call. After a [container reset](#container-reset), ask for it again before opening a tab: the reset brings a new URL.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "browser_devToolsUrl",
+  "params": [],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "url": string  // ws://127.0.0.1:<port>/<token>
+  },
+  "id": string
+}
+```
+
+---
+
 <span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: 1.25.0+</span>
 
 #### `browser_debugUrl`
 
-Returns the Chrome DevTools remote debugging URL for the WebView.
+:::warning Deprecated
+Use [`browser_devToolsUrl`](#browser_devtoolsurl) instead. Existing deployments continue to work, but new deployments should not use `browser_debugUrl`.
+:::
+
+Returns the fixed Chrome DevTools URL of the WebView, `ws://localhost:3000`. DevTools are served there without a token while tabs are open, until `browser_devToolsUrl` is called.
 
 ```ts title="Request"
 {

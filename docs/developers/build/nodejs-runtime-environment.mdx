@@ -752,9 +752,28 @@ _STD_.webview.initSurface(size, onSuccess, onError);
 _STD_.webview.getSurfaceSize(onSuccess, onError);
 
 /**
- * @since 1.9.2 (Android)
+ * @since 1.30.0 (Android)
  * 
- * Returns the debug URL of the WebView.
+ * Gets the Chrome DevTools URL of the WebView, of the form `ws://127.0.0.1:<port>/<token>`.
+ * Append a DevTools path to it to reach that path, for example `<url>/json/version`. The DevTools
+ * URLs in the answers, such as `webSocketDebuggerUrl`, carry the token too. Requests without the
+ * token are refused. The URL is the same on every call. Treat it as a secret: anyone on the device
+ * who has it can control the browser.
+ * 
+ * Call it before opening the first tab. From the first call on, DevTools are no longer served at
+ * the URL of `getDebugUrl`; tabs opened before the first call are served there, without a token,
+ * until then. On processors older than 1.30.0 this function is undefined; fall back to `getDebugUrl`.
+ * @param {WebViewGetDevToolsUrlSuccess} onSuccess the success callback.
+ * @param {WebViewError} onError the error callback.
+ */
+_STD_.webview.getDevToolsUrl(onSuccess, onError);
+
+/**
+ * @since 1.9.2 (Android)
+ * @deprecated Use `_STD_.webview.getDevToolsUrl` instead.
+ * 
+ * Returns the fixed debug URL of the WebView, `ws://localhost:3000`. DevTools are served there
+ * without a token while tabs are open, until `getDevToolsUrl` is called.
  * @return {string} the debug URL.
  */
 _STD_.webview.getDebugUrl(): string;
@@ -906,6 +925,14 @@ type WebViewProxyConfig = {
  * @param {WebViewSurfaceSize | null} size the surface size, or `null` if the browser currently has no surface.
  */
 type WebViewGetSurfaceSizeSuccess = (size) => void;
+
+/**
+ * @since 1.30.0 (Android)
+ * 
+ * @callback WebViewGetDevToolsUrlSuccess
+ * @param {string} url the DevTools URL, `ws://127.0.0.1:<port>/<token>`.
+ */
+type WebViewGetDevToolsUrlSuccess = (url) => void;
 
 /**
  * @since 1.27.0 (Android)
