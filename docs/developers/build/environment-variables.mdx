@@ -38,7 +38,7 @@ const API_KEY = _STD_.env.API_KEY;
 
 Cargo Runtime Environment
 
-In the Cargo runtime, environment variables are available as standard system environment variables on the deployment's distro image. For example, in Node.js:
+In the Cargo runtime, environment variables are available as standard system environment variables on the Deployment's distro image. They are set for the Deployment's own processes only; see [the Cargo runtime page](/developers/build/cargo-runtime-environment#environment-variables) for what else the entrypoint starts with and the limits on names, values and size. For example, in Node.js:
 
 ```typescript
 const API_KEY = process.env.API_KEY;
@@ -52,7 +52,7 @@ For interval-based deployments with multiple executions, you can update environm
 acurast deployments <id> --update-env-vars
 ```
 
-This is useful for rotating API keys on a schedule without redeploying the script.
+This is useful for rotating API keys on a schedule without redeploying the Deployment.
 
 ## Programmatic access (SDK)
 

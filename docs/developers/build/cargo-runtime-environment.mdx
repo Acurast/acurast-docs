@@ -33,6 +33,28 @@ Env vars declared in your deployment config are injected as standard system envi
 let api_key = std::env::var("API_KEY").unwrap();
 ```
 
+### What the entrypoint starts with
+
+The Processor composes the environment of the entrypoint itself; nothing is inherited from the Processor App's own process. It holds:
+
+| Variable | Set by |
+| --- | --- |
+| `PATH`, `HOME` | the defaults from [PRoot Quirks](#proot-quirks) |
+| `BRIDGE_SOCKET` | the Processor, for the [RPC API](#rpc-api) |
+| `PWD` | PRoot |
+| `PROOT_LOADER`, `PROOT_TMP_DIR`, `LD_LIBRARY_PATH` | PRoot's own settings. They name Processor paths that do not exist inside the image; do not rely on them |
+| the variables listed in `includeEnvironmentVariables` | the Deployment, applied last. A Deployment value for `PATH`, `HOME` or `LD_LIBRARY_PATH` replaces the one above |
+
+Deployment variables reach the Deployment's own processes inside the image and nothing else. The PRoot process that runs the Deployment never sees them, so loader and PRoot settings such as `LD_PRELOAD`, `LD_LIBRARY_PATH` or `PROOT_*` only affect programs started inside the image. Android variables such as `ANDROID_ROOT` or `BOOTCLASSPATH` are absent, and `TMPDIR` is unset, so `mktemp` and `tmpfile` use the image's `/tmp`.
+
+A variable name that is not a shell identifier, for example one starting with `-`, reaches the entrypoint process, but a shell does not pass it on to the programs it starts.
+
+### Limits
+
+- A variable name must not be empty and must not contain `=` or a NUL byte. A value must not contain a NUL byte.
+- The variables of one Deployment must fit in 128 KiB, names and values together.
+- An execution whose variables break these rules is refused before the entrypoint runs, and the execution report names the variable.
+
 ## PRoot Quirks
 
 The PRoot container starts with a minimal environment. The processor injects the following defaults before the entrypoint runs:
