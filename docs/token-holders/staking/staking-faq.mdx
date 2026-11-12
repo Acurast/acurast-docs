@@ -53,7 +53,10 @@ While the number of delegations is not limited, a committer's delegated stake is
 ### What happens to the Delegator's stake when the Committer starts cooldown?
 Delegators can only choose a cooldown period that is shorter (never longer) than the selected Committer's cooldown. For example, if the selected Committer choses a cooldown of 6 months and the Delegator chose 2 months, once the Committer starts cooldown, it will take 4 months until the Delegator's cooldown automatically starts as well.
 
-Delegators can see when their Committers start cooldown and can redelegate their stake to a different Committer, regardless of whether their own cooldown period has already started.
+Delegators can see when their Committers start cooldown and can redelegate their stake to a different Committer, or move it into their own stake, regardless of whether their own cooldown period has already started.
+
+### I delegated, and now I run Processors myself. Do I have to wait out my delegation's cooldown to stake its tokens myself?
+No. On the delegation's page in the Acurast Hub, use **Move to own stake** (if you have no own stake yet) or **Add to own stake** (if you do). The delegation ends and its whole amount goes straight into your own stake, without being unlocked and without a cooldown. Your stake's cooldown must be at least as long as the cooldown left on the delegation; the Hub raises it if needed and warns you before you confirm. The delegation must be at least 7 days old, unless its Committer is in cooldown. See [How to Stake](/token-holders/staking/how-to-stake#move-a-delegation-into-your-own-stake) for details.
 
 ### What happens to the Delegator's stake when their Committer is slashed?
 Delegators are affected by slashing and will lose a pro rata share of their stake if their Committer is slashed. Delegators can choose to redelegate their stake to a different Committer.
