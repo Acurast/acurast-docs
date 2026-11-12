@@ -1,6 +1,6 @@
 ---
 title: How To Stake
-description: "How to create a stake as a Committer or delegate to a Committer on the Staking page of the Acurast Hub."
+description: "How to create a stake as a Committer, delegate to a Committer, or move a delegation into your own stake on the Staking page of the Acurast Hub."
 slug: /token-holders/staking/how-to-stake
 ---
 
@@ -13,14 +13,14 @@ To create a stake, Compute Providers (aka Committers) have to:
 1. Compute: select the amount of Compute they are comfortable to commit.
 2. Cooldown: select the Cooldown period. The cooldown period is measured in blocks. The Staking Frontend also provides an estimate expressed in time (days etc.)
 3. Tokens: Select the amount of tokens to stake
-4. Compound: Select if Autocompoundung is ON or OFF
+4. Compound: Select if Autocompounding is ON or OFF
 
-To do a delegation, Delgators have to:
+To do a delegation, Delegators have to:
 
 1. Committer: Select a Committer
 2. Cooldown: Select a Cooldown period
 3. Tokens: Select the amount of tokens to delegate
-4. Compound: Select if Autocompoundung is ON or OFF
+4. Compound: Select if Autocompounding is ON or OFF
 
 ## Staking Lifecycle
 
@@ -34,7 +34,7 @@ To do a delegation, Delgators have to:
 **Delegator:**
 
 * **Start Staking:** Delegators choose one or several committers to delegate to, then select the amount of tokens and cooldown period (which cannot exceed their chosen committer's cooldown).
-* **While staking:** Delegators can add more tokens, increase duration, compound or withdraw rewards. They can also redelegate their stake to a different committer with equal or greater parameters (committed compute, stake size, and cooldown duration).
+* **While staking:** Delegators can add more tokens, increase duration, compound or withdraw rewards. They can also redelegate their stake to a different committer with equal or greater parameters (committed compute, stake size, and cooldown duration). Delegators who also provide compute can [move a delegation into their own stake](#move-a-delegation-into-your-own-stake).
 * **Exit staking:** Delegator triggers cooldown (reducing rewards to 50%) and waits until it ends.
 * **Finalize (Withdraw/Claim):** After cooldown ends, delegator finalizes the stake, withdrawing the unlocked funds and any unclaimed rewards.
 
@@ -42,3 +42,22 @@ To do a delegation, Delgators have to:
 ## Reward compounding (Autocompound)
 
 When creating a stake, committers and delegators can choose whether their staking rewards should be automatically compounded (automatically added back to their stake) or made available for withdrawal. If they choose not to autocompound, rewards accumulate and can be withdrawn at any time - users are then free to move these rewards or manually stake them again. Autocompounding simply automates this process, maximizing reward growth over time without requiring manual action.
+
+## Move a Delegation into Your Own Stake
+
+A Delegator who also provides compute can move a running delegation into their own stake. The delegation ends, but its tokens are never unlocked: they remain locked and move straight into the stake, without waiting out the delegation's cooldown.
+
+Open the delegation on the Staking page of the Acurast Hub. Depending on your account, it shows one of two buttons:
+
+* **Move to own stake:** your account manages Processors but has no own stake yet. The Hub opens the form for a new stake. Choose the committed compute, cooldown, Delegation Fee and autocompound setting as for any new stake.
+* **Add to own stake:** your account already has an own stake that is not in cooldown. The Hub opens the form for updating your stake. In the same step, you can also increase the cooldown and committed compute, lower the Delegation Fee and change the autocompound setting.
+
+In both cases:
+
+* The **whole delegation** is moved. You can't move part of it, and no free balance is used. To stake more tokens, add them to your stake afterwards.
+* The **same rules as for any stake** apply, including the limit on how much can be staked per compute: your own stake can't exceed a multiple of your committed compute, so the stronger your Processors' benchmarks, the more stake they can back. If the delegation would take your stake over that limit, it can't be moved until you commit more compute. See [Limited stake per commitment](/token-holders/staking/staking-mechanics#reward-flow) and [What is the maximum of tokens a user can stake?](/token-holders/staking/staking-faq#what-is-the-maximum-of-tokens-a-user-can-stake).
+* Your stake's **cooldown can't be shorter than the cooldown left on the delegation**. If the delegation's cooldown hasn't started, that is its full cooldown period. When this is longer than your stake's current cooldown (or the network minimum, for a new stake), the Hub raises the cooldown to that length and shows a warning next to the cooldown slider and in the confirmation dialog.
+* The same **waiting period as for redelegation** applies: the delegation must be at least 7 days old, unless the Committer it is delegated to is in cooldown.
+* The button isn't shown for a stale delegation, for a delegation with an unclaimed slash, or when your own stake is in cooldown.
+
+On the network, these options use the `commit_compute_from_delegation` (new stake) and `stake_more_from_delegation` (existing stake) calls of the compute pallet.

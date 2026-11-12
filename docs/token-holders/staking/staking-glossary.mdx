@@ -75,6 +75,9 @@ Detaching a running Delegation from one Committer and attaching it to a new Comm
 
 Redelegation can only be done if the current delegation is older than 7 days or if the stake of the chosen Committer is in cooldown.
 
+### Move to Own Stake
+Ending a running Delegation and moving its tokens straight into the Delegator's own Stake. The tokens remain locked throughout, so there is no cooldown to wait out. Creates a new Stake if the Delegator has none, or adds the Delegation to the existing Stake. The whole Delegation is moved, and the Stake's cooldown must be at least as long as the cooldown left on the Delegation. The same 7-day rule as for redelegation applies. See [How to Stake](/token-holders/staking/how-to-stake#move-a-delegation-into-your-own-stake).
+
 ### Delegation Fee
 A fee Committers can set once upon creating a Stake and will receive from the rewards of the Delegations attached to their stake. The Delegation fee cannot be increased during the lifetime of a Stake, but it can be decreased.
 
@@ -89,7 +92,7 @@ The amount of delegations a Committer can accept.
 A Delegation is stale if the Committer it was delegated to did trigger a cooldown which did end. A stale delegation will not earn any rewards and should be finalized.
 
 ### Committer in Cooldown
-A delegation shows "Committer in cooldown" to indicate that the Committer this delegation was delegated to, started the cooldown. All following rewards will be halved, while slashing penalty will stay the same. Delegators can choose to trigger their own cooldown or to delegate to a different committer.
+A delegation shows "Committer in cooldown" to indicate that the Committer this delegation was delegated to, started the cooldown. All following rewards will be halved, while slashing penalty will stay the same. Delegators can choose to trigger their own cooldown, to delegate to a different committer, or, if they provide compute themselves, to move the delegation into their own stake.
 
 ## Time & Measurement
 
