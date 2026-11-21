@@ -18,12 +18,12 @@ Download the Acurast chain spec from the Acurast GitHub repository:
 <Tabs groupId="network">
   <TabItem value="mainnet" label="Mainnet" default>
 
-[Acurast Mainnet chain spec](https://github.com/Acurast/acurast-substrate/blob/acurast-v0.26.5/chain-specs/acurast-mainnet-parachain-3396-raw.json)
+[Acurast Mainnet chain spec](https://github.com/Acurast/acurast-substrate/blob/acurast-v0.27.3/chain-specs/acurast-mainnet-parachain-3396-raw.json)
 
   </TabItem>
   <TabItem value="canary" label="Canary">
 
-[Acurast Canary chain spec](https://github.com/Acurast/acurast-substrate/blob/acurast-v0.26.5/chain-specs/acurast-kusama-parachain-2239-raw.json)
+[Acurast Canary chain spec](https://github.com/Acurast/acurast-substrate/blob/acurast-v0.27.3/chain-specs/acurast-kusama-parachain-2239-raw.json)
 
   </TabItem>
 </Tabs>
@@ -43,7 +43,8 @@ In the `docker-compose.yml` file, put the following content:
 ```yml
 services:
   node:
-    image: "acurast/node-mainnet:acurast-v0.26.7"
+    image: "acurast/node-mainnet:acurast-v0.27.3"
+    stop_grace_period: 120s
     command: "--chain /node/chain-specs/acurast-mainnet-parachain-3396-raw.json \
       --base-path /node/data \
       --bootnodes /ip4/82.220.91.112/tcp/30335/ws/p2p/12D3KooWMJM3htCon6tQ6FzRuWkxtwEkd3i5awZitdTviWwJX3KY \
@@ -72,7 +73,8 @@ services:
 ```yml
 services:
   node:
-    image: "acurast/node-canary:acurast-v0.26.7"
+    image: "acurast/node-canary:acurast-v0.27.3"
+    stop_grace_period: 120s
     command: "--chain /node/chain-specs/acurast-kusama-parachain-2239-raw.json \
       --base-path /node/data \
       --bootnodes /ip4/57.129.99.69/tcp/30334/ws/p2p/12D3KooWKrSDeVQ4tVQ1eGjqVAhAW3cgMQFHNCBbJrpmupEvdD4A \
@@ -97,6 +99,8 @@ services:
 
   </TabItem>
 </Tabs>
+
+`stop_grace_period: 120s` gives the node time to close its database cleanly when the container is stopped or recreated. Without it, Docker kills the container 10 seconds after asking it to stop.
 
 The configuration above will start the Acurast node with the following options:
 - `--chain` - specifies the chain spec file
@@ -127,6 +131,47 @@ This will start the Acurast node in detached mode. You can check the logs by run
 ```bash
 docker compose logs -f
 ```
+
+## Upgrade the node
+
+New node versions are published as Docker image tags (`acurast-vX.Y.Z`) for [Mainnet](https://hub.docker.com/r/acurast/node-mainnet/tags) and [Canary](https://hub.docker.com/r/acurast/node-canary/tags), with release notes on [GitHub](https://github.com/Acurast/acurast-substrate/releases). The Canary image is sometimes published before the Mainnet image, so check both.
+
+An upgrade is an image swap. The node keeps using its existing `data` folder, no resync is needed unless the release notes say otherwise.
+
+1. Pull the new image:
+
+```bash
+docker pull acurast/node-mainnet:acurast-vX.Y.Z
+```
+
+2. Check that the new binary accepts your node's arguments. Run it with the same arguments as in your `docker-compose.yml`, followed by `--help`. The node does not start: it either prints the help text, which means every argument was accepted, or stops with `error: unexpected argument '...' found`:
+
+```bash
+docker run --rm acurast/node-mainnet:acurast-vX.Y.Z \
+  --chain /node/chain-specs/acurast-mainnet-parachain-3396-raw.json \
+  --pruning=archive \
+  --help
+```
+
+Do not compare your arguments with the `--help` output instead: some accepted arguments are hidden aliases that the help text does not list, for example `--pruning` (an alias of `--state-pruning`).
+
+3. Change the image tag in `docker-compose.yml` and recreate the container:
+
+```bash
+docker compose up -d
+```
+
+4. Check the new version with the `system_version` RPC method:
+
+```bash
+curl -H "Content-Type: application/json" \
+  --data '{"jsonrpc":"2.0","method":"system_version","params":[],"id":1}' \
+  http://localhost:9934
+```
+
+For a collator, also check the logs: `Prepared block for proposing` and `Pre-sealed block for proposal` lines show that it is authoring again. Depending on when the collator's next slot comes, this can take a few minutes after the restart.
+
+To roll back, change the image tag back to the previous version and run `docker compose up -d` again. This works as long as the new version did not migrate the database, which the release notes would mention.
 
 ## Collator Onboarding
 
