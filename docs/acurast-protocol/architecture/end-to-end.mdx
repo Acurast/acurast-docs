@@ -45,7 +45,7 @@ A prerequisite for assigning the `deployment` to the processor is that the proce
 
 ### (3) `Deployment` Execution
 
-Next, the `deployment_script` is executed in the processor runtime. In the illustrated example of Fig. 1, the execution is performed inside of the Acurast Secure Hardware Runtime (ASHR), _i.e.,_ because _confidentiality_ is ascertained by secure hardware _e.g.,_ an isolated and external coprocessor (Google's Titan M2 Chip). Other runtimes (e.g., the Acurast Zero-Knowledge Runtime (AZKR)) may provide additional soundness guarantees.
+Next, the `deployment_script` is executed in the processor runtime. In the illustrated example of Fig. 1, the execution is performed inside of the Acurast Secure Hardware Runtime (ASHR), an isolated runtime whose _confidentiality_ is ascertained by secure hardware, _e.g.,_ an isolated and external coprocessor (Google's Titan M2 Chip) that holds the processor's keys. Other runtimes (e.g., the Acurast Zero-Knowledge Runtime (AZKR)) may provide additional soundness guarantees.
 
 ### (4) `Deployment` Fulfillment
 
