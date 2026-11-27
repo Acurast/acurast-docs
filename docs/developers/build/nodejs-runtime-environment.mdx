@@ -217,6 +217,10 @@ The ECDSA signature is returned as raw `r || s` (64 bytes, hex), **not** DER. `s
 See [Signing requests from a deployment](/developers/examples/signing-requests) for a full hash → sign → verify walkthrough.
 :::
 
+:::info Encryption
+`encryptFor` and `decryptFrom` exchange encrypted messages between the Deployment's key and the holder of another public key. See [Encryption](/developers/build/encryption) for what an envelope guarantees and how a peer implements the other side.
+:::
+
 ```javascript
 /**
  * Signs the given digest with the secp256r1 (P-256) key generated for the current deployment.
@@ -238,6 +242,7 @@ _STD_.signers.secp256r1.sign(payload);
  * @param {string} salt Hex string representing the salt used for encryption.
  * @param {string} payload Hex string representing the bytes to encrypt.
  * @return {string} Hex string representing the encrypted payload.
+ * @deprecated Use `_STD_.signers.secp256r1.encryptFor` instead.
  */
 _STD_.signers.secp256r1.encrypt(publicKey, salt, payload);
 
@@ -250,8 +255,34 @@ _STD_.signers.secp256r1.encrypt(publicKey, salt, payload);
  * @param {string} salt Hex string representing the salt used for encryption.
  * @param {string} payload Hex string representing the bytes to decrypt.
  * @return {string} Hex string representing the decrypted payload.
+ * @deprecated Use `_STD_.signers.secp256r1.decryptFrom` instead.
  */
 _STD_.signers.secp256r1.decrypt(publicKey, salt, payload);
+
+/**
+ * Encrypts the given payload with the secp256r1 encryption key of the current Deployment for the holder of
+ * `publicKey`, into an envelope. See [Encryption](/developers/build/encryption).
+ *
+ * @since Android TBD
+ *
+ * @param {string} publicKey Hex string of the recipient's 33-byte compressed public key.
+ * @param {string} payload Hex string representing the bytes to encrypt.
+ * @param {string} [salt] Hex string of a 16-byte salt. A random one is drawn when it is omitted.
+ * @return {string} Hex string representing the envelope.
+ */
+_STD_.signers.secp256r1.encryptFor(publicKey, payload, salt);
+
+/**
+ * Decrypts an envelope that the holder of `publicKey` encrypted for the secp256r1 encryption key of the current
+ * Deployment. See [Encryption](/developers/build/encryption).
+ *
+ * @since Android TBD
+ *
+ * @param {string} publicKey Hex string of the sender's 33-byte compressed public key.
+ * @param {string} envelope Hex string representing the envelope.
+ * @return {string} Hex string representing the decrypted payload.
+ */
+_STD_.signers.secp256r1.decryptFrom(publicKey, envelope);
 
 /**
  * Signs the given digest with the secp256k1 key generated for the current deployment.
@@ -273,6 +304,7 @@ _STD_.signers.secp256k1.sign(payload);
  * @param {string} salt Hex string representing the salt used for encryption.
  * @param {string} payload Hex string representing the bytes to encrypt.
  * @return {string} Hex string representing the encrypted payload.
+ * @deprecated Use `_STD_.signers.secp256k1.encryptFor` instead.
  */
 _STD_.signers.secp256k1.encrypt(publicKey, salt, payload);
 
@@ -285,8 +317,34 @@ _STD_.signers.secp256k1.encrypt(publicKey, salt, payload);
  * @param {string} salt Hex string representing the salt used for encryption.
  * @param {string} payload Hex string representing the bytes to decrypt.
  * @return {string} Hex string representing the decrypted payload.
+ * @deprecated Use `_STD_.signers.secp256k1.decryptFrom` instead.
  */
 _STD_.signers.secp256k1.decrypt(publicKey, salt, payload);
+
+/**
+ * Encrypts the given payload with the secp256k1 encryption key of the current Deployment for the holder of
+ * `publicKey`, into an envelope. See [Encryption](/developers/build/encryption).
+ *
+ * @since Android TBD
+ *
+ * @param {string} publicKey Hex string of the recipient's 33-byte compressed public key.
+ * @param {string} payload Hex string representing the bytes to encrypt.
+ * @param {string} [salt] Hex string of a 16-byte salt. A random one is drawn when it is omitted.
+ * @return {string} Hex string representing the envelope.
+ */
+_STD_.signers.secp256k1.encryptFor(publicKey, payload, salt);
+
+/**
+ * Decrypts an envelope that the holder of `publicKey` encrypted for the secp256k1 encryption key of the current
+ * Deployment. See [Encryption](/developers/build/encryption).
+ *
+ * @since Android TBD
+ *
+ * @param {string} publicKey Hex string of the sender's 33-byte compressed public key.
+ * @param {string} envelope Hex string representing the envelope.
+ * @return {string} Hex string representing the decrypted payload.
+ */
+_STD_.signers.secp256k1.decryptFrom(publicKey, envelope);
 
 /**
  * Signs the given message with the ed25519 key generated for the current deployment.

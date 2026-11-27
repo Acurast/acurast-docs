@@ -58,6 +58,7 @@ const sidebars = {
             "developers/build/environment-variables",
             "developers/build/nodejs-runtime-environment",
             "developers/build/cargo-runtime-environment",
+            "developers/build/encryption",
             "developers/build/llm-on-acurast",
           ],
         },
