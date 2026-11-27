@@ -483,6 +483,10 @@ For `p256` and `secp256k1` the input is **not hashed**: the processor performs a
 
 Encrypts bytes using ECDH key agreement with the receiver's public key. Supported curves: `p256`, `secp256k1`.
 
+:::warning Deprecated
+Use [`signer_encryptFor`](#signer_encryptfor) instead. `signer_encrypt` keeps working unchanged; see [Encryption](/developers/build/encryption#migrating-from-encrypt-and-decrypt).
+:::
+
 ```ts title="Request"
 {
   "jsonrpc": "2.0",
@@ -515,6 +519,10 @@ Encrypts bytes using ECDH key agreement with the receiver's public key. Supporte
 
 Decrypts bytes using ECDH key agreement with the sender's public key. Supported curves: `p256`, `secp256k1`.
 
+:::warning Deprecated
+Use [`signer_decryptFrom`](#signer_decryptfrom) instead. `signer_decrypt` keeps working unchanged; see [Encryption](/developers/build/encryption#migrating-from-encrypt-and-decrypt).
+:::
+
 ```ts title="Request"
 {
   "jsonrpc": "2.0",
@@ -524,6 +532,69 @@ Decrypts bytes using ECDH key agreement with the sender's public key. Supported 
     "publicKey": string,  // hex, sender's public key
     "salt": string,       // hex
     "bytes": string       // hex, ciphertext
+  }],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "bytes": string  // hex, plaintext
+  },
+  "id": string
+}
+```
+
+---
+
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: TBD</span>
+
+#### `signer_encryptFor`
+
+Encrypts bytes with the Deployment's encryption key for the holder of the given public key, into an envelope. Supported curves: `p256`, `secp256k1`. See [Encryption](/developers/build/encryption) for the envelope format and what it guarantees.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "signer_encryptFor",
+  "params": [{
+    "curve": "p256" | "secp256k1",
+    "publicKey": string,  // hex, recipient's 33-byte compressed public key
+    "bytes": string,      // hex, plaintext
+    "salt"?: string       // hex, 16 bytes; a random salt is drawn when omitted or null
+  }],
+  "id": string
+}
+```
+
+```ts title="Response"
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "bytes": string  // hex, envelope
+  },
+  "id": string
+}
+```
+
+---
+
+<span class="badge badge--secondary" style={{float: "right", marginTop: "0.3rem", marginLeft: "0.3rem"}}>Android: TBD</span>
+
+#### `signer_decryptFrom`
+
+Decrypts an envelope that the holder of the given public key encrypted for the Deployment's encryption key. Supported curves: `p256`, `secp256k1`.
+
+```ts title="Request"
+{
+  "jsonrpc": "2.0",
+  "method": "signer_decryptFrom",
+  "params": [{
+    "curve": "p256" | "secp256k1",
+    "publicKey": string,  // hex, sender's 33-byte compressed public key
+    "bytes": string       // hex, envelope
   }],
   "id": string
 }
